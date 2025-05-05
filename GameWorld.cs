@@ -1,4 +1,5 @@
-﻿using Kaiju.ComponentPattern;
+﻿using Kaiju.Command;
+using Kaiju.ComponentPattern;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -33,12 +34,15 @@ namespace Kaiju
         public GameObject playerGo;
         public Player player;
 
+        private InputHandler inputHandler = InputHandler.Instance;
+
         public float DeltaTime { get; private set; }
         private GameWorld()
         {
             _graphics = new GraphicsDeviceManager(this);
-            _graphics.PreferredBackBufferHeight = 1080;
-            _graphics.PreferredBackBufferWidth = 1920;
+            _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            _graphics.ToggleFullScreen();
             Window.AllowUserResizing = true;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -55,6 +59,9 @@ namespace Kaiju
             {
                 gameObject.Awake();
             }
+            inputHandler.AddUpdateCommand(Keys.A, new MoveCommand(player, new Vector2(-1, 0)));
+            inputHandler.AddUpdateCommand(Keys.D, new MoveCommand(player, new Vector2(1, 0)));
+            inputHandler.AddButtonDownCommand(Keys.Space, new JumpCommand(player));
 
             base.Initialize();
         }
@@ -75,6 +82,7 @@ namespace Kaiju
                 Exit();
 
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            inputHandler.Execute();
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Update();
