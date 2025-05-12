@@ -96,7 +96,7 @@ namespace Kaiju
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, null);
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Draw(_spriteBatch);
