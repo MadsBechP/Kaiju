@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Kaiju
 {
@@ -34,9 +35,6 @@ namespace Kaiju
         public GameObject playerGo;
         public Player player;
 
-        public GameObject playerGo2;
-        public Player player2;
-
         private InputHandler inputHandler = InputHandler.Instance;
 
         public float DeltaTime { get; private set; }
@@ -58,12 +56,6 @@ namespace Kaiju
             playerGo.AddComponent<SpriteRenderer>();
             playerGo.AddComponent<Collider>();
             gameObjects.Add(playerGo);
-
-            playerGo2 = new GameObject();
-            player2 = playerGo2.AddComponent<Player>();
-            playerGo2.AddComponent<SpriteRenderer>();
-            playerGo2.AddComponent<Collider>();
-            gameObjects.Add(playerGo2);
 
             foreach (var gameObject in gameObjects)
             {
@@ -141,6 +133,7 @@ namespace Kaiju
                             {
                                 if (rects1.Rectangle.Intersects(rects2.Rectangle))
                                 {
+                                    Debug.WriteLine($"Collision with {go1} and {go2}");
                                     handledCollision = true;
                                     break;
                                 }
