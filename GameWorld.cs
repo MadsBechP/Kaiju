@@ -55,6 +55,10 @@ namespace Kaiju
             playerGo.AddComponent<SpriteRenderer>();
             gameObjects.Add(playerGo);
 
+            GameObject timerGo = new GameObject();
+            timerGo.AddComponent<Timer>();
+            gameObjects.Add(timerGo);
+
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Awake();
