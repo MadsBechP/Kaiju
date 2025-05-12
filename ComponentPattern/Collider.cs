@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,9 +71,12 @@ namespace Kaiju.ComponentPattern
 
         public void UpdatePixelCollider()
         {
+            Vector2 scale = gameObject.Transform.Scale;
+            bool isFlipped = sr.IsFlipped;
+
             for (int i = 0; i < pixelPerfectRectangles.Count; i++)
             {
-                pixelPerfectRectangles[i].UpdatePosition(gameObject, sr.Sprite.Width, sr.Sprite.Height);
+                pixelPerfectRectangles[i].UpdatePosition(gameObject, sr.Sprite.Width, sr.Sprite.Height, scale, isFlipped);
             }
         }
 
@@ -124,9 +128,26 @@ namespace Kaiju.ComponentPattern
             this.Y = y;
         }
 
-        public void UpdatePosition(GameObject gameObject, int width, int height)
+        public void UpdatePosition(GameObject gameObject, int width, int height, Vector2 scale, bool isFlipped)
         {
-            Rectangle = new Rectangle((int)gameObject.Transform.Position.X + X - width / 2, (int)gameObject.Transform.Position.Y + Y - width / 2, 1, 1);
+            int finalX = X;
+            if (isFlipped)
+            {
+                finalX = width - X - 1;
+            }
+
+            int scaledX = (int)(finalX * scale.X);
+            int scaledY = (int)(Y * scale.Y);
+
+            int scaledWidth = (int)(1 * scale.X);  // width of pixel scaled
+            int scaledHeight = (int)(1 * scale.Y); // height of pixel scaled
+
+            Rectangle = new Rectangle(
+                (int)(gameObject.Transform.Position.X + scaledX - (width * scale.X) / 2),
+                (int)(gameObject.Transform.Position.Y + scaledY - (height * scale.Y) / 2),
+                Math.Max(scaledWidth, 1),
+                Math.Max(scaledHeight, 1)
+            );
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Kaiju.ComponentPattern
         public override void Start()
         {
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
-            sr.SetSprite("Goji");
+            sr.SetSprite("goji");
             gameObject.Transform.Position = new Vector2(GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
             gameObject.Transform.Scale = new Vector2(0.2f, 0.2f);
             speed = 600;
@@ -47,11 +47,11 @@ namespace Kaiju.ComponentPattern
             gameObject.Transform.Translate(velocity * GameWorld.Instance.DeltaTime);
             if (velocity.X < 0 && grounded)
             {
-                sr.SpriteEffect = SpriteEffects.None;
+                sr.SetFlipHorizontal(false);
             }
             if (velocity.X > 0 && grounded)
             {
-                sr.SpriteEffect = SpriteEffects.FlipHorizontally;
+                sr.SetFlipHorizontal(true);
             }
         }
         public void Jump()
