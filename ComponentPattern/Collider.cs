@@ -22,11 +22,14 @@ namespace Kaiju.ComponentPattern
         {
             get
             {
-                return new Rectangle(
-                    (int)(gameObject.Transform.Position.X - sr.Sprite.Width / 2),
-                    (int)(gameObject.Transform.Position.Y - sr.Sprite.Height / 2),
-                    sr.Sprite.Width,
-                    sr.Sprite.Height);
+                float scaleX = gameObject.Transform.Scale.X;
+                float scaleY = gameObject.Transform.Scale.Y;
+                int scaledWidth = (int)(sr.Sprite.Width * scaleX);
+                int scaledHeight = (int)(sr.Sprite.Height * scaleY);
+                int x = (int)(gameObject.Transform.Position.X - scaledWidth / 2);
+                int y = (int)(gameObject.Transform.Position.Y - scaledHeight / 2);
+
+                return new Rectangle(x, y, scaledWidth, scaledHeight);
             }
         }
 
