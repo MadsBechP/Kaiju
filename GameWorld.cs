@@ -34,6 +34,9 @@ namespace Kaiju
         public GameObject playerGo;
         public Player player;
 
+        public GameObject playerGo2;
+        public Player player2;
+
         private InputHandler inputHandler = InputHandler.Instance;
 
         public float DeltaTime { get; private set; }
@@ -55,6 +58,12 @@ namespace Kaiju
             playerGo.AddComponent<SpriteRenderer>();
             playerGo.AddComponent<Collider>();
             gameObjects.Add(playerGo);
+
+            playerGo2 = new GameObject();
+            player2 = playerGo2.AddComponent<Player>();
+            playerGo2.AddComponent<SpriteRenderer>();
+            playerGo2.AddComponent<Collider>();
+            gameObjects.Add(playerGo2);
 
             foreach (var gameObject in gameObjects)
             {
@@ -89,6 +98,7 @@ namespace Kaiju
             {
                 gameObject.Update();
             }
+            CheckCollision();
             Cleanup();
 
             base.Update(gameTime);
@@ -107,14 +117,59 @@ namespace Kaiju
 
             base.Draw(gameTime);
         }
+
+        public void CheckCollision()
+        {
+            HashSet<(GameObject, GameObject)> handledCollisions = new();
+            foreach (GameObject go1 in gameObjects)
+            {
+                foreach (GameObject go2 in gameObjects)
+                {
+                    if (go1 == go2 || handledCollisions.Contains((go1,go2)))
+                    {
+                        continue;
+                    }
+                    Collider col1 = go1.GetComponent<Collider>() as Collider;
+                    Collider col2 = go2.GetComponent<Collider>() as Collider;
+
+                    if (col1 != null && col2 != null && col1.CollisionBox.Intersects(col2.CollisionBox))
+                    {
+                        bool handledCollision = false;
+                        foreach (RectangleData rects1 in col1.PixelPerfectRectangles)
+                        {
+                            foreach (RectangleData rects2 in col2.PixelPerfectRectangles)
+                            {
+                                if (rects1.Rectangle.Intersects(rects2.Rectangle))
+                                {
+                                    handledCollision = true;
+                                    break;
+                                }
+                            }
+                            if (handledCollision)
+                            {
+                                break;
+                            }
+                        }
+                        if (handledCollision)
+                        {
+                            go1.OnCollisionEnter(col2);
+                            handledCollisions.Add((go1, go2));
+                        }
+                    }
+                }
+            }
+        }
+
         public void Instantiate(GameObject gameObjectToInstantiate)
         {
             newGameObjects.Add(gameObjectToInstantiate);
         }
+
         public void Destroy(GameObject gameObjectToDestroy)
         {
             destroyedGameObjects.Add(gameObjectToDestroy);
         }
+
         private void Cleanup()
         {
             for (int i = 0; i < newGameObjects.Count; i++)

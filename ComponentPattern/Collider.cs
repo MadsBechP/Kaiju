@@ -15,6 +15,8 @@ namespace Kaiju.ComponentPattern
         private SpriteRenderer sr;
         private Texture2D pixel;
         private List<RectangleData> pixelPerfectRectangles = new();
+        public List<RectangleData> PixelPerfectRectangles { get => pixelPerfectRectangles; }
+
 
         public Collider(GameObject gameObject) : base(gameObject)
         {
