@@ -53,12 +53,14 @@ namespace Kaiju
             playerGo = new GameObject();
             player = playerGo.AddComponent<Player>();
             playerGo.AddComponent<SpriteRenderer>();
+            playerGo.AddComponent<Collider>();
             gameObjects.Add(playerGo);
 
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Awake();
             }
+
             inputHandler.AddUpdateCommand(Keys.A, new MoveCommand(player, new Vector2(-1, 0)));
             inputHandler.AddUpdateCommand(Keys.D, new MoveCommand(player, new Vector2(1, 0)));
             inputHandler.AddButtonDownCommand(Keys.Space, new JumpCommand(player));
