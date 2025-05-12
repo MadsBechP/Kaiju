@@ -57,11 +57,11 @@ namespace Kaiju.ComponentPattern
             gameObject.Transform.Translate(velocity * GameWorld.Instance.DeltaTime);
             if (velocity.X < 0 && grounded)
             {
-                sr.SetFlipHorizontal(false);
+                sr.SetFlipHorizontal(true);
             }
             if (velocity.X > 0 && grounded)
             {
-                sr.SetFlipHorizontal(true);
+                sr.SetFlipHorizontal(false);
             }
         }
         public void Jump()

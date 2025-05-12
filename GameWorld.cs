@@ -55,6 +55,8 @@ namespace Kaiju
             player = playerGo.AddComponent<Player>();
             playerGo.AddComponent<SpriteRenderer>();
             playerGo.AddComponent<Collider>();
+            Animator animator = playerGo.AddComponent<Animator>();
+
             gameObjects.Add(playerGo);
 
             foreach (var gameObject in gameObjects)
@@ -117,7 +119,7 @@ namespace Kaiju
             {
                 foreach (GameObject go2 in gameObjects)
                 {
-                    if (go1 == go2 || handledCollisions.Contains((go1,go2)))
+                    if (go1 == go2 || handledCollisions.Contains((go1, go2)))
                     {
                         continue;
                     }
@@ -180,6 +182,24 @@ namespace Kaiju
             }
             destroyedGameObjects.Clear();
             newGameObjects.Clear();
+        }
+
+        private Animation BuildAnimation(string name, string spriteSheetName, int frameWidth, int frameHeight, int frameCount, float fps)
+        {
+            Texture2D spriteSheet = Content.Load<Texture2D>(spriteSheetName);
+
+            Rectangle[] frames = new Rectangle[frameCount];
+            int sheetWidth = spriteSheet.Width;
+            int columns = sheetWidth / frameWidth;
+
+            for (int i = 0; i < frameCount; i++)
+            {
+                int x = (i % columns) * frameWidth;
+                int y = (i / columns) * frameHeight;
+                frames[i] = new Rectangle(x, y, frameWidth, frameHeight);
+            }
+
+            return new Animation(name, spriteSheet, frames, fps);
         }
     }
 }
