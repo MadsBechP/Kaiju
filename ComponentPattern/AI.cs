@@ -16,7 +16,7 @@ namespace Kaiju.ComponentPattern
 
         public AI(GameObject gameObject) : base(gameObject)
         {
-            startPos = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+            
         }
 
         public override void Start()
@@ -30,18 +30,16 @@ namespace Kaiju.ComponentPattern
             gameObject.Transform.Scale = new Vector2(2f, 2f);
 
 
-            if (this == GameWorld.Instance.player1)
+            if (this.gameObject == GameWorld.Instance.player1Go)
             {
                 opponent = GameWorld.Instance.player2;
 
             }
-            if (this == GameWorld.Instance.player2)
+            if (this.gameObject == GameWorld.Instance.player2Go)
             {
                 opponent = GameWorld.Instance.player1;
                 sr.SpriteEffect = SpriteEffects.FlipHorizontally;
             }
-            
-            gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3)*2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
         }
         public override void Update()
         {
@@ -58,6 +56,10 @@ namespace Kaiju.ComponentPattern
             {
                 jump.Execute();
             }
+        }
+        public override void OnCollisionEnter(Collider collider)
+        {
+            gameObject.Transform.Position = new Vector2(GameWorld.Instance.Graphics.PreferredBackBufferWidth/2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
         }
     }
 }
