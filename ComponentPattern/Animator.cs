@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 
 namespace DesignPatterns.ComponentPattern
 {
@@ -34,6 +35,7 @@ namespace DesignPatterns.ComponentPattern
                 CurrentIndex = 0;
             }
             spriteRenderer.Sprite = currentAnimation.Sprites[CurrentIndex];
+            spriteRenderer.Source = new Rectangle(0, 0, spriteRenderer.Sprite.Width, spriteRenderer.Sprite.Height);
         }
 
         public void AddAnimation(Animation animation)

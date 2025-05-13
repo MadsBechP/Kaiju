@@ -58,6 +58,18 @@ namespace Kaiju
             playerGo.AddComponent<Collider>();
             Animator animator = playerGo.AddComponent<Animator>();
 
+            animator.AddAnimation(BuildAnimation("Idle", new string[] { "GZ_Sprites\\GZ_Walk\\GZ_Walk_01" }));
+
+            animator.AddAnimation(BuildAnimation("Walk", new string[] {
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_01",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_02",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_03",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_04",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_05",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_06",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_07",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_08"}));
+
             gameObjects.Add(playerGo);
 
             foreach (var gameObject in gameObjects)
@@ -103,7 +115,7 @@ namespace Kaiju
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, null);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, null);
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Draw(_spriteBatch);

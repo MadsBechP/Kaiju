@@ -26,6 +26,10 @@ namespace Kaiju.ComponentPattern
         public void SetSprite(string spriteName)
         {
             Sprite = GameWorld.Instance.Content.Load<Texture2D>(spriteName);
+            if (Source == Rectangle.Empty)
+            {
+                Source = new Rectangle(0, 0, Sprite.Width, Sprite.Height);
+            }
         }
         public override void Start()
         {
