@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,10 +18,12 @@ namespace Kaiju.ComponentPattern
         private Texture2D previousSprite;
         private List<RectangleData> pixelPerfectRectangles = new();
         public List<RectangleData> PixelPerfectRectangles { get => pixelPerfectRectangles; }
+        private Dictionary<Texture2D, List<RectangleData>> colliderChache = new();
 
 
         public Collider(GameObject gameObject) : base(gameObject)
         {
+
         }
 
         public Rectangle CollisionBox
@@ -42,7 +45,6 @@ namespace Kaiju.ComponentPattern
         {
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
             pixel = GameWorld.Instance.Content.Load<Texture2D>("pixel");
-            CreateRectangles();
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -59,8 +61,17 @@ namespace Kaiju.ComponentPattern
             if (sr.Sprite != previousSprite)
             {
                 previousSprite = sr.Sprite;
-                pixelPerfectRectangles.Clear();
-                CreateRectangles();
+                if (!colliderChache.TryGetValue(sr.Sprite, out pixelPerfectRectangles))
+                {
+                    Debug.WriteLine("Cache missing — generating new pixel data");
+                    pixelPerfectRectangles = CreateRectangles(sr.Sprite);
+                    colliderChache[sr.Sprite] = pixelPerfectRectangles;
+                }
+                else
+                {
+                    Debug.WriteLine("Cache hit");
+                }
+                pixelPerfectRectangles = pixelPerfectRectangles.Select(p => new RectangleData(p.X, p.Y)).ToList();
             }
 
             UpdatePixelCollider();
@@ -90,14 +101,15 @@ namespace Kaiju.ComponentPattern
             }
         }
 
-        private void CreateRectangles()
+        private List<RectangleData> CreateRectangles(Texture2D texture)
         {
+            List<RectangleData> rectangles = new();
             List<Color[]> lines = new();
 
-            for (int y = 0; y < sr.Sprite.Height; y++)
+            for (int y = 0; y < texture.Height; y++)
             {
-                Color[] colors = new Color[sr.Sprite.Width];
-                sr.Sprite.GetData(0, new Rectangle(0, y, sr.Sprite.Width, 1), colors, 0, sr.Sprite.Width);
+                Color[] colors = new Color[texture.Width];
+                texture.GetData(0, new Rectangle(0, y, texture.Width, 1), colors, 0, texture.Width);
                 lines.Add(colors);
             }
 
@@ -115,12 +127,13 @@ namespace Kaiju.ComponentPattern
                             || (y > 0 && lines[y - 1][x].A == 0)
                             || (y < lines.Count - 1 && lines[y + 1][x].A == 0))
                         {
-                            RectangleData rd = new(x, y);
-                            pixelPerfectRectangles.Add(rd);
+                            rectangles.Add(new RectangleData(x, y));
                         }
                     }
                 }
             }
+
+            return rectangles;
         }
     }
 
