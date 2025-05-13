@@ -34,6 +34,7 @@ namespace Kaiju
         public GameObject playerGo;
         public Player player;
 
+       
         private InputHandler inputHandler = InputHandler.Instance;
 
         public float DeltaTime { get; private set; }
@@ -58,6 +59,11 @@ namespace Kaiju
             GameObject timerGo = new GameObject();
             timerGo.AddComponent<Timer>();
             gameObjects.Add(timerGo);
+
+            GameObject damageMeterGo = new GameObject();
+            damageMeterGo.AddComponent<DamageMeter>();
+            gameObjects.Add(damageMeterGo);
+                        
 
             foreach (var gameObject in gameObjects)
             {
