@@ -38,7 +38,6 @@ namespace Kaiju.ComponentPattern
             if (this.gameObject == GameWorld.Instance.player2Go)
             {
                 opponent = GameWorld.Instance.player1;
-                sr.SpriteEffect = SpriteEffects.FlipHorizontally;
             }
         }
         public override void Update()

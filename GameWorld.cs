@@ -59,15 +59,15 @@ namespace Kaiju
             player1Go.AddComponent<SpriteRenderer>();
             player1Go.AddComponent<Collider>();
             player1Go.AddComponent<Animator>();
-            player1Go.AddComponent<Godzilla>();
+            player1.chr = player1Go.AddComponent<Godzilla>();
             gameObjects.Add(player1Go);
 
             player2Go = new GameObject();
-            player2 = player2Go.AddComponent<Player>();
+            player2 = player2Go.AddComponent<AI>();
             player2Go.AddComponent<SpriteRenderer>();
             player2Go.AddComponent<Collider>();
             player2Go.AddComponent<Animator>();
-            player2Go.AddComponent<Godzilla>();
+            player2.chr = player2Go.AddComponent<Gigan>();
             gameObjects.Add(player2Go);
 
             foreach (var gameObject in gameObjects)

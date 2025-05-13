@@ -35,12 +35,16 @@ namespace Kaiju.ComponentPattern.Characters
                 InputHandler.Instance.AddUpdateCommand(Keys.D, new MoveCommand(GameWorld.Instance.player1, new Vector2(1, 0)));
                 InputHandler.Instance.AddButtonDownCommand(Keys.W, new JumpCommand(GameWorld.Instance.player1));
             }
-            if (this.gameObject == GameWorld.Instance.player2Go)
+            else if (this.gameObject == GameWorld.Instance.player2Go)
             {
                 InputHandler.Instance.AddUpdateCommand(Keys.Left, new MoveCommand(GameWorld.Instance.player2, new Vector2(-1, 0)));
                 InputHandler.Instance.AddUpdateCommand(Keys.Right, new MoveCommand(GameWorld.Instance.player2, new Vector2(1, 0)));
                 InputHandler.Instance.AddButtonDownCommand(Keys.Up, new JumpCommand(GameWorld.Instance.player2));
             }
+        }
+        public override void Flip(bool x)
+        {
+            sr.SetFlipHorizontal(x);
         }
     }
 }

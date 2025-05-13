@@ -1,4 +1,5 @@
 ﻿using DesignPatterns.ComponentPattern;
+using Kaiju.ComponentPattern.Characters;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX.Direct3D9;
@@ -14,6 +15,8 @@ namespace Kaiju.ComponentPattern
 
         protected SpriteRenderer sr;
         private Animator animator;
+        public Character chr;
+        public bool facingRight;
 
 
         public Player(GameObject gameObject) : base(gameObject)
@@ -25,6 +28,7 @@ namespace Kaiju.ComponentPattern
         {
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
             animator = gameObject.GetComponent<Animator>() as Animator;
+            
             if (gameObject == GameWorld.Instance.player1Go)
             {
                 gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
@@ -75,14 +79,20 @@ namespace Kaiju.ComponentPattern
 
             velocity *= speed;
             gameObject.Transform.Translate(velocity * GameWorld.Instance.DeltaTime);
+
             if (velocity.X < 0 && grounded)
             {
-                sr.SetFlipHorizontal(true);
+                chr.Flip(true);
+                facingRight = true;
             }
             if (velocity.X > 0 && grounded)
             {
-                sr.SetFlipHorizontal(false);
+                chr.Flip(false);
+                facingRight = false;
             }
+
+
+
 
             animator.PlayAnimation("Walk");
         }
