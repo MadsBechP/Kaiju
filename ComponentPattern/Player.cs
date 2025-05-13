@@ -7,10 +7,12 @@ namespace Kaiju.ComponentPattern
     public class Player : Component
     {
         private float speed;
-        private SpriteRenderer sr;
+        protected SpriteRenderer sr;
         private Vector2 yVelocity;
         private bool grounded = false;
-        byte animationIndex;
+        private byte animationIndex;
+        protected Vector2 startPos = new Vector2(GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+
         public Player(GameObject gameObject) : base(gameObject)
         {
 
@@ -20,8 +22,8 @@ namespace Kaiju.ComponentPattern
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
             sr.Source = new Rectangle(27 + (72*animationIndex), 0, 72, 63);
             sr.SetSprite("Goji");
-            gameObject.Transform.Scale = new Vector2(3f, 3f);
-            gameObject.Transform.Position = new Vector2(GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+            gameObject.Transform.Scale = new Vector2(4f, 4f);
+            gameObject.Transform.Position = startPos;
             speed = 600;
         }
         public override void Update()

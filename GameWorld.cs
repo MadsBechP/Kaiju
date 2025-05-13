@@ -31,8 +31,10 @@ namespace Kaiju
         private List<GameObject> newGameObjects = new List<GameObject>();
         private List<GameObject> destroyedGameObjects = new List<GameObject>();
 
-        public GameObject playerGo;
-        public Player player;
+        public GameObject player1Go;
+        public Player player1;
+        public GameObject player2Go;
+        public Player player2;
 
         private InputHandler inputHandler = InputHandler.Instance;
 
@@ -50,18 +52,26 @@ namespace Kaiju
 
         protected override void Initialize()
         {
-            playerGo = new GameObject();
-            player = playerGo.AddComponent<Player>();
-            playerGo.AddComponent<SpriteRenderer>();
-            gameObjects.Add(playerGo);
+            player1Go = new GameObject();
+            player1 = player1Go.AddComponent<Player>();
+            player1Go.AddComponent<SpriteRenderer>();
+            gameObjects.Add(player1Go);
+
+            player2Go = new GameObject();
+            player2 = player2Go.AddComponent<AI>();
+            player2Go.AddComponent<SpriteRenderer>();
+            gameObjects.Add(player2Go);
 
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Awake();
             }
-            inputHandler.AddUpdateCommand(Keys.A, new MoveCommand(player, new Vector2(-1, 0)));
-            inputHandler.AddUpdateCommand(Keys.D, new MoveCommand(player, new Vector2(1, 0)));
-            inputHandler.AddButtonDownCommand(Keys.Space, new JumpCommand(player));
+            inputHandler.AddUpdateCommand(Keys.A, new MoveCommand(player1, new Vector2(-1, 0)));
+            inputHandler.AddUpdateCommand(Keys.D, new MoveCommand(player1, new Vector2(1, 0)));
+            inputHandler.AddButtonDownCommand(Keys.W, new JumpCommand(player1));
+            inputHandler.AddUpdateCommand(Keys.Left, new MoveCommand(player2, new Vector2(-1, 0)));
+            inputHandler.AddUpdateCommand(Keys.Right, new MoveCommand(player2, new Vector2(1, 0)));
+            inputHandler.AddButtonDownCommand(Keys.Up, new JumpCommand(player2));
 
             base.Initialize();
         }
