@@ -1,9 +1,11 @@
-﻿using Kaiju.Command;
+﻿using DesignPatterns.ComponentPattern;
+using Kaiju.Command;
 using Kaiju.ComponentPattern;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Kaiju
 {
@@ -55,12 +57,29 @@ namespace Kaiju
             player1Go = new GameObject();
             player1 = player1Go.AddComponent<Player>();
             player1Go.AddComponent<SpriteRenderer>();
+            playerGo.AddComponent<Collider>();
             gameObjects.Add(player1Go);
+            Animator animator = playerGo.AddComponent<Animator>();
 
             player2Go = new GameObject();
             player2 = player2Go.AddComponent<AI>();
             player2Go.AddComponent<SpriteRenderer>();
+            player2Go.AddComponent<Collider>();
             gameObjects.Add(player2Go);
+            
+            animator.AddAnimation(BuildAnimation("Idle", new string[] { "GZ_Sprites\\GZ_Walk\\GZ_Walk_01" }));
+            animator.AddAnimation(BuildAnimation("Walk", new string[] {
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_01",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_02",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_03",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_04",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_05",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_06",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_07",
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_08"}));
+
+            
+
 
             foreach (var gameObject in gameObjects)
             {
@@ -97,6 +116,7 @@ namespace Kaiju
             {
                 gameObject.Update();
             }
+            CheckCollision();
             Cleanup();
 
             base.Update(gameTime);
@@ -106,7 +126,7 @@ namespace Kaiju
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, null);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, null);
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Draw(_spriteBatch);
@@ -115,14 +135,60 @@ namespace Kaiju
 
             base.Draw(gameTime);
         }
+
+        public void CheckCollision()
+        {
+            HashSet<(GameObject, GameObject)> handledCollisions = new();
+            foreach (GameObject go1 in gameObjects)
+            {
+                foreach (GameObject go2 in gameObjects)
+                {
+                    if (go1 == go2 || handledCollisions.Contains((go1, go2)))
+                    {
+                        continue;
+                    }
+                    Collider col1 = go1.GetComponent<Collider>() as Collider;
+                    Collider col2 = go2.GetComponent<Collider>() as Collider;
+
+                    if (col1 != null && col2 != null && col1.CollisionBox.Intersects(col2.CollisionBox))
+                    {
+                        bool handledCollision = false;
+                        foreach (RectangleData rects1 in col1.PixelPerfectRectangles)
+                        {
+                            foreach (RectangleData rects2 in col2.PixelPerfectRectangles)
+                            {
+                                if (rects1.Rectangle.Intersects(rects2.Rectangle))
+                                {
+                                    Debug.WriteLine($"Collision with {go1} and {go2}");
+                                    handledCollision = true;
+                                    break;
+                                }
+                            }
+                            if (handledCollision)
+                            {
+                                break;
+                            }
+                        }
+                        if (handledCollision)
+                        {
+                            go1.OnCollisionEnter(col2);
+                            handledCollisions.Add((go1, go2));
+                        }
+                    }
+                }
+            }
+        }
+
         public void Instantiate(GameObject gameObjectToInstantiate)
         {
             newGameObjects.Add(gameObjectToInstantiate);
         }
+
         public void Destroy(GameObject gameObjectToDestroy)
         {
             destroyedGameObjects.Add(gameObjectToDestroy);
         }
+
         private void Cleanup()
         {
             for (int i = 0; i < newGameObjects.Count; i++)
@@ -140,6 +206,20 @@ namespace Kaiju
             }
             destroyedGameObjects.Clear();
             newGameObjects.Clear();
+        }
+
+        private Animation BuildAnimation(string animationName, string[] spriteNames)
+        {
+            Texture2D[] sprites = new Texture2D[spriteNames.Length];
+
+            for (int i = 0; i < sprites.Length; i++)
+            {
+                sprites[i] = GameWorld.Instance.Content.Load<Texture2D>(spriteNames[i]);
+            }
+
+            Animation animation = new Animation(animationName, sprites, 5);
+
+            return animation;
         }
     }
 }

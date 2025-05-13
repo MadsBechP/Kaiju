@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using DesignPatterns.ComponentPattern;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX.Direct3D9;
 
@@ -10,6 +11,9 @@ namespace Kaiju.ComponentPattern
         protected SpriteRenderer sr;
         private Vector2 yVelocity;
         private bool grounded = false;
+        private Animator animator;
+        private Vector2 currentVelocity = Vector2.Zero;
+
         private byte animationIndex;
         protected Vector2 startPos = new Vector2(GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
 
@@ -17,18 +21,19 @@ namespace Kaiju.ComponentPattern
         {
 
         }
+
         public override void Start()
         {
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
-            sr.Source = new Rectangle(27 + (72*animationIndex), 0, 72, 63);
-            sr.SetSprite("Goji");
-            gameObject.Transform.Scale = new Vector2(4f, 4f);
+            animator = gameObject.GetComponent<Animator>() as Animator;
+            sr.SetSprite("GZ_Sprites\\GZ_Walk\\GZ_Walk_01");
+            gameObject.Transform.Scale = new Vector2(3f, 3f);
             gameObject.Transform.Position = startPos;
             speed = 600;
         }
+
         public override void Update()
         {
-            
             gameObject.Transform.Translate(yVelocity * GameWorld.Instance.DeltaTime);
             if (gameObject.Transform.Position.Y < GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - (sr.Origin.Y * gameObject.Transform.Scale.Y))
             {
@@ -41,15 +46,24 @@ namespace Kaiju.ComponentPattern
                 yVelocity = Vector2.Zero;
                 grounded = true;
             }
+
+            if (currentVelocity == Vector2.Zero && grounded)
+            {
+                animator.PlayAnimation("Idle");
+            }
+
+            currentVelocity = Vector2.Zero;
         }
+
         public void Move(Vector2 velocity)
         {
-            sr.Source = new Rectangle(27 + (72 * animationIndex), 0, 72, 63);
-            animationIndex++;
-            if (animationIndex == 8)
+            if (velocity == Vector2.Zero)
             {
-                animationIndex = 0;
+                return;
             }
+
+            currentVelocity = velocity;
+
             if (velocity != Vector2.Zero)
             {
                 velocity.Normalize();
@@ -59,13 +73,16 @@ namespace Kaiju.ComponentPattern
             gameObject.Transform.Translate(velocity * GameWorld.Instance.DeltaTime);
             if (velocity.X < 0 && grounded)
             {
-                sr.SpriteEffect = SpriteEffects.FlipHorizontally;
+                sr.SetFlipHorizontal(true);
             }
             if (velocity.X > 0 && grounded)
             {
-                sr.SpriteEffect = SpriteEffects.None;
+                sr.SetFlipHorizontal(false);
             }
+
+            animator.PlayAnimation("Walk");
         }
+
         public void Jump()
         {
             if (grounded)

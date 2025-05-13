@@ -25,5 +25,10 @@ namespace Kaiju.ComponentPattern
         {
 
         }
+
+        public virtual void OnCollisionEnter(Collider collider)
+        {
+
+        }
     }
 }
