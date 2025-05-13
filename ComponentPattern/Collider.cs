@@ -14,6 +14,7 @@ namespace Kaiju.ComponentPattern
     {
         private SpriteRenderer sr;
         private Texture2D pixel;
+        private Texture2D previousSprite;
         private List<RectangleData> pixelPerfectRectangles = new();
         public List<RectangleData> PixelPerfectRectangles { get => pixelPerfectRectangles; }
 
@@ -55,6 +56,13 @@ namespace Kaiju.ComponentPattern
 
         public override void Update()
         {
+            if (sr.Sprite != previousSprite)
+            {
+                previousSprite = sr.Sprite;
+                pixelPerfectRectangles.Clear();
+                CreateRectangles();
+            }
+
             UpdatePixelCollider();
         }
 
