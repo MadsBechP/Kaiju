@@ -49,11 +49,13 @@ namespace Kaiju.ComponentPattern
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+#if DEBUG
             foreach (var rect in pixelPerfectRectangles)
             {
                 DrawRectangle(rect.Rectangle, spriteBatch);
             }
             DrawRectangle(CollisionBox, spriteBatch);
+#endif
         }
 
         public override void Update()
@@ -63,14 +65,10 @@ namespace Kaiju.ComponentPattern
                 previousSprite = sr.Sprite;
                 if (!colliderChache.TryGetValue(sr.Sprite, out pixelPerfectRectangles))
                 {
-                    Debug.WriteLine("Cache missing — generating new pixel data");
                     pixelPerfectRectangles = CreateRectangles(sr.Sprite);
                     colliderChache[sr.Sprite] = pixelPerfectRectangles;
                 }
-                else
-                {
-                    Debug.WriteLine("Cache hit");
-                }
+
                 pixelPerfectRectangles = pixelPerfectRectangles.Select(p => new RectangleData(p.X, p.Y)).ToList();
             }
 
