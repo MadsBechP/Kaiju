@@ -1,4 +1,5 @@
-﻿using Kaiju.Command;
+﻿using DesignPatterns.ComponentPattern;
+using Kaiju.Command;
 using Kaiju.ComponentPattern;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -184,22 +185,18 @@ namespace Kaiju
             newGameObjects.Clear();
         }
 
-        private Animation BuildAnimation(string name, string spriteSheetName, int frameWidth, int frameHeight, int frameCount, float fps)
+        private Animation BuildAnimation(string animationName, string[] spriteNames)
         {
-            Texture2D spriteSheet = Content.Load<Texture2D>(spriteSheetName);
+            Texture2D[] sprites = new Texture2D[spriteNames.Length];
 
-            Rectangle[] frames = new Rectangle[frameCount];
-            int sheetWidth = spriteSheet.Width;
-            int columns = sheetWidth / frameWidth;
-
-            for (int i = 0; i < frameCount; i++)
+            for (int i = 0; i < sprites.Length; i++)
             {
-                int x = (i % columns) * frameWidth;
-                int y = (i / columns) * frameHeight;
-                frames[i] = new Rectangle(x, y, frameWidth, frameHeight);
+                sprites[i] = GameWorld.Instance.Content.Load<Texture2D>(spriteNames[i]);
             }
 
-            return new Animation(name, spriteSheet, frames, fps);
+            Animation animation = new Animation(animationName, sprites, 5);
+
+            return animation;
         }
     }
 }
