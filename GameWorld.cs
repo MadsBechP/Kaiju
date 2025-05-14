@@ -1,6 +1,7 @@
 ﻿using DesignPatterns.ComponentPattern;
 using Kaiju.Command;
 using Kaiju.ComponentPattern;
+using Kaiju.ComponentPattern.Characters;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -33,10 +34,11 @@ namespace Kaiju
         private List<GameObject> newGameObjects = new List<GameObject>();
         private List<GameObject> destroyedGameObjects = new List<GameObject>();
 
-        public GameObject playerGo;
-        public Player player;
+        public GameObject player1Go;
+        public Player player1;
+        public GameObject player2Go;
+        public Player player2;
 
-        private InputHandler inputHandler = InputHandler.Instance;
 
         public float DeltaTime { get; private set; }
         private GameWorld()
@@ -52,34 +54,26 @@ namespace Kaiju
 
         protected override void Initialize()
         {
-            playerGo = new GameObject();
-            player = playerGo.AddComponent<Player>();
-            playerGo.AddComponent<SpriteRenderer>();
-            playerGo.AddComponent<Collider>();
-            Animator animator = playerGo.AddComponent<Animator>();
+            player1Go = new GameObject();
+            player1 = player1Go.AddComponent<Player>();
+            player1Go.AddComponent<SpriteRenderer>();
+            player1Go.AddComponent<Collider>();
+            player1Go.AddComponent<Animator>();
+            player1.chr = player1Go.AddComponent<Godzilla>();
+            gameObjects.Add(player1Go);
 
-            animator.AddAnimation(BuildAnimation("Idle", new string[] { "GZ_Sprites\\GZ_Walk\\GZ_Walk_01" }));
-
-            animator.AddAnimation(BuildAnimation("Walk", new string[] {
-                "GZ_Sprites\\GZ_Walk\\GZ_Walk_01",
-                "GZ_Sprites\\GZ_Walk\\GZ_Walk_02",
-                "GZ_Sprites\\GZ_Walk\\GZ_Walk_03",
-                "GZ_Sprites\\GZ_Walk\\GZ_Walk_04",
-                "GZ_Sprites\\GZ_Walk\\GZ_Walk_05",
-                "GZ_Sprites\\GZ_Walk\\GZ_Walk_06",
-                "GZ_Sprites\\GZ_Walk\\GZ_Walk_07",
-                "GZ_Sprites\\GZ_Walk\\GZ_Walk_08"}));
-
-            gameObjects.Add(playerGo);
+            player2Go = new GameObject();
+            player2 = player2Go.AddComponent<AI>();
+            player2Go.AddComponent<SpriteRenderer>();
+            player2Go.AddComponent<Collider>();
+            player2Go.AddComponent<Animator>();
+            player2.chr = player2Go.AddComponent<Gigan>();
+            gameObjects.Add(player2Go);
 
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Awake();
             }
-
-            inputHandler.AddUpdateCommand(Keys.A, new MoveCommand(player, new Vector2(-1, 0)));
-            inputHandler.AddUpdateCommand(Keys.D, new MoveCommand(player, new Vector2(1, 0)));
-            inputHandler.AddButtonDownCommand(Keys.Space, new JumpCommand(player));
 
             base.Initialize();
         }
@@ -100,7 +94,7 @@ namespace Kaiju
                 Exit();
 
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            inputHandler.Execute();
+            InputHandler.Instance.Execute();
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Update();
@@ -197,7 +191,7 @@ namespace Kaiju
             newGameObjects.Clear();
         }
 
-        private Animation BuildAnimation(string animationName, string[] spriteNames)
+        public Animation BuildAnimation(string animationName, string[] spriteNames)
         {
             Texture2D[] sprites = new Texture2D[spriteNames.Length];
 
