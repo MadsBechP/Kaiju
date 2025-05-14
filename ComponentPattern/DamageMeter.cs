@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Kaiju.Observer;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Kaiju.ComponentPattern
 {
-    public class DamageMeter : Component
+    public class DamageMeter : Component, IObserver
     {
         private SpriteFont damageFont;
         private SpriteFont playerNameFont;
@@ -16,7 +17,7 @@ namespace Kaiju.ComponentPattern
         private Texture2D profileTexture;
         private float scale = 1.4f;
 
-        private string damageText = "00%";
+        private string damageText = "";
         private string playerName;
         private int damageTaken;
 
@@ -27,7 +28,8 @@ namespace Kaiju.ComponentPattern
         
         
         public DamageMeter(GameObject gameObject) : base(gameObject)
-        {            
+        {
+            GameWorld.Instance.Attach(this); 
         }
         
         public void Setup(string playerName, Texture2D profileTexture, Vector2 damageFontPos, Vector2 namePos, Vector2 hudPos, Vector2 profilePos)
@@ -46,11 +48,11 @@ namespace Kaiju.ComponentPattern
             playerNameFont = GameWorld.Instance.Content.Load<SpriteFont>("playerNameFont");
             playerHUD = GameWorld.Instance.Content.Load<Texture2D>("playerHUD");
         }
-        public override void Update()
-        {
-            base.Update();
+        //public override void Update()
+        //{
+        //    base.Update();
             
-        }
+        //}
         public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(playerHUD, hudPos, Color.White);
@@ -68,5 +70,10 @@ namespace Kaiju.ComponentPattern
 
         }
 
+        public void Updated()
+        {
+            damageTaken++;
+            damageText = $"{damageTaken:D2}%";
+        }
     }
 }

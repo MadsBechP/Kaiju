@@ -1,5 +1,6 @@
 ﻿using Kaiju.Command;
 using Kaiju.ComponentPattern;
+using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -7,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Kaiju
 {
-    public class GameWorld : Game
+    public class GameWorld : Game, ISubject
     {
         private static GameWorld instance;
 
@@ -104,6 +105,8 @@ namespace Kaiju
             gameObjects.Add(playerDamageMeterGo);
             AIDamageMeterGo.Awake();
             playerDamageMeterGo.Awake();
+            AIDamageMeter.Updated();
+            playerDamageMeter.Updated();
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -168,6 +171,25 @@ namespace Kaiju
             }
             destroyedGameObjects.Clear();
             newGameObjects.Clear();
+        }
+
+        private List<IObserver> observers = new List<IObserver>();
+        public void Attach(IObserver observer)
+        {
+            observers.Add(observer);
+        }
+
+        public void Detach(IObserver observer)
+        {
+            observers.Remove(observer);
+        }
+
+        public void Notify()
+        {
+            foreach (IObserver observer in observers)
+            {
+                observer.Updated();
+            }
         }
     }
 }
