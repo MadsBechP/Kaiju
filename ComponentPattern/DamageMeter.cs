@@ -45,7 +45,6 @@ namespace Kaiju.ComponentPattern
             damageFont = GameWorld.Instance.Content.Load<SpriteFont>("DamageFont");
             playerNameFont = GameWorld.Instance.Content.Load<SpriteFont>("playerNameFont");
             playerHUD = GameWorld.Instance.Content.Load<Texture2D>("playerHUD");
-            //profileTexture = GameWorld.Instance.Content.Load<Texture2D>("GZProfile");
         }
         public override void Update()
         {
@@ -69,10 +68,5 @@ namespace Kaiju.ComponentPattern
 
         }
 
-        public void TakeDamage()
-        {
-            damageTaken++;
-            damageText = $"{damageTaken}%";
-        }
     }
 }

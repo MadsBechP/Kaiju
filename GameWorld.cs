@@ -81,10 +81,10 @@ namespace Kaiju
             playerDamageMeter.Setup(
                 "GZ",
                 playerProfile,
-                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) - 750, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 185), // damageFontPos
-                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) - 735, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 80), // namePos
-                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) - 1000, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 250), // hudPos
-                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) - 950, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 200) // profilePos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 750, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 735, Graphics.PreferredBackBufferHeight - 80), // namePos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 1000,Graphics.PreferredBackBufferHeight - 250), // hudPos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 950, Graphics.PreferredBackBufferHeight - 200) // profilePos
                );
 
             var AIProfile = Content.Load<Texture2D>("GZProfile");
@@ -94,10 +94,10 @@ namespace Kaiju
             AIDamageMeter.Setup(
                 "AI-GZ",
                 AIProfile,
-                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) + 790, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 185), // damageFontPos
-                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) + 780, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 80), // namePos
-                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) + 550, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 250), // hudPos
-                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) + 600, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 200) // profilePos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 790, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 780, Graphics.PreferredBackBufferHeight - 80), // namePos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 550, Graphics.PreferredBackBufferHeight - 250), // hudPos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 600, Graphics.PreferredBackBufferHeight - 200) // profilePos
                );
 
             gameObjects.Add(AIDamageMeterGo);
