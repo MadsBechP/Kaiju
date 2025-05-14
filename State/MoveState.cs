@@ -7,12 +7,15 @@ using System.Threading.Tasks;
 
 namespace Kaiju.State
 {
-    public class MoveState : IState<Player>
+    public class MoveState : IState<AI>
     {
+        public AI parrent;
+        public Player player;
 
-        public void Enter(Task parrent)
+        public void Enter(AI parrent)
         {
-            
+            this.parrent = parrent;
+            player = GameWorld.Instance.player1;
         }
 
         public void Execute()
