@@ -58,7 +58,12 @@ namespace Kaiju.ComponentPattern
         }
         public override void OnCollisionEnter(Collider collider)
         {
-            gameObject.Transform.Position = new Vector2(GameWorld.Instance.Graphics.PreferredBackBufferWidth/2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+            if (collider.isAttack)
+            {
+                gameObject.Transform.Position = new Vector2(GameWorld.Instance.Graphics.PreferredBackBufferWidth/2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+            }
+
+
         }
     }
 }

@@ -20,24 +20,45 @@ namespace Kaiju.ComponentPattern
         public List<RectangleData> PixelPerfectRectangles { get => pixelPerfectRectangles; }
         private Dictionary<Texture2D, List<RectangleData>> colliderChache = new();
 
+        public bool isAttack;
+        private float currentTime;
+        private float maxTime;
+        private Rectangle position;
+        public Player Owner { get; set; }
+
 
         public Collider(GameObject gameObject) : base(gameObject)
         {
 
+        }
+        public Collider(GameObject gameObject, float maxTime, Rectangle position, Player owner) : base(gameObject)
+        {
+            this.isAttack = true;
+            this.maxTime = maxTime;
+            this.position = position;
+            this.Owner = owner;
         }
 
         public Rectangle CollisionBox
         {
             get
             {
-                float scaleX = gameObject.Transform.Scale.X;
-                float scaleY = gameObject.Transform.Scale.Y;
-                int scaledWidth = (int)(sr.Sprite.Width * scaleX);
-                int scaledHeight = (int)(sr.Sprite.Height * scaleY);
-                int x = (int)(gameObject.Transform.Position.X - scaledWidth / 2);
-                int y = (int)(gameObject.Transform.Position.Y - scaledHeight / 2);
+                if (isAttack)
+                {
+                    return position;
+                }
+                else
+                {
+                    float scaleX = gameObject.Transform.Scale.X;
+                    float scaleY = gameObject.Transform.Scale.Y;
+                    int scaledWidth = (int)(sr.Sprite.Width * scaleX);
+                    int scaledHeight = (int)(sr.Sprite.Height * scaleY);
+                    int x = (int)(gameObject.Transform.Position.X - scaledWidth / 2);
+                    int y = (int)(gameObject.Transform.Position.Y - scaledHeight / 2);
 
-                return new Rectangle(x, y, scaledWidth, scaledHeight);
+                    return new Rectangle(x, y, scaledWidth, scaledHeight);
+                }
+                   
             }
         }
 
@@ -60,19 +81,30 @@ namespace Kaiju.ComponentPattern
 
         public override void Update()
         {
-            if (sr.Sprite != previousSprite)
+            if (!isAttack)
             {
-                previousSprite = sr.Sprite;
-                if (!colliderChache.TryGetValue(sr.Sprite, out pixelPerfectRectangles))
+                if (sr.Sprite != previousSprite)
                 {
-                    pixelPerfectRectangles = CreateRectangles(sr.Sprite);
-                    colliderChache[sr.Sprite] = pixelPerfectRectangles;
+                    previousSprite = sr.Sprite;
+                    if (!colliderChache.TryGetValue(sr.Sprite, out pixelPerfectRectangles))
+                    {
+                        pixelPerfectRectangles = CreateRectangles(sr.Sprite);
+                        colliderChache[sr.Sprite] = pixelPerfectRectangles;
+                    }
+
+                    pixelPerfectRectangles = pixelPerfectRectangles.Select(p => new RectangleData(p.X, p.Y)).ToList();
                 }
 
-                pixelPerfectRectangles = pixelPerfectRectangles.Select(p => new RectangleData(p.X, p.Y)).ToList();
+                UpdatePixelCollider(); 
             }
-
-            UpdatePixelCollider();
+            else
+            {
+                currentTime += GameWorld.Instance.DeltaTime;
+                if (currentTime > maxTime)
+                {
+                    GameWorld.Instance.Destroy(gameObject);
+                }
+            }
         }
 
         private void DrawRectangle(Rectangle collisionBox, SpriteBatch spriteBatch)

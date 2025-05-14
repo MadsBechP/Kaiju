@@ -1,6 +1,4 @@
-﻿using DesignPatterns.ComponentPattern;
-
-namespace Kaiju.ComponentPattern.Characters
+﻿namespace Kaiju.ComponentPattern.Characters
 {
     public class Character : Component
     {
@@ -15,7 +13,7 @@ namespace Kaiju.ComponentPattern.Characters
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
             ani = gameObject.GetComponent<Animator>() as Animator;
         }
-        public virtual void Flip(bool x)
+        public virtual void FaceRight(bool x)
         {
         }
     }

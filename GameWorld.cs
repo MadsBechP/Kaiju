@@ -1,5 +1,4 @@
-﻿using DesignPatterns.ComponentPattern;
-using Kaiju.Command;
+﻿using Kaiju.Command;
 using Kaiju.ComponentPattern;
 using Kaiju.ComponentPattern.Characters;
 using Microsoft.Xna.Framework;
@@ -152,7 +151,7 @@ namespace Kaiju
                                 break;
                             }
                         }
-                        if (handledCollision)
+                        if (handledCollision || col2.isAttack)
                         {
                             go1.OnCollisionEnter(col2);
                             handledCollisions.Add((go1, go2));
@@ -191,7 +190,7 @@ namespace Kaiju
             newGameObjects.Clear();
         }
 
-        public Animation BuildAnimation(string animationName, string[] spriteNames)
+        public Animation BuildAnimation(string animationName, string[] spriteNames, bool heldAnimation)
         {
             Texture2D[] sprites = new Texture2D[spriteNames.Length];
 
@@ -200,7 +199,7 @@ namespace Kaiju
                 sprites[i] = GameWorld.Instance.Content.Load<Texture2D>(spriteNames[i]);
             }
 
-            Animation animation = new Animation(animationName, sprites, 5);
+            Animation animation = new Animation(animationName, sprites, 5, heldAnimation);
 
             return animation;
         }

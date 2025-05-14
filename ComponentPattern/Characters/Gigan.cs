@@ -1,5 +1,4 @@
-﻿using DesignPatterns.ComponentPattern;
-using Kaiju.Command;
+﻿using Kaiju.Command;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using SharpDX.Direct2D1;
@@ -19,12 +18,12 @@ namespace Kaiju.ComponentPattern.Characters
             sr.SetSprite("GG_Sprites\\GG_Walk\\GG_Walk_01");
             gameObject.Transform.Scale = new Vector2(3f, 3f);
 
-            ani.AddAnimation(GameWorld.Instance.BuildAnimation("Idle", new string[] { "GG_Sprites\\GG_Walk\\GG_Walk_01" }));
+            ani.AddAnimation(GameWorld.Instance.BuildAnimation("Idle", new string[] { "GG_Sprites\\GG_Walk\\GG_Walk_01" }, false));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("Walk", new string[] {
                 "GG_Sprites\\GG_Walk\\GG_Walk_01",
                 "GG_Sprites\\GG_Walk\\GG_Walk_02",
                 "GG_Sprites\\GG_Walk\\GG_Walk_03",
-                "GG_Sprites\\GG_Walk\\GG_Walk_04"}));
+                "GG_Sprites\\GG_Walk\\GG_Walk_04"}, true));
 
             if (this.gameObject == GameWorld.Instance.player1Go)
             {
@@ -39,9 +38,9 @@ namespace Kaiju.ComponentPattern.Characters
                 InputHandler.Instance.AddButtonDownCommand(Keys.Up, new JumpCommand(GameWorld.Instance.player2));
             }
         }
-        public override void Flip(bool x)
+        public override void FaceRight(bool x)
         {
-            sr.SetFlipHorizontal(!x);
+            sr.SetFlipHorizontal(x);
         }
     } 
         
