@@ -1,5 +1,4 @@
-﻿using Kaiju.ComponentPattern;
-using Kaiju;
+﻿using Kaiju;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -9,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 
-namespace DesignPatterns.ComponentPattern
+namespace Kaiju.ComponentPattern
 {
     public class Animator : Component
     {
@@ -18,6 +17,7 @@ namespace DesignPatterns.ComponentPattern
         private SpriteRenderer spriteRenderer;
         private Dictionary<string, Animation> animations = new Dictionary<string, Animation>();
         private Animation currentAnimation;
+        private bool held = false;
 
         public Animator(GameObject gameObject) : base(gameObject)
         {
@@ -29,13 +29,20 @@ namespace DesignPatterns.ComponentPattern
             elapsed += GameWorld.Instance.DeltaTime;
             CurrentIndex = (int)(elapsed * currentAnimation.FPS);
 
-            if (CurrentIndex > currentAnimation.Sprites.Length - 1)
+            if (currentAnimation.HeldAnimation && held && CurrentIndex > currentAnimation.Sprites.Length - 1)
             {
                 elapsed = 0;
                 CurrentIndex = 0;
             }
+            else if (currentAnimation.HeldAnimation && !held || CurrentIndex > currentAnimation.Sprites.Length - 1)
+            {
+                elapsed = 0;
+                CurrentIndex = 0;
+                PlayAnimation("Idle");
+            }
             spriteRenderer.Sprite = currentAnimation.Sprites[CurrentIndex];
             spriteRenderer.Source = new Rectangle(0, 0, spriteRenderer.Sprite.Width, spriteRenderer.Sprite.Height);
+            held = false;
         }
 
         public void AddAnimation(Animation animation)
@@ -49,11 +56,18 @@ namespace DesignPatterns.ComponentPattern
 
         public void PlayAnimation(string animationName)
         {
-            if (animationName != currentAnimation.Name)
+            if (animationName != "Walk" || (animationName == "Walk" && (currentAnimation.Name == "Idle" || currentAnimation.Name == "Walk")))
             {
-                currentAnimation = animations[animationName];
-                elapsed = 0;
-                CurrentIndex = 0;
+                if (animationName != currentAnimation.Name)
+                {
+                    currentAnimation = animations[animationName];
+                    elapsed = 0;
+                    CurrentIndex = 0;
+                }
+                if (currentAnimation.HeldAnimation)
+                {
+                    held = true;
+                } 
             }
         }
     }
@@ -63,11 +77,13 @@ namespace DesignPatterns.ComponentPattern
         public float FPS { get; private set; }
         public string Name { get; private set; }
         public Texture2D[] Sprites { get; private set; }
-        public Animation(string name, Texture2D[] sprites, float fps)
+        public bool HeldAnimation { get; private set; }
+        public Animation(string name, Texture2D[] sprites, float fps, bool heldAnimation)
         {
-            this.Name = name;
-            this.Sprites = sprites;
-            this.FPS = fps;
+            Name = name;
+            Sprites = sprites;
+            FPS = fps;
+            HeldAnimation = heldAnimation;
         }
 
     }

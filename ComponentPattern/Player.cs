@@ -1,18 +1,25 @@
-﻿using DesignPatterns.ComponentPattern;
+﻿using Kaiju.ComponentPattern.Characters;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct3D11;
 using SharpDX.Direct3D9;
+using System;
 
 namespace Kaiju.ComponentPattern
 {
     public class Player : Component
     {
         private float speed;
-        private SpriteRenderer sr;
-        private Vector2 yVelocity;
         private bool grounded = false;
-        private Animator animator;
+        private Vector2 yVelocity;
         private Vector2 currentVelocity = Vector2.Zero;
+
+        protected SpriteRenderer sr;
+        private Animator animator;
+        public Character chr;
+        public bool facingRight;
+        private bool lastPunchRight;
+
 
         public Player(GameObject gameObject) : base(gameObject)
         {
@@ -23,9 +30,17 @@ namespace Kaiju.ComponentPattern
         {
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
             animator = gameObject.GetComponent<Animator>() as Animator;
-            sr.SetSprite("GZ_Sprites\\GZ_Walk\\GZ_Walk_01");
-            gameObject.Transform.Scale = new Vector2(3f, 3f);
-            gameObject.Transform.Position = new Vector2(GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+
+            if (gameObject == GameWorld.Instance.player1Go)
+            {
+                gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+                facingRight = true;
+            }
+            else if (gameObject == GameWorld.Instance.player2Go)
+            {
+                gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+                facingRight = false;
+            }
             speed = 600;
         }
 
@@ -43,10 +58,18 @@ namespace Kaiju.ComponentPattern
                 yVelocity = Vector2.Zero;
                 grounded = true;
             }
+            if (facingRight)
+            {
+                chr.FaceRight(true);
+            }
+            else
+            {
+                chr.FaceRight(false);
+            }
 
             if (currentVelocity == Vector2.Zero && grounded)
             {
-                animator.PlayAnimation("Idle");
+                //animator.PlayAnimation("Idle");
             }
 
             currentVelocity = Vector2.Zero;
@@ -68,13 +91,14 @@ namespace Kaiju.ComponentPattern
 
             velocity *= speed;
             gameObject.Transform.Translate(velocity * GameWorld.Instance.DeltaTime);
+
             if (velocity.X < 0 && grounded)
             {
-                sr.SetFlipHorizontal(true);
+                facingRight = false;
             }
             if (velocity.X > 0 && grounded)
             {
-                sr.SetFlipHorizontal(false);
+                facingRight = true;
             }
 
             animator.PlayAnimation("Walk");
@@ -88,5 +112,49 @@ namespace Kaiju.ComponentPattern
                 gameObject.Transform.Translate(yVelocity * GameWorld.Instance.DeltaTime);
             }
         }
+        public void Attack(int atkNumber)
+        {
+            GameObject attackGo = new();
+            Rectangle position = new Rectangle();
+            if (facingRight)
+            {
+                position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
+            }
+            else
+            {
+                position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
+            }
+            attackGo.AddComponent<Collider>(0.2f, position, this);
+            GameWorld.Instance.Instantiate(attackGo);
+
+            switch (atkNumber)
+            {
+                case 1:
+                    {
+                        if (lastPunchRight)
+                        {
+                            animator.PlayAnimation("LPunch");
+                            lastPunchRight = false;
+                        }
+                        else
+                        {
+                            animator.PlayAnimation("RPunch");
+                            lastPunchRight = true;
+                        }
+                        return;
+                    }
+                case 2:
+                    {
+                        animator.PlayAnimation("TailSwipe");
+                        return;
+                    }
+            }
+
+        }
+        public void Block()
+        {
+            animator.PlayAnimation("Block");
+        }
+
     }
 }
