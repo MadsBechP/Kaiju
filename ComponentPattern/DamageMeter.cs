@@ -13,59 +13,66 @@ namespace Kaiju.ComponentPattern
         private SpriteFont damageFont;
         private SpriteFont playerNameFont;
         private Texture2D playerHUD;
-        private Texture2D playerProfile;
-
-        private string text = "00%";
-        private string playerName = "GZ";
-
-        private Vector2 positionDamageFont = new Vector2(
-            (GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) - 305,
-            GameWorld.Instance.Graphics.PreferredBackBufferHeight - 185);
-
-        private Vector2 positionPlayerName = new Vector2(
-            (GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) - 310,
-            GameWorld.Instance.Graphics.PreferredBackBufferHeight - 80);
-
-        private Vector2 positionPlayerHud = new Vector2(
-            (GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) - 550,
-            GameWorld.Instance.Graphics.PreferredBackBufferHeight - 250);
-
-        private Vector2 positionPlayerProfile = new Vector2(
-            (GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) - 505,
-            GameWorld.Instance.Graphics.PreferredBackBufferHeight - 200);
-
+        private Texture2D profileTexture;
         private float scale = 1.4f;
 
-        public DamageMeter(GameObject gameObject) : base(gameObject)
-        {
+        private string damageText = "00%";
+        private string playerName;
+        private int damageTaken;
 
+        private Vector2 damageFontPos;
+        private Vector2 namePos;
+        private Vector2 hudPos;
+        private Vector2 profilePos;
+        
+        
+        public DamageMeter(GameObject gameObject) : base(gameObject)
+        {            
         }
+        
+        public void Setup(string playerName, Texture2D profileTexture, Vector2 damageFontPos, Vector2 namePos, Vector2 hudPos, Vector2 profilePos)
+        {
+            this.playerName = playerName;
+            this.profileTexture = profileTexture;
+            this.damageFontPos = damageFontPos;
+            this.namePos = namePos;
+            this.hudPos = hudPos;
+            this.profilePos = profilePos;
+        }
+
         public override void Start()
         {  
             damageFont = GameWorld.Instance.Content.Load<SpriteFont>("DamageFont");
             playerNameFont = GameWorld.Instance.Content.Load<SpriteFont>("playerNameFont");
             playerHUD = GameWorld.Instance.Content.Load<Texture2D>("playerHUD");
-            playerProfile = GameWorld.Instance.Content.Load<Texture2D>("GZProfile");
+            //profileTexture = GameWorld.Instance.Content.Load<Texture2D>("GZProfile");
         }
         public override void Update()
         {
             base.Update();
+            
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(playerHUD, positionPlayerHud, Color.White);
+            spriteBatch.Draw(playerHUD, hudPos, Color.White);
 
-            spriteBatch.Draw(playerProfile, positionPlayerProfile, null, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 1);
+            spriteBatch.Draw(profileTexture, profilePos, null, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 1);
 
-            if (!string.IsNullOrEmpty(text))
+            if (!string.IsNullOrEmpty(damageText))
             {
-                spriteBatch.DrawString(damageFont, text, positionDamageFont, Color.White);
+                spriteBatch.DrawString(damageFont, damageText, damageFontPos, Color.White);
             }
             if (!string.IsNullOrEmpty(playerName))
             {
-                spriteBatch.DrawString(playerNameFont, playerName, positionPlayerName, Color.White);
+                spriteBatch.DrawString(playerNameFont, playerName, namePos, Color.White);
             }
 
+        }
+
+        public void TakeDamage()
+        {
+            damageTaken++;
+            damageText = $"{damageTaken}%";
         }
     }
 }

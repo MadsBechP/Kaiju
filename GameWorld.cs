@@ -60,10 +60,6 @@ namespace Kaiju
             timerGo.AddComponent<Timer>();
             gameObjects.Add(timerGo);
 
-            GameObject damageMeterGo = new GameObject();
-            damageMeterGo.AddComponent<DamageMeter>();
-            gameObjects.Add(damageMeterGo);
-                        
 
             foreach (var gameObject in gameObjects)
             {
@@ -78,12 +74,44 @@ namespace Kaiju
 
         protected override void LoadContent()
         {
+            var playerProfile = Content.Load<Texture2D>("GZProfile");
+
+            GameObject playerDamageMeterGo = new GameObject();
+            var playerDamageMeter = playerDamageMeterGo.AddComponent<DamageMeter>();
+            playerDamageMeter.Setup(
+                "GZ",
+                playerProfile,
+                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) - 750, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 185), // damageFontPos
+                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) - 735, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 80), // namePos
+                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) - 1000, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 250), // hudPos
+                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) - 950, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 200) // profilePos
+               );
+
+            var AIProfile = Content.Load<Texture2D>("GZProfile");
+
+            GameObject AIDamageMeterGo = new GameObject();
+            var AIDamageMeter = AIDamageMeterGo.AddComponent<DamageMeter>();
+            AIDamageMeter.Setup(
+                "AI-GZ",
+                AIProfile,
+                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) + 790, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 185), // damageFontPos
+                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) + 780, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 80), // namePos
+                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) + 550, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 250), // hudPos
+                new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) + 600, GameWorld.Instance.Graphics.PreferredBackBufferHeight - 200) // profilePos
+               );
+
+            gameObjects.Add(AIDamageMeterGo);
+            gameObjects.Add(playerDamageMeterGo);
+            AIDamageMeterGo.Awake();
+            playerDamageMeterGo.Awake();
+
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Start();
             }
+                        
         }
 
         protected override void Update(GameTime gameTime)
