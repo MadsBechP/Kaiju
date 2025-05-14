@@ -17,7 +17,7 @@ namespace Kaiju.ComponentPattern
         private Texture2D profileTexture;
         private float scale = 1.4f;
 
-        private string damageText = "";
+        private string damageText;
         private string playerName;
         private int damageTaken;
 
@@ -48,11 +48,7 @@ namespace Kaiju.ComponentPattern
             playerNameFont = GameWorld.Instance.Content.Load<SpriteFont>("playerNameFont");
             playerHUD = GameWorld.Instance.Content.Load<Texture2D>("playerHUD");
         }
-        //public override void Update()
-        //{
-        //    base.Update();
-            
-        //}
+        
         public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(playerHUD, hudPos, Color.White);
