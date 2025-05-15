@@ -62,8 +62,17 @@ namespace Kaiju.ComponentPattern
                 hit = false;
             }
 
+            // Plays animation when taking damage
+            if (hit)
+            {
+                animator.PlayAnimation("Hit");
+            }
             // Timer for attack
-            atkCooldown += GameWorld.Instance.DeltaTime;
+            if (atkCooldown > 0)
+            {
+            atkCooldown -= GameWorld.Instance.DeltaTime;
+            }
+
 
             // Adds gravity
             if (gameObject.Transform.Position.Y < GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - (sr.Origin.Y * gameObject.Transform.Scale.Y))
@@ -79,18 +88,18 @@ namespace Kaiju.ComponentPattern
             }
 
             // Velocity resistance depending on players state
-            if (grounded)
+            if (hit)
+            {
+                gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.1f), gameObject.Transform.CurrentVelocity.Y);
+            }
+            else if (grounded)
             {
                 gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.5f), gameObject.Transform.CurrentVelocity.Y);
                 hit = false;
             }
-            else if (!hit)
-            {
-                gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.3f), gameObject.Transform.CurrentVelocity.Y);
-            }
             else
             {
-                gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.1f), gameObject.Transform.CurrentVelocity.Y);
+                gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.3f), gameObject.Transform.CurrentVelocity.Y);
             }
 
             // Changes sprites facing direction
@@ -147,29 +156,31 @@ namespace Kaiju.ComponentPattern
         }
         public void Attack(int atkNumber)
         {
-            if (atkCooldown < 1)
+            if (atkCooldown > 0 || hit)
             {
                 return;
             }
-            atkCooldown = 0;
+            atkCooldown = 0.5f;
 
             GameObject attackGo = new();
             Rectangle position = new Rectangle();
-            if (facingRight)
-            {
-                position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
-            }
-            else
-            {
-                position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
-            }
-            attackGo.AddComponent<Collider>(0.2f, position, this, 1);
-            GameWorld.Instance.Instantiate(attackGo);
+            int damage = 0;
+            
+            
 
             switch (atkNumber)
             {
                 case 1:
                     {
+                        if (facingRight)
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
+                        }
+                        else
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
+                        }
+
                         if (lastPunchRight)
                         {
                             animator.PlayAnimation("LPunch");
@@ -180,15 +191,26 @@ namespace Kaiju.ComponentPattern
                             animator.PlayAnimation("RPunch");
                             lastPunchRight = true;
                         }
-                        return;
+                        break;
                     }
                 case 2:
                     {
+                        if (facingRight)
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
+                        }
+                        else
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
+                        }
+
                         animator.PlayAnimation("TailSwipe");
-                        return;
+                        break;
                     }
             }
-            
+            attackGo.AddComponent<Collider>(0.2f, position, this, damage);
+            GameWorld.Instance.Instantiate(attackGo);
+
         }
         public void Block()
         {
@@ -206,7 +228,8 @@ namespace Kaiju.ComponentPattern
                 Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
                 knockback.Normalize();
 
-                gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 3000;
+                gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 1000;
+                gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime);
             }
         }
     }

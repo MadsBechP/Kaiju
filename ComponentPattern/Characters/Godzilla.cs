@@ -17,7 +17,7 @@ namespace Kaiju.ComponentPattern.Characters
             sr.SetSprite("GZ_Sprites\\GZ_Walk\\GZ_Walk_01");
             gameObject.Transform.Scale = new Vector2(3f, 3f);
 
-            ani.AddAnimation(GameWorld.Instance.BuildAnimation("Idle", new string[] { "GZ_Sprites\\GZ_Walk\\GZ_Walk_01" } , false));
+            ani.AddAnimation(GameWorld.Instance.BuildAnimation("Idle", new string[] { "GZ_Sprites\\GZ_Walk\\GZ_Walk_01" } , 5, false));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("Walk", new string[] {
                 "GZ_Sprites\\GZ_Walk\\GZ_Walk_01",
                 "GZ_Sprites\\GZ_Walk\\GZ_Walk_02",
@@ -26,15 +26,20 @@ namespace Kaiju.ComponentPattern.Characters
                 "GZ_Sprites\\GZ_Walk\\GZ_Walk_05",
                 "GZ_Sprites\\GZ_Walk\\GZ_Walk_06",
                 "GZ_Sprites\\GZ_Walk\\GZ_Walk_07",
-                "GZ_Sprites\\GZ_Walk\\GZ_Walk_08"}, true));
+                "GZ_Sprites\\GZ_Walk\\GZ_Walk_08"}, 5, true));
+            ani.AddAnimation(GameWorld.Instance.BuildAnimation("Hit", new string[] {
+                "GZ_Sprites\\GZ_Hit\\GZ_Hit_01",
+                "GZ_Sprites\\GZ_Hit\\GZ_Hit_02",
+                "GZ_Sprites\\GZ_Hit\\GZ_Hit_03",
+                "GZ_Sprites\\GZ_Hit\\GZ_Hit_04"}, 8, false));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("LPunch", new string[] {
                 "GZ_Sprites\\GZ_Punch_L\\GZ_Punch_L_01",
-                "GZ_Sprites\\GZ_Punch_L\\GZ_Punch_L_02"}, false));
+                "GZ_Sprites\\GZ_Punch_L\\GZ_Punch_L_02"}, 5, false));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("RPunch", new string[] {
                 "GZ_Sprites\\GZ_Punch_R\\GZ_Punch_R_01",
-                "GZ_Sprites\\GZ_Punch_R\\GZ_Punch_R_02"}, false));
+                "GZ_Sprites\\GZ_Punch_R\\GZ_Punch_R_02"}, 5, false));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("Block", new string[] {
-                "GZ_Sprites\\GZ_Crouch\\GZ_Crouch_01"}, true));
+                "GZ_Sprites\\GZ_Crouch\\GZ_Crouch_01"}, 5, true));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("TailSwipe", new string[] {
                 "GZ_Sprites\\GZ_Crouch\\GZ_Crouch_01",
                 "GZ_Sprites\\GZ_Crouch\\GZ_Crouch_02",
@@ -42,7 +47,8 @@ namespace Kaiju.ComponentPattern.Characters
                 "GZ_Sprites\\GZ_Crouch\\GZ_Crouch_04",
                 "GZ_Sprites\\GZ_Crouch\\GZ_Crouch_03",
                 "GZ_Sprites\\GZ_Crouch\\GZ_Crouch_02",
-                "GZ_Sprites\\GZ_Crouch\\GZ_Crouch_01"}, false));
+                "GZ_Sprites\\GZ_Crouch\\GZ_Crouch_01"}, 5, false));
+            
 
 
             if (this.gameObject == GameWorld.Instance.player1Go)

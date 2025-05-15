@@ -62,7 +62,7 @@ namespace Kaiju
             gameObjects.Add(player1Go);
 
             player2Go = new GameObject();
-            player2 = player2Go.AddComponent<AI>();
+            player2 = player2Go.AddComponent<Player>();
             player2Go.AddComponent<SpriteRenderer>();
             player2Go.AddComponent<Collider>();
             player2Go.AddComponent<Animator>();
@@ -195,7 +195,7 @@ namespace Kaiju
             newGameObjects.Clear();
         }
 
-        public Animation BuildAnimation(string animationName, string[] spriteNames, bool heldAnimation)
+        public Animation BuildAnimation(string animationName, string[] spriteNames, int fps, bool heldAnimation)
         {
             Texture2D[] sprites = new Texture2D[spriteNames.Length];
 
@@ -204,7 +204,7 @@ namespace Kaiju
                 sprites[i] = GameWorld.Instance.Content.Load<Texture2D>(spriteNames[i]);
             }
 
-            Animation animation = new Animation(animationName, sprites, 5, heldAnimation);
+            Animation animation = new Animation(animationName, sprites, fps, heldAnimation);
 
             return animation;
         }
