@@ -25,18 +25,20 @@ namespace Kaiju.ComponentPattern
         private float maxTime;
         private Rectangle position;
         public Player Owner { get; set; }
+        public int Damage { get; private set; }
 
 
         public Collider(GameObject gameObject) : base(gameObject)
         {
 
         }
-        public Collider(GameObject gameObject, float maxTime, Rectangle position, Player owner) : base(gameObject)
+        public Collider(GameObject gameObject, float maxTime, Rectangle position, Player owner, int damage) : base(gameObject)
         {
             this.isAttack = true;
             this.maxTime = maxTime;
             this.position = position;
             this.Owner = owner;
+            this.Damage = damage;
         }
 
         public Rectangle CollisionBox

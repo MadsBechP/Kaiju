@@ -12,13 +12,11 @@ namespace Kaiju.ComponentPattern
         ICommand left;
         ICommand right;
         ICommand jump;
+        ICommand attack;
         Player opponent;
 
         Vector2 Pos { get {return gameObject.Transform.Position; } }
         Vector2 OPos { get { return opponent.gameObject.Transform.Position; } }
-
-        private List<IObserver> observers = new List<IObserver>();
-        public int Damage { get; private set; }
 
         public AI(GameObject gameObject) : base(gameObject)
         {
@@ -32,6 +30,7 @@ namespace Kaiju.ComponentPattern
             left = new MoveCommand(this, new Vector2(-1, 0));
             right = new MoveCommand(this, new Vector2(1, 0));
             jump = new JumpCommand(this);
+            attack = new AttackCommand(this, 1);
 
             gameObject.Transform.Scale = new Vector2(2f, 2f);
 
@@ -45,6 +44,7 @@ namespace Kaiju.ComponentPattern
             {
                 opponent = GameWorld.Instance.player1;
             }
+            speed = 300;
         }
         public override void Update()
         {
@@ -57,21 +57,14 @@ namespace Kaiju.ComponentPattern
             {
                 left.Execute();
             }
-            if (Pos.Y > OPos.Y + 300)
+            else
+            {
+                attack.Execute();
+            }
+            if (Pos.Y > OPos.Y + 100)
             {
                 jump.Execute();
             }
         }
-        public override void OnCollisionEnter(Collider collider)
-        {
-            if (collider.isAttack)
-            {
-                gameObject.Transform.Position = new Vector2(GameWorld.Instance.Graphics.PreferredBackBufferWidth/2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
-                TakeDamage(5);
-            }
-
-
-        }
-
     }
 }

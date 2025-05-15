@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using SharpDX.Direct3D11;
 using SharpDX.Direct3D9;
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -12,16 +13,18 @@ namespace Kaiju.ComponentPattern
 {
     public class Player : Component, ISubject
     {
-        private float speed;
+        protected float speed;
         private bool grounded = false;
-        private Vector2 yVelocity;
-        private Vector2 currentVelocity = Vector2.Zero;
 
         protected SpriteRenderer sr;
         private Animator animator;
         public Character chr;
         public bool facingRight;
         private bool lastPunchRight;
+        private float atkCooldown;
+
+        private bool hit = false;
+        private float hitTimer;
 
         private List<IObserver> observers = new List<IObserver>();
         public int Damage { get; private set; }
@@ -52,18 +55,60 @@ namespace Kaiju.ComponentPattern
 
         public override void Update()
         {
-            gameObject.Transform.Translate(yVelocity * GameWorld.Instance.DeltaTime);
+            // Moves player according to its current velocity
+            gameObject.Transform.Translate();
+
+            // Timer for hitstun
+            if (hitTimer > 0)
+            {
+                hitTimer -= GameWorld.Instance.DeltaTime;
+            }
+            else if (hit)
+            {
+                hit = false;
+            }
+
+            // Plays animation when taking damage
+            if (hit)
+            {
+                animator.PlayAnimation("Hit");
+            }
+            // Timer for attack
+            if (atkCooldown > 0)
+            {
+            atkCooldown -= GameWorld.Instance.DeltaTime;
+            }
+
+
+            // Adds gravity
             if (gameObject.Transform.Position.Y < GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - (sr.Origin.Y * gameObject.Transform.Scale.Y))
             {
-                yVelocity += new Vector2(0, 90f);
+                gameObject.Transform.AddVelocity(new Vector2(0, 2f));
                 grounded = false;
             }
             else
             {
                 gameObject.Transform.Position = new Vector2(gameObject.Transform.Position.X, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - (sr.Origin.Y * gameObject.Transform.Scale.Y));
-                yVelocity = Vector2.Zero;
+                gameObject.Transform.CurrentVelocity = new Vector2(gameObject.Transform.CurrentVelocity.X, 0);
                 grounded = true;
             }
+
+            // Velocity resistance depending on players state
+            if (hit)
+            {
+                gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.1f), gameObject.Transform.CurrentVelocity.Y);
+            }
+            else if (grounded)
+            {
+                gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.5f), gameObject.Transform.CurrentVelocity.Y);
+                hit = false;
+            }
+            else
+            {
+                gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.3f), gameObject.Transform.CurrentVelocity.Y);
+            }
+
+            // Changes sprites facing direction
             if (facingRight)
             {
                 chr.FaceRight(true);
@@ -73,12 +118,9 @@ namespace Kaiju.ComponentPattern
                 chr.FaceRight(false);
             }
 
-            if (currentVelocity == Vector2.Zero && grounded)
-            {
-                //animator.PlayAnimation("Idle");
-            }
+            
+            
 
-            currentVelocity = Vector2.Zero;
         }
 
         public void Move(Vector2 velocity)
@@ -88,15 +130,16 @@ namespace Kaiju.ComponentPattern
                 return;
             }
 
-            currentVelocity = velocity;
-
             if (velocity != Vector2.Zero)
             {
                 velocity.Normalize();
             }
 
             velocity *= speed;
-            gameObject.Transform.Translate(velocity * GameWorld.Instance.DeltaTime);
+            if (Math.Abs(gameObject.Transform.CurrentVelocity.X) < 8 && !hit)
+            {
+                gameObject.Transform.AddVelocity(velocity * GameWorld.Instance.DeltaTime);
+            }
 
             if (velocity.X < 0 && grounded)
             {
@@ -114,29 +157,36 @@ namespace Kaiju.ComponentPattern
         {
             if (grounded)
             {
-                yVelocity = new Vector2(0, -2000f);
-                gameObject.Transform.Translate(yVelocity * GameWorld.Instance.DeltaTime);
+                gameObject.Transform.AddVelocity(new Vector2(0, -2000f) * GameWorld.Instance.DeltaTime);
             }
         }
         public void Attack(int atkNumber)
         {
+            if (atkCooldown > 0 || hit)
+            {
+                return;
+            }
+            atkCooldown = 0.5f;
+
             GameObject attackGo = new();
             Rectangle position = new Rectangle();
-            if (facingRight)
-            {
-                position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
-            }
-            else
-            {
-                position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
-            }
-            attackGo.AddComponent<Collider>(0.2f, position, this);
-            GameWorld.Instance.Instantiate(attackGo);
+            int damage = 0;
+            
+            
 
             switch (atkNumber)
             {
                 case 1:
                     {
+                        if (facingRight)
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
+                        }
+                        else
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
+                        }
+
                         if (lastPunchRight)
                         {
                             animator.PlayAnimation("LPunch");
@@ -147,14 +197,27 @@ namespace Kaiju.ComponentPattern
                             animator.PlayAnimation("RPunch");
                             lastPunchRight = true;
                         }
-                        return;
+                        damage = 5;
+                        break;
                     }
                 case 2:
                     {
+                        if (facingRight)
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
+                        }
+                        else
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
+                        }
+
                         animator.PlayAnimation("TailSwipe");
-                        return;
+                        damage = 10;
+                        break;
                     }
             }
+            attackGo.AddComponent<Collider>(0.2f, position, this, damage);
+            GameWorld.Instance.Instantiate(attackGo);
 
         }
         public void Block()
@@ -162,6 +225,22 @@ namespace Kaiju.ComponentPattern
             animator.PlayAnimation("Block");
         }
 
+        public override void OnCollisionEnter(Collider collider)
+        {
+            if (collider.isAttack && !hit)
+            {
+                GameWorld.Instance.Destroy(collider.gameObject);
+
+                TakeDamage(collider.Damage);
+                hit = true;
+                hitTimer = 0.5f;
+                Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
+                knockback.Normalize();
+
+                gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 50 * Damage;
+                gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime * 10 * Damage);
+            }
+        }
         public void TakeDamage(int amount)
         {
             Damage += amount;

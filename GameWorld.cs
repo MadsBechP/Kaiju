@@ -65,7 +65,7 @@ namespace Kaiju
             gameObjects.Add(player1Go);
 
             player2Go = new GameObject();
-            player2 = player2Go.AddComponent<AI>();
+            player2 = player2Go.AddComponent<Player>();
             player2Go.AddComponent<SpriteRenderer>();
             player2Go.AddComponent<Collider>();
             player2Go.AddComponent<Animator>();
@@ -87,41 +87,75 @@ namespace Kaiju
 
         protected override void LoadContent()
         {
-            var playerProfile = Content.Load<Texture2D>("GZProfile");
+            Texture2D player1Profile = Content.Load<Texture2D>("GZProfile");
+            Texture2D player2Profile = Content.Load<Texture2D>("GZProfile");
+            string name1 = "null";
+            string name2 = "null";
+            switch (player1.chr)
+            {
+                case Godzilla:
+                    {
+                        player1Profile = Content.Load<Texture2D>("GZProfile");
+                        name1 = "Godzilla";
+                        break;
+                    }
+                case Gigan:
+                    {
+                        player1Profile = Content.Load<Texture2D>("GiganProfile");
+                        name1 = "Gigan";
+                        break;
+                    }
+            }
+            switch (player2.chr)
+            {
+                case Godzilla:
+                    {
+                        player2Profile = Content.Load<Texture2D>("GZProfile");
+                        name2 = "Godzilla";
+                        break;
+                    }
+                case Gigan:
+                    {
+                        player2Profile = Content.Load<Texture2D>("GiganProfile");
+                        name2 = "Gigan";
+                        break;
+                    }
+            }
 
-            GameObject playerDamageMeterGo = new GameObject();
-            var playerDamageMeter = playerDamageMeterGo.AddComponent<DamageMeter>();
+
+
+
+            GameObject player1DamageMeterGo = new GameObject();
+            var playerDamageMeter = player1DamageMeterGo.AddComponent<DamageMeter>();
             playerDamageMeter.Setup(
-                "GZ",
-                playerProfile,
+                name1,
+                player1Profile,
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 750, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 735, Graphics.PreferredBackBufferHeight - 80), // namePos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 1000,Graphics.PreferredBackBufferHeight - 250), // hudPos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 950, Graphics.PreferredBackBufferHeight - 200) // profilePos
                );
 
-            var AIProfile = Content.Load<Texture2D>("GiganProfile");
-
-            GameObject AIDamageMeterGo = new GameObject();
-            var AIDamageMeter = AIDamageMeterGo.AddComponent<DamageMeter>();
-            AIDamageMeter.Setup(
-                "CPU",
-                AIProfile,
+            GameObject player2DamageMeterGo = new GameObject();
+            var player2DamageMeter = player2DamageMeterGo.AddComponent<DamageMeter>();
+            player2DamageMeter.Setup(
+                name2,
+                player2Profile,
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) + 790, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) + 780, Graphics.PreferredBackBufferHeight - 80), // namePos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) + 550, Graphics.PreferredBackBufferHeight - 250), // hudPos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) + 610, Graphics.PreferredBackBufferHeight - 200) // profilePos
                );
 
-            gameObjects.Add(AIDamageMeterGo);
-            gameObjects.Add(playerDamageMeterGo);
+            gameObjects.Add(player1DamageMeterGo);
+            gameObjects.Add(player2DamageMeterGo);
 
-            AIDamageMeterGo.Awake();
-            playerDamageMeterGo.Awake();
+            player1DamageMeterGo.Awake();
+            player2DamageMeterGo.Awake();
 
             
-            playerDamageMeter.SetSubject(player1);            
-            AIDamageMeter.SetSubject(player2);
+            playerDamageMeter.SetSubject(player1);
+            player2DamageMeter.SetSubject(player2);
 
             //AIDamageMeter.Updated();
             //playerDamageMeter.Updated();
@@ -183,6 +217,7 @@ namespace Kaiju
                     if (col1 != null && col2 != null && col1.CollisionBox.Intersects(col2.CollisionBox))
                     {
                         bool handledCollision = false;
+
                         foreach (RectangleData rects1 in col1.PixelPerfectRectangles)
                         {
                             foreach (RectangleData rects2 in col2.PixelPerfectRectangles)
@@ -194,12 +229,16 @@ namespace Kaiju
                                     break;
                                 }
                             }
+                            if (rects1.Rectangle.Intersects(col2.CollisionBox) && col2.isAttack && !(col2.Owner == go1.GetComponent<Player>() as Player || col2.Owner == go1.GetComponent<AI>() as AI))
+                            {
+                                handledCollision = true;
+                            }
                             if (handledCollision)
                             {
                                 break;
                             }
                         }
-                        if (handledCollision || col2.isAttack)
+                        if (handledCollision)
                         {
                             go1.OnCollisionEnter(col2);
                             handledCollisions.Add((go1, go2));
@@ -238,7 +277,7 @@ namespace Kaiju
             newGameObjects.Clear();
         }
 
-        public Animation BuildAnimation(string animationName, string[] spriteNames, bool heldAnimation)
+        public Animation BuildAnimation(string animationName, string[] spriteNames, int fps, bool heldAnimation)
         {
             Texture2D[] sprites = new Texture2D[spriteNames.Length];
 
@@ -247,7 +286,7 @@ namespace Kaiju
                 sprites[i] = GameWorld.Instance.Content.Load<Texture2D>(spriteNames[i]);
             }
 
-            Animation animation = new Animation(animationName, sprites, 5, heldAnimation);
+            Animation animation = new Animation(animationName, sprites, fps, heldAnimation);
 
             return animation;
         }
