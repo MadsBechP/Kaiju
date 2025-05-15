@@ -25,11 +25,12 @@ namespace Kaiju.ComponentPattern
         private Vector2 namePos;
         private Vector2 hudPos;
         private Vector2 profilePos;
-        
+
+        private ISubject subject;
         
         public DamageMeter(GameObject gameObject) : base(gameObject)
         {
-            GameWorld.Instance.Attach(this); 
+            //GameWorld.Instance.Attach(this); 
         }
         
         public void Setup(string playerName, Texture2D profileTexture, Vector2 damageFontPos, Vector2 namePos, Vector2 hudPos, Vector2 profilePos)
@@ -42,11 +43,29 @@ namespace Kaiju.ComponentPattern
             this.profilePos = profilePos;
         }
 
+        public void SetSubject(ISubject subject)
+        {
+            this.subject = subject;
+            subject.Attach(this);
+        }
+
         public override void Start()
         {  
             damageFont = GameWorld.Instance.Content.Load<SpriteFont>("DamageFont");
             playerNameFont = GameWorld.Instance.Content.Load<SpriteFont>("playerNameFont");
             playerHUD = GameWorld.Instance.Content.Load<Texture2D>("playerHUD");
+
+
+            if (subject is Player player)
+            {
+                damageTaken = player.Damage;
+            }
+            else if (subject is AI ai)
+            {
+                damageTaken = ai.Damage;
+            }
+
+            damageText = $"{damageTaken:D2}%";
         }
         
         public override void Draw(SpriteBatch spriteBatch)
@@ -68,7 +87,15 @@ namespace Kaiju.ComponentPattern
 
         public void Updated()
         {
-            damageTaken++;
+            if(subject is Player player)
+            {
+                damageTaken = player.Damage;
+            }
+            else if (subject is AI ai)
+            {
+                damageTaken = ai.Damage;
+            }
+
             damageText = $"{damageTaken:D2}%";
         }
     }

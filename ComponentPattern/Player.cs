@@ -1,13 +1,15 @@
 ﻿using Kaiju.ComponentPattern.Characters;
+using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX.Direct3D11;
 using SharpDX.Direct3D9;
 using System;
+using System.Collections.Generic;
 
 namespace Kaiju.ComponentPattern
 {
-    public class Player : Component
+    public class Player : Component, ISubject
     {
         private float speed;
         private bool grounded = false;
@@ -19,6 +21,9 @@ namespace Kaiju.ComponentPattern
         public Character chr;
         public bool facingRight;
         private bool lastPunchRight;
+
+        private List<IObserver> observers = new List<IObserver>();
+        public int Damage { get; private set; }
 
 
         public Player(GameObject gameObject) : base(gameObject)
@@ -156,5 +161,28 @@ namespace Kaiju.ComponentPattern
             animator.PlayAnimation("Block");
         }
 
+        public void TakeDamage(int amount)
+        {
+            Damage += amount;
+            Notify();
+        }
+
+        public void Attach(IObserver observer)
+        {
+            observers.Add(observer);
+        }
+
+        public void Detach(IObserver observer)
+        {
+            observers.Remove(observer);
+        }
+
+        public void Notify()
+        {
+            foreach (var observer in observers)
+            {
+                observer.Updated();
+            }
+        }
     }
 }

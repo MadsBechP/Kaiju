@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Kaiju
 {
-    public class GameWorld : Game, ISubject
+    public class GameWorld : Game/*, /*ISubject**/
     {
         private static GameWorld instance;
 
@@ -33,6 +33,7 @@ namespace Kaiju
         private List<GameObject> gameObjects = new List<GameObject>();
         private List<GameObject> newGameObjects = new List<GameObject>();
         private List<GameObject> destroyedGameObjects = new List<GameObject>();
+        //private List<IObserver> observers = new List<IObserver>();
 
         public GameObject player1Go;
         public Player player1;
@@ -115,10 +116,16 @@ namespace Kaiju
 
             gameObjects.Add(AIDamageMeterGo);
             gameObjects.Add(playerDamageMeterGo);
+
             AIDamageMeterGo.Awake();
             playerDamageMeterGo.Awake();
-            AIDamageMeter.Updated();
-            playerDamageMeter.Updated();
+
+            
+            playerDamageMeter.SetSubject(player1);            
+            AIDamageMeter.SetSubject(player2);
+
+            //AIDamageMeter.Updated();
+            //playerDamageMeter.Updated();
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -246,23 +253,23 @@ namespace Kaiju
             return animation;
         }
 
-        private List<IObserver> observers = new List<IObserver>();
-        public void Attach(IObserver observer)
-        {
-            observers.Add(observer);
-        }
+       
+        //public void Attach(IObserver observer)
+        //{
+        //    observers.Add(observer);
+        //}
 
-        public void Detach(IObserver observer)
-        {
-            observers.Remove(observer);
-        }
+        //public void Detach(IObserver observer)
+        //{
+        //    observers.Remove(observer);
+        //}
 
-        public void Notify()
-        {
-            foreach (IObserver observer in observers)
-            {
-                observer.Updated();
-            }
-        }
+        //public void Notify()
+        //{
+        //    foreach (IObserver observer in observers)
+        //    {
+        //        observer.Updated();
+        //    }
+        //}
     }
 }
