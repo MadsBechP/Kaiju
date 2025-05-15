@@ -58,10 +58,6 @@ namespace Kaiju.ComponentPattern
             UpdateDamage();
         }
 
-        public override void Update()
-        {
-            UpdateDamage();
-        }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -79,7 +75,7 @@ namespace Kaiju.ComponentPattern
             }
 
         }
-        
+
         private void UpdateDamage()
         {
             if (subject is Player player)
@@ -94,19 +90,10 @@ namespace Kaiju.ComponentPattern
             damageText = $"{damageTaken:D2}%";
             Debug.WriteLine($"DamageMeter Updated: {damageText}");
         }
+       
         public void Updated()
         {
-            //if(subject is Player player)
-            //{
-            //    damageTaken = player.Damage;
-            //}
-            //else if (subject is AI ai)
-            //{
-            //    damageTaken = ai.Damage;
-            //}
-
-            //damageText = $"{damageTaken:D2}%";
-            //Debug.WriteLine($"DamageMeter Updated: {damageText}");
+            UpdateDamage();
         }
     }
 }
