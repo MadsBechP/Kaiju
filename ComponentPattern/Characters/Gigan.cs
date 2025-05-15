@@ -24,18 +24,27 @@ namespace Kaiju.ComponentPattern.Characters
                 "GG_Sprites\\GG_Walk\\GG_Walk_02",
                 "GG_Sprites\\GG_Walk\\GG_Walk_03",
                 "GG_Sprites\\GG_Walk\\GG_Walk_04"}, true));
+            ani.AddAnimation(GameWorld.Instance.BuildAnimation("LPunch", new string[] {
+                "GG_Sprites\\GG_Punch_L\\GG_Punch_L_01",
+                "GG_Sprites\\GG_Punch_L\\GG_Punch_L_02"}, false));
+            ani.AddAnimation(GameWorld.Instance.BuildAnimation("RPunch", new string[] {
+                "GG_Sprites\\GG_Punch_R\\GG_Punch_R_01",
+                "GG_Sprites\\GG_Punch_R\\GG_Punch_R_02"}, false));
 
-            if (this.gameObject == GameWorld.Instance.player1Go)
+            if (gameObject.GetComponent<Player>() as Player != null)
             {
-                InputHandler.Instance.AddUpdateCommand(Keys.A, new MoveCommand(GameWorld.Instance.player1, new Vector2(-1, 0)));
-                InputHandler.Instance.AddUpdateCommand(Keys.D, new MoveCommand(GameWorld.Instance.player1, new Vector2(1, 0)));
-                InputHandler.Instance.AddButtonDownCommand(Keys.W, new JumpCommand(GameWorld.Instance.player1));
-            }
-            else if (this.gameObject == GameWorld.Instance.player2Go)
-            {
-                InputHandler.Instance.AddUpdateCommand(Keys.Left, new MoveCommand(GameWorld.Instance.player2, new Vector2(-1, 0)));
-                InputHandler.Instance.AddUpdateCommand(Keys.Right, new MoveCommand(GameWorld.Instance.player2, new Vector2(1, 0)));
-                InputHandler.Instance.AddButtonDownCommand(Keys.Up, new JumpCommand(GameWorld.Instance.player2));
+                if (this.gameObject == GameWorld.Instance.player1Go)
+                {
+                    InputHandler.Instance.AddUpdateCommand(Keys.A, new MoveCommand(GameWorld.Instance.player1, new Vector2(-1, 0)));
+                    InputHandler.Instance.AddUpdateCommand(Keys.D, new MoveCommand(GameWorld.Instance.player1, new Vector2(1, 0)));
+                    InputHandler.Instance.AddButtonDownCommand(Keys.W, new JumpCommand(GameWorld.Instance.player1));
+                }
+                else if (this.gameObject == GameWorld.Instance.player2Go)
+                {
+                    InputHandler.Instance.AddUpdateCommand(Keys.Left, new MoveCommand(GameWorld.Instance.player2, new Vector2(-1, 0)));
+                    InputHandler.Instance.AddUpdateCommand(Keys.Right, new MoveCommand(GameWorld.Instance.player2, new Vector2(1, 0)));
+                    InputHandler.Instance.AddButtonDownCommand(Keys.Up, new JumpCommand(GameWorld.Instance.player2));
+                } 
             }
         }
         public override void FaceRight(bool x)

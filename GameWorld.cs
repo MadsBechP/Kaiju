@@ -135,6 +135,7 @@ namespace Kaiju
                     if (col1 != null && col2 != null && col1.CollisionBox.Intersects(col2.CollisionBox))
                     {
                         bool handledCollision = false;
+
                         foreach (RectangleData rects1 in col1.PixelPerfectRectangles)
                         {
                             foreach (RectangleData rects2 in col2.PixelPerfectRectangles)
@@ -146,12 +147,16 @@ namespace Kaiju
                                     break;
                                 }
                             }
+                            if (rects1.Rectangle.Intersects(col2.CollisionBox) && col2.isAttack && !(col2.Owner == go1.GetComponent<Player>() as Player || col2.Owner == go1.GetComponent<AI>() as AI))
+                            {
+                                handledCollision = true;
+                            }
                             if (handledCollision)
                             {
                                 break;
                             }
                         }
-                        if (handledCollision || col2.isAttack)
+                        if (handledCollision)
                         {
                             go1.OnCollisionEnter(col2);
                             handledCollisions.Add((go1, go2));
