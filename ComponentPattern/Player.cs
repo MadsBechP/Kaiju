@@ -1,14 +1,17 @@
 ﻿using Kaiju.ComponentPattern.Characters;
+using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX.Direct3D11;
 using SharpDX.Direct3D9;
 using System;
 using System.Threading;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Kaiju.ComponentPattern
 {
-    public class Player : Component
+    public class Player : Component, ISubject
     {
         protected float speed;
         private bool grounded = false;
@@ -22,6 +25,9 @@ namespace Kaiju.ComponentPattern
 
         private bool hit = false;
         private float hitTimer;
+
+        private List<IObserver> observers = new List<IObserver>();
+        public int Damage { get; private set; }
 
 
         public Player(GameObject gameObject) : base(gameObject)
@@ -230,6 +236,29 @@ namespace Kaiju.ComponentPattern
 
                 gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 1000;
                 gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime);
+        public void TakeDamage(int amount)
+        {
+            Damage += amount;
+            Debug.WriteLine($"{this} took damage: {Damage}"); // tjek om TakeDamage faktisk bliver kaldt
+            Notify();
+        }
+
+        public void Attach(IObserver observer)
+        {
+            observers.Add(observer);
+        }
+
+        public void Detach(IObserver observer)
+        {
+            observers.Remove(observer);
+        }
+
+        public void Notify()
+        {
+            Debug.WriteLine($"{this} Notifying {observers.Count} observers."); //tjek om Notify bliver kaldt og sender vider til observer
+            foreach (var observer in observers)
+            {
+                observer.Updated();
             }
         }
     }

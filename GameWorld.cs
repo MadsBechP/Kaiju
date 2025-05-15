@@ -1,6 +1,7 @@
 ﻿using Kaiju.Command;
 using Kaiju.ComponentPattern;
 using Kaiju.ComponentPattern.Characters;
+using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -38,6 +39,8 @@ namespace Kaiju
         public GameObject player2Go;
         public Player player2;
 
+       
+        private InputHandler inputHandler = InputHandler.Instance;
 
         public float DeltaTime { get; private set; }
         private GameWorld()
@@ -69,6 +72,11 @@ namespace Kaiju
             player2.chr = player2Go.AddComponent<Gigan>();
             gameObjects.Add(player2Go);
 
+            GameObject timerGo = new GameObject();
+            timerGo.AddComponent<Timer>();
+            gameObjects.Add(timerGo);
+
+
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Awake();
@@ -79,12 +87,52 @@ namespace Kaiju
 
         protected override void LoadContent()
         {
+            var playerProfile = Content.Load<Texture2D>("GZProfile");
+
+            GameObject playerDamageMeterGo = new GameObject();
+            var playerDamageMeter = playerDamageMeterGo.AddComponent<DamageMeter>();
+            playerDamageMeter.Setup(
+                "GZ",
+                playerProfile,
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 750, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 735, Graphics.PreferredBackBufferHeight - 80), // namePos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 1000,Graphics.PreferredBackBufferHeight - 250), // hudPos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 950, Graphics.PreferredBackBufferHeight - 200) // profilePos
+               );
+
+            var AIProfile = Content.Load<Texture2D>("GiganProfile");
+
+            GameObject AIDamageMeterGo = new GameObject();
+            var AIDamageMeter = AIDamageMeterGo.AddComponent<DamageMeter>();
+            AIDamageMeter.Setup(
+                "CPU",
+                AIProfile,
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 790, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 780, Graphics.PreferredBackBufferHeight - 80), // namePos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 550, Graphics.PreferredBackBufferHeight - 250), // hudPos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 610, Graphics.PreferredBackBufferHeight - 200) // profilePos
+               );
+
+            gameObjects.Add(AIDamageMeterGo);
+            gameObjects.Add(playerDamageMeterGo);
+
+            AIDamageMeterGo.Awake();
+            playerDamageMeterGo.Awake();
+
+            
+            playerDamageMeter.SetSubject(player1);            
+            AIDamageMeter.SetSubject(player2);
+
+            //AIDamageMeter.Updated();
+            //playerDamageMeter.Updated();
+
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Start();
             }
+                        
         }
 
         protected override void Update(GameTime gameTime)
@@ -208,5 +256,7 @@ namespace Kaiju
 
             return animation;
         }
+
+       
     }
 }

@@ -1,6 +1,9 @@
 ﻿using Kaiju.Command;
+using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Kaiju.ComponentPattern
 {
@@ -14,6 +17,9 @@ namespace Kaiju.ComponentPattern
 
         Vector2 Pos { get {return gameObject.Transform.Position; } }
         Vector2 OPos { get { return opponent.gameObject.Transform.Position; } }
+
+        private List<IObserver> observers = new List<IObserver>();
+        public int Damage { get; private set; }
 
         public AI(GameObject gameObject) : base(gameObject)
         {
