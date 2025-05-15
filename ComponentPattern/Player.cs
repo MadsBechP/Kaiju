@@ -197,6 +197,7 @@ namespace Kaiju.ComponentPattern
                             animator.PlayAnimation("RPunch");
                             lastPunchRight = true;
                         }
+                        damage = 5;
                         break;
                     }
                 case 2:
@@ -211,6 +212,7 @@ namespace Kaiju.ComponentPattern
                         }
 
                         animator.PlayAnimation("TailSwipe");
+                        damage = 10;
                         break;
                     }
             }
@@ -225,17 +227,20 @@ namespace Kaiju.ComponentPattern
 
         public override void OnCollisionEnter(Collider collider)
         {
-            if (collider.isAttack)
+            if (collider.isAttack && !hit)
             {
                 GameWorld.Instance.Destroy(collider.gameObject);
 
+                TakeDamage(collider.Damage);
                 hit = true;
                 hitTimer = 0.5f;
                 Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
                 knockback.Normalize();
 
-                gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 1000;
-                gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime);
+                gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 50 * Damage;
+                gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime * 10 * Damage);
+            }
+        }
         public void TakeDamage(int amount)
         {
             Damage += amount;
