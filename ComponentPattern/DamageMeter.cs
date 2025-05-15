@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,8 +30,7 @@ namespace Kaiju.ComponentPattern
         private ISubject subject;
         
         public DamageMeter(GameObject gameObject) : base(gameObject)
-        {
-            //GameWorld.Instance.Attach(this); 
+        {            
         }
         
         public void Setup(string playerName, Texture2D profileTexture, Vector2 damageFontPos, Vector2 namePos, Vector2 hudPos, Vector2 profilePos)
@@ -55,19 +55,14 @@ namespace Kaiju.ComponentPattern
             playerNameFont = GameWorld.Instance.Content.Load<SpriteFont>("playerNameFont");
             playerHUD = GameWorld.Instance.Content.Load<Texture2D>("playerHUD");
 
-
-            if (subject is Player player)
-            {
-                damageTaken = player.Damage;
-            }
-            else if (subject is AI ai)
-            {
-                damageTaken = ai.Damage;
-            }
-
-            damageText = $"{damageTaken:D2}%";
+            UpdateDamage();
         }
-        
+
+        public override void Update()
+        {
+            UpdateDamage();
+        }
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(playerHUD, hudPos, Color.White);
@@ -84,10 +79,10 @@ namespace Kaiju.ComponentPattern
             }
 
         }
-
-        public void Updated()
+        
+        private void UpdateDamage()
         {
-            if(subject is Player player)
+            if (subject is Player player)
             {
                 damageTaken = player.Damage;
             }
@@ -97,6 +92,21 @@ namespace Kaiju.ComponentPattern
             }
 
             damageText = $"{damageTaken:D2}%";
+            Debug.WriteLine($"DamageMeter Updated: {damageText}");
+        }
+        public void Updated()
+        {
+            //if(subject is Player player)
+            //{
+            //    damageTaken = player.Damage;
+            //}
+            //else if (subject is AI ai)
+            //{
+            //    damageTaken = ai.Damage;
+            //}
+
+            //damageText = $"{damageTaken:D2}%";
+            //Debug.WriteLine($"DamageMeter Updated: {damageText}");
         }
     }
 }

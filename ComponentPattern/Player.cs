@@ -6,6 +6,7 @@ using SharpDX.Direct3D11;
 using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Kaiju.ComponentPattern
 {
@@ -164,6 +165,7 @@ namespace Kaiju.ComponentPattern
         public void TakeDamage(int amount)
         {
             Damage += amount;
+            Debug.WriteLine($"{this} took damage: {Damage}"); // tjek om TakeDamage faktisk bliver kaldt
             Notify();
         }
 
@@ -179,6 +181,7 @@ namespace Kaiju.ComponentPattern
 
         public void Notify()
         {
+            Debug.WriteLine($"{this} Notifying {observers.Count} observers."); //tjek om Notify bliver kaldt og sender vider til observer
             foreach (var observer in observers)
             {
                 observer.Updated();

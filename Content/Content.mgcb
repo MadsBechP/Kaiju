@@ -13,6 +13,13 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin DamageFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:DamageFont.spritefont
+
 #begin GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Dia_01.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -421,12 +428,17 @@
 /processorParam:TextureFormat=Color
 /build:GG_Sprites/GG_Walk/GG_Walk_04.png;GG_Sprites/GG_Walk/GG_Walk_04
 
-#begin DamageFont.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
+#begin GiganProfile.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
 /processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:DamageFont.spritefont
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:GiganProfile.png
 
 #begin Goji.png
 /importer:TextureImporter
@@ -824,18 +836,6 @@
 /processorParam:TextureFormat=Color
 /build:GZ_Sprites/GZ_Walk/GZ_Walk_08.png;GZ_Sprites/GZ_Walk/GZ_Walk_08
 
-#begin Pixel.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Pixel.png
-
 #begin GZProfile.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -854,6 +854,18 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:HUDFont.spritefont
+
+#begin Pixel.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Pixel.png
 
 #begin playerHUD.png
 /importer:TextureImporter

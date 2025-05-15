@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Kaiju
 {
-    public class GameWorld : Game/*, /*ISubject**/
+    public class GameWorld : Game
     {
         private static GameWorld instance;
 
@@ -33,7 +33,6 @@ namespace Kaiju
         private List<GameObject> gameObjects = new List<GameObject>();
         private List<GameObject> newGameObjects = new List<GameObject>();
         private List<GameObject> destroyedGameObjects = new List<GameObject>();
-        //private List<IObserver> observers = new List<IObserver>();
 
         public GameObject player1Go;
         public Player player1;
@@ -101,17 +100,17 @@ namespace Kaiju
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 950, Graphics.PreferredBackBufferHeight - 200) // profilePos
                );
 
-            var AIProfile = Content.Load<Texture2D>("GZProfile");
+            var AIProfile = Content.Load<Texture2D>("GiganProfile");
 
             GameObject AIDamageMeterGo = new GameObject();
             var AIDamageMeter = AIDamageMeterGo.AddComponent<DamageMeter>();
             AIDamageMeter.Setup(
-                "AI-GZ",
+                "CPU",
                 AIProfile,
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) + 790, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) + 780, Graphics.PreferredBackBufferHeight - 80), // namePos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) + 550, Graphics.PreferredBackBufferHeight - 250), // hudPos
-                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 600, Graphics.PreferredBackBufferHeight - 200) // profilePos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 610, Graphics.PreferredBackBufferHeight - 200) // profilePos
                );
 
             gameObjects.Add(AIDamageMeterGo);
@@ -254,22 +253,5 @@ namespace Kaiju
         }
 
        
-        //public void Attach(IObserver observer)
-        //{
-        //    observers.Add(observer);
-        //}
-
-        //public void Detach(IObserver observer)
-        //{
-        //    observers.Remove(observer);
-        //}
-
-        //public void Notify()
-        //{
-        //    foreach (IObserver observer in observers)
-        //    {
-        //        observer.Updated();
-        //    }
-        //}
     }
 }

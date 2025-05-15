@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Kaiju.ComponentPattern
 {
-    public class AI : Player, ISubject
+    public class AI : Player
     {
         ICommand left;
         ICommand right;
@@ -73,29 +73,5 @@ namespace Kaiju.ComponentPattern
 
         }
 
-        public void TakeDamage(int amount)
-        {
-            Damage += amount;
-            Debug.WriteLine($"{this} took damage! new value {Damage}"); // tjek om TakeDamage faktisk bliver kaldt
-            Notify();
-        }
-
-        public void Attach(IObserver observer)
-        {
-            observers.Add(observer);
-        }
-
-        public void Detach(IObserver observer)
-        {
-            observers.Remove(observer);
-        }
-
-        public void Notify()
-        {
-            foreach (var observer in observers)
-            {
-                observer.Updated();
-            }
-        }
     }
 }
