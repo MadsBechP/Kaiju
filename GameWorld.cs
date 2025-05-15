@@ -1,10 +1,12 @@
 ﻿using Kaiju.Command;
 using Kaiju.ComponentPattern;
+using Kaiju.ComponentPattern.Characters;
 using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Kaiju
 {
@@ -32,8 +34,10 @@ namespace Kaiju
         private List<GameObject> newGameObjects = new List<GameObject>();
         private List<GameObject> destroyedGameObjects = new List<GameObject>();
 
-        public GameObject playerGo;
-        public Player player;
+        public GameObject player1Go;
+        public Player player1;
+        public GameObject player2Go;
+        public Player player2;
 
        
         private InputHandler inputHandler = InputHandler.Instance;
@@ -52,10 +56,21 @@ namespace Kaiju
 
         protected override void Initialize()
         {
-            playerGo = new GameObject();
-            player = playerGo.AddComponent<Player>();
-            playerGo.AddComponent<SpriteRenderer>();
-            gameObjects.Add(playerGo);
+            player1Go = new GameObject();
+            player1 = player1Go.AddComponent<Player>();
+            player1Go.AddComponent<SpriteRenderer>();
+            player1Go.AddComponent<Collider>();
+            player1Go.AddComponent<Animator>();
+            player1.chr = player1Go.AddComponent<Godzilla>();
+            gameObjects.Add(player1Go);
+
+            player2Go = new GameObject();
+            player2 = player2Go.AddComponent<AI>();
+            player2Go.AddComponent<SpriteRenderer>();
+            player2Go.AddComponent<Collider>();
+            player2Go.AddComponent<Animator>();
+            player2.chr = player2Go.AddComponent<Gigan>();
+            gameObjects.Add(player2Go);
 
             GameObject timerGo = new GameObject();
             timerGo.AddComponent<Timer>();
@@ -66,9 +81,6 @@ namespace Kaiju
             {
                 gameObject.Awake();
             }
-            inputHandler.AddUpdateCommand(Keys.A, new MoveCommand(player, new Vector2(-1, 0)));
-            inputHandler.AddUpdateCommand(Keys.D, new MoveCommand(player, new Vector2(1, 0)));
-            inputHandler.AddButtonDownCommand(Keys.Space, new JumpCommand(player));
 
             base.Initialize();
         }
@@ -123,11 +135,12 @@ namespace Kaiju
                 Exit();
 
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            inputHandler.Execute();
+            InputHandler.Instance.Execute();
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Update();
             }
+            CheckCollision();
             Cleanup();
 
             base.Update(gameTime);
@@ -137,7 +150,7 @@ namespace Kaiju
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, null);
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Draw(_spriteBatch);
@@ -146,14 +159,60 @@ namespace Kaiju
 
             base.Draw(gameTime);
         }
+
+        public void CheckCollision()
+        {
+            HashSet<(GameObject, GameObject)> handledCollisions = new();
+            foreach (GameObject go1 in gameObjects)
+            {
+                foreach (GameObject go2 in gameObjects)
+                {
+                    if (go1 == go2 || handledCollisions.Contains((go1, go2)))
+                    {
+                        continue;
+                    }
+                    Collider col1 = go1.GetComponent<Collider>() as Collider;
+                    Collider col2 = go2.GetComponent<Collider>() as Collider;
+
+                    if (col1 != null && col2 != null && col1.CollisionBox.Intersects(col2.CollisionBox))
+                    {
+                        bool handledCollision = false;
+                        foreach (RectangleData rects1 in col1.PixelPerfectRectangles)
+                        {
+                            foreach (RectangleData rects2 in col2.PixelPerfectRectangles)
+                            {
+                                if (rects1.Rectangle.Intersects(rects2.Rectangle))
+                                {
+                                    Debug.WriteLine($"Collision with {go1} and {go2}");
+                                    handledCollision = true;
+                                    break;
+                                }
+                            }
+                            if (handledCollision)
+                            {
+                                break;
+                            }
+                        }
+                        if (handledCollision || col2.isAttack)
+                        {
+                            go1.OnCollisionEnter(col2);
+                            handledCollisions.Add((go1, go2));
+                        }
+                    }
+                }
+            }
+        }
+
         public void Instantiate(GameObject gameObjectToInstantiate)
         {
             newGameObjects.Add(gameObjectToInstantiate);
         }
+
         public void Destroy(GameObject gameObjectToDestroy)
         {
             destroyedGameObjects.Add(gameObjectToDestroy);
         }
+
         private void Cleanup()
         {
             for (int i = 0; i < newGameObjects.Count; i++)
@@ -171,6 +230,20 @@ namespace Kaiju
             }
             destroyedGameObjects.Clear();
             newGameObjects.Clear();
+        }
+
+        public Animation BuildAnimation(string animationName, string[] spriteNames, bool heldAnimation)
+        {
+            Texture2D[] sprites = new Texture2D[spriteNames.Length];
+
+            for (int i = 0; i < sprites.Length; i++)
+            {
+                sprites[i] = GameWorld.Instance.Content.Load<Texture2D>(spriteNames[i]);
+            }
+
+            Animation animation = new Animation(animationName, sprites, 5, heldAnimation);
+
+            return animation;
         }
 
         private List<IObserver> observers = new List<IObserver>();

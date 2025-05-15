@@ -38,6 +38,14 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        public void OnCollisionEnter(Collider collider)
+        {
+            foreach (var component in components)
+            {
+                component.OnCollisionEnter(collider);
+            }
+        }
+
         public T AddComponent<T>(params object[] additionalParameters) where T : Component
         {
             Type componentType = typeof(T);
