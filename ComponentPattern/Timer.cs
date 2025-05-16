@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Kaiju.ComponentPattern
 {
-    internal class Timer : Component
+    public class Timer : Component
     {
         private SpriteFont hudFont;
         private string text;

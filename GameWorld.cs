@@ -2,6 +2,7 @@
 using Kaiju.ComponentPattern;
 using Kaiju.ComponentPattern.Characters;
 using Kaiju.Observer;
+using Kaiju.State;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -29,7 +30,7 @@ namespace Kaiju
         private GraphicsDeviceManager _graphics;
         public GraphicsDeviceManager Graphics { get { return _graphics; } }
         private SpriteBatch _spriteBatch;
-
+        
         private List<GameObject> gameObjects = new List<GameObject>();
         private List<GameObject> newGameObjects = new List<GameObject>();
         private List<GameObject> destroyedGameObjects = new List<GameObject>();
@@ -157,8 +158,6 @@ namespace Kaiju
             playerDamageMeter.SetSubject(player1);
             player2DamageMeter.SetSubject(player2);
 
-            //AIDamageMeter.Updated();
-            //playerDamageMeter.Updated();
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -291,6 +290,14 @@ namespace Kaiju
             return animation;
         }
 
+       public void SetGameState(IGameScreenState newGameState)
+       {
+
+       }
        
+       public void ChangeGameState()
+       {
+
+       }
     }
 }
