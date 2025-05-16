@@ -33,6 +33,7 @@ namespace Kaiju
         private List<GameObject> gameObjects = new List<GameObject>();
         private List<GameObject> newGameObjects = new List<GameObject>();
         private List<GameObject> destroyedGameObjects = new List<GameObject>();
+        private List<GameObject> UIObjects = new List<GameObject>();
 
         public GameObject player1Go;
         public Player player1;
@@ -41,6 +42,7 @@ namespace Kaiju
 
        
         private InputHandler inputHandler = InputHandler.Instance;
+        private Camera camera;
 
         public float DeltaTime { get; private set; }
         private GameWorld()
@@ -65,7 +67,7 @@ namespace Kaiju
             gameObjects.Add(player1Go);
 
             player2Go = new GameObject();
-            player2 = player2Go.AddComponent<Player>();
+            player2 = player2Go.AddComponent<AI>();
             player2Go.AddComponent<SpriteRenderer>();
             player2Go.AddComponent<Collider>();
             player2Go.AddComponent<Animator>();
@@ -74,8 +76,9 @@ namespace Kaiju
 
             GameObject timerGo = new GameObject();
             timerGo.AddComponent<Timer>();
-            gameObjects.Add(timerGo);
-
+            
+            UIObjects.Add(timerGo);
+            timerGo.Awake();
 
             foreach (var gameObject in gameObjects)
             {
@@ -87,6 +90,7 @@ namespace Kaiju
 
         protected override void LoadContent()
         {
+            
             Texture2D player1Profile = Content.Load<Texture2D>("GZProfile");
             Texture2D player2Profile = Content.Load<Texture2D>("GZProfile");
             string name1 = "null";
@@ -147,8 +151,8 @@ namespace Kaiju
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) + 610, Graphics.PreferredBackBufferHeight - 200) // profilePos
                );
 
-            gameObjects.Add(player1DamageMeterGo);
-            gameObjects.Add(player2DamageMeterGo);
+            UIObjects.Add(player1DamageMeterGo);
+            UIObjects.Add(player2DamageMeterGo);
 
             player1DamageMeterGo.Awake();
             player2DamageMeterGo.Awake();
@@ -166,20 +170,37 @@ namespace Kaiju
             {
                 gameObject.Start();
             }
-                        
+            foreach (var gameObject in UIObjects)
+            {
+                gameObject.Start();
+            }
+            camera = new Camera(_graphics);
+
         }
 
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+            if (Keyboard.GetState().IsKeyDown(Keys.M))
+            {
+                Graphics.PreferredBackBufferWidth++;
+                Graphics.PreferredBackBufferHeight++;
+            }
 
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             InputHandler.Instance.Execute();
+
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Update();
             }
+            foreach (var gameObject in UIObjects)
+            {
+                gameObject.Update();
+            }
+
+            camera.MoveToward((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             CheckCollision();
             Cleanup();
 
@@ -190,8 +211,17 @@ namespace Kaiju
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, null);
+            Matrix transform = Matrix.CreateTranslation(-camera.GetTopLeft().X, -camera.GetTopLeft().Y, 0);
+            //transform += Matrix.CreateScale(0.5f);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, transform);
             foreach (var gameObject in gameObjects)
+            {
+                gameObject.Draw(_spriteBatch);
+            }
+            _spriteBatch.End();
+
+            _spriteBatch.Begin();
+            foreach (var gameObject in UIObjects)
             {
                 gameObject.Draw(_spriteBatch);
             }
