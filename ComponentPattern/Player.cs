@@ -23,6 +23,10 @@ namespace Kaiju.ComponentPattern
         private bool lastPunchRight;
         private float atkCooldown;
 
+        private bool specialActive;
+        private float SpecialDuration = 3;
+        private float specialTime;
+
         private bool hit = false;
         private float hitTimer;
 
@@ -55,6 +59,16 @@ namespace Kaiju.ComponentPattern
 
         public override void Update()
         {
+            if (specialActive)
+            {
+                specialTime += GameWorld.Instance.DeltaTime;
+                if (specialTime > SpecialDuration)
+                {
+                    specialActive = false;
+                    specialTime = 0;
+                }
+            }
+
             // Moves player according to its current velocity
             gameObject.Transform.Translate();
 
@@ -76,7 +90,7 @@ namespace Kaiju.ComponentPattern
             // Timer for attack
             if (atkCooldown > 0)
             {
-            atkCooldown -= GameWorld.Instance.DeltaTime;
+                atkCooldown -= GameWorld.Instance.DeltaTime;
             }
 
 
@@ -117,10 +131,6 @@ namespace Kaiju.ComponentPattern
             {
                 chr.FaceRight(false);
             }
-
-            
-            
-
         }
 
         public void Move(Vector2 velocity)
@@ -150,7 +160,14 @@ namespace Kaiju.ComponentPattern
                 facingRight = true;
             }
 
-            animator.PlayAnimation("Walk");
+            if (specialActive)
+            {
+                animator.PlayAnimation("SawMove");
+            }
+            else
+            {
+                animator.PlayAnimation("Walk");
+            }
         }
 
         public void Jump()
@@ -171,8 +188,8 @@ namespace Kaiju.ComponentPattern
             GameObject attackGo = new();
             Rectangle position = new Rectangle();
             int damage = 0;
-            
-            
+
+
 
             switch (atkNumber)
             {
@@ -204,6 +221,30 @@ namespace Kaiju.ComponentPattern
                     {
                         if (facingRight)
                         {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
+                        }
+                        else
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
+                        }
+
+                        if (lastPunchRight)
+                        {
+                            animator.PlayAnimation("LKick");
+                            lastPunchRight = false;
+                        }
+                        else
+                        {
+                            animator.PlayAnimation("RKick");
+                            lastPunchRight = true;
+                        }
+                        damage = 5;
+                        break;
+                    }
+                case 3:
+                    {
+                        if (facingRight)
+                        {
                             position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
                         }
                         else
@@ -215,11 +256,57 @@ namespace Kaiju.ComponentPattern
                         damage = 10;
                         break;
                     }
+                case 4:
+                    {
+                        if (facingRight)
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
+                        }
+                        else
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
+                        }
+
+                        animator.PlayAnimation("Kick");
+                        damage = 10;
+                        break;
+                    }
+                case 5:
+                    {
+                        if (facingRight)
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
+                        }
+                        else
+                        {
+                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
+                        }
+
+                        animator.PlayAnimation("Beam");
+                        damage = 10;
+                        break;
+                    }
             }
             attackGo.AddComponent<Collider>(0.2f, position, this, damage);
             GameWorld.Instance.Instantiate(attackGo);
 
         }
+
+        public void Special(int specialNumber)
+        {            
+            switch (specialNumber)
+            {
+                case 1:
+                    animator.PlayAnimation("Special");
+                    break;
+
+                case 2:
+                    animator.PlayAnimation("SawStill");
+                    specialActive = true;
+                    break;
+            }
+        }
+
         public void Block()
         {
             animator.PlayAnimation("Block");

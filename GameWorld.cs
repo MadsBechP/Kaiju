@@ -61,7 +61,7 @@ namespace Kaiju
             player1Go.AddComponent<SpriteRenderer>();
             player1Go.AddComponent<Collider>();
             player1Go.AddComponent<Animator>();
-            player1.chr = player1Go.AddComponent<Godzilla>();
+            player1.chr = player1Go.AddComponent<Gigan>();
             gameObjects.Add(player1Go);
 
             player2Go = new GameObject();
