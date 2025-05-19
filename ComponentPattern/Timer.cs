@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Kaiju.State;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,10 @@ namespace Kaiju.ComponentPattern
         private string text;
         private Vector2 position = new Vector2(GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2, 20);
         private float timeLeft = 120f;
+
         public Timer(GameObject gameObject) : base(gameObject)
         {
+
         }
 
         public override void Awake()
@@ -32,6 +35,7 @@ namespace Kaiju.ComponentPattern
                 if (timeLeft < 0f)
                 {
                     timeLeft = 0f;
+                    GameWorld.Instance.ChangeGameState(new VictoryState(GameWorld.Instance)); // if time runs out it will change to the victory state
                 }
                 TimeSpan time = TimeSpan.FromSeconds(timeLeft);
                 text = $"{time.Minutes:D2}:{time.Seconds:D2}";

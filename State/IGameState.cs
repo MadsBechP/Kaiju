@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Kaiju.State
 {
-    public interface IGameScreenState
+    public interface IGameState
     {
         void Update(GameTime gameTime);
         void Draw(SpriteBatch spriteBatch);

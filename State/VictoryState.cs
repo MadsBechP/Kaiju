@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Kaiju.State
 {
-    public class VictoryState : IGameScreenState
+    public class VictoryState : IGameState
     {
         private GameWorld game;
 
