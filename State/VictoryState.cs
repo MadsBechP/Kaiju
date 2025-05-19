@@ -7,10 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Kaiju.State
-{
+{    
     public class VictoryState : IGameState
     {
         private GameWorld game;
+        private SpriteFont victoryFont;
+        private string winText;
 
         public VictoryState(GameWorld game)
         {

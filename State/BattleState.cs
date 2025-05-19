@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Kaiju.State
-{
+{    
     public class BattleState : IGameState
     {
         private GameWorld game;
@@ -33,10 +33,7 @@ namespace Kaiju.State
 
         private void LoadContent()
         {
-            //Texture2D player1Profile = game.Content.Load<Texture2D>("GZProfile");
-            //Texture2D player2Profile = game.Content.Load<Texture2D>("GZProfile");
-            //string name1 = "null";
-            //string name2 = "null";
+            
             switch (game.player1.chr)
             {
                 case Godzilla:
@@ -92,8 +89,6 @@ namespace Kaiju.State
                 new Vector2((game.Graphics.PreferredBackBufferWidth / 2) + 610, game.Graphics.PreferredBackBufferHeight - 200) // profilePos
                );
 
-            //gameObjects.Add(player1DamageMeterGo);
-            //gameObjects.Add(player2DamageMeterGo);
 
             game.Instantiate(player1DamageMeterGo);
             game.Instantiate(player2DamageMeterGo);

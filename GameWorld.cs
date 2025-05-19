@@ -92,77 +92,7 @@ namespace Kaiju
         }
 
         protected override void LoadContent()
-        {
-            //Texture2D player1Profile = Content.Load<Texture2D>("GZProfile");
-            //Texture2D player2Profile = Content.Load<Texture2D>("GZProfile");
-            //string name1 = "null";
-            //string name2 = "null";
-            //switch (player1.chr)
-            //{
-            //    case Godzilla:
-            //        {
-            //            player1Profile = Content.Load<Texture2D>("GZProfile");
-            //            name1 = "Godzilla";
-            //            break;
-            //        }
-            //    case Gigan:
-            //        {
-            //            player1Profile = Content.Load<Texture2D>("GiganProfile");
-            //            name1 = "Gigan";
-            //            break;
-            //        }
-            //}
-            //switch (player2.chr)
-            //{
-            //    case Godzilla:
-            //        {
-            //            player2Profile = Content.Load<Texture2D>("GZProfile");
-            //            name2 = "Godzilla";
-            //            break;
-            //        }
-            //    case Gigan:
-            //        {
-            //            player2Profile = Content.Load<Texture2D>("GiganProfile");
-            //            name2 = "Gigan";
-            //            break;
-            //        }
-            //}
-
-
-
-
-            //GameObject player1DamageMeterGo = new GameObject();
-            //var playerDamageMeter = player1DamageMeterGo.AddComponent<DamageMeter>();
-            //playerDamageMeter.Setup(
-            //    name1,
-            //    player1Profile,
-            //    new Vector2((Graphics.PreferredBackBufferWidth / 2) - 750, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
-            //    new Vector2((Graphics.PreferredBackBufferWidth / 2) - 735, Graphics.PreferredBackBufferHeight - 80), // namePos
-            //    new Vector2((Graphics.PreferredBackBufferWidth / 2) - 1000, Graphics.PreferredBackBufferHeight - 250), // hudPos
-            //    new Vector2((Graphics.PreferredBackBufferWidth / 2) - 950, Graphics.PreferredBackBufferHeight - 200) // profilePos
-            //   );
-
-            //GameObject player2DamageMeterGo = new GameObject();
-            //var player2DamageMeter = player2DamageMeterGo.AddComponent<DamageMeter>();
-            //player2DamageMeter.Setup(
-            //    name2,
-            //    player2Profile,
-            //    new Vector2((Graphics.PreferredBackBufferWidth / 2) + 790, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
-            //    new Vector2((Graphics.PreferredBackBufferWidth / 2) + 780, Graphics.PreferredBackBufferHeight - 80), // namePos
-            //    new Vector2((Graphics.PreferredBackBufferWidth / 2) + 550, Graphics.PreferredBackBufferHeight - 250), // hudPos
-            //    new Vector2((Graphics.PreferredBackBufferWidth / 2) + 610, Graphics.PreferredBackBufferHeight - 200) // profilePos
-            //   );
-
-            //gameObjects.Add(player1DamageMeterGo);
-            //gameObjects.Add(player2DamageMeterGo);
-
-            //player1DamageMeterGo.Awake();
-            //player2DamageMeterGo.Awake();
-
-
-            //playerDamageMeter.SetSubject(player1);
-            //player2DamageMeter.SetSubject(player2);
-
+        {            
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 

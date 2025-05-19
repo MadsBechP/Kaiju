@@ -886,3 +886,10 @@
 /processorParam:TextureFormat=Compressed
 /build:playerNameFont.spritefont
 
+#begin VictoryFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:VictoryFont.spritefont
+
