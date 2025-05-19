@@ -31,6 +31,10 @@ namespace Kaiju.ComponentPattern
         private float hitTimer;
 
         private List<IObserver> observers = new List<IObserver>();
+
+        public InputType InputType { get; set; }
+        public PlayerIndex GamePadIndex { get; set; }
+
         public int Damage { get; private set; }
 
 

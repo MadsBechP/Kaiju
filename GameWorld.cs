@@ -10,6 +10,12 @@ using System.Diagnostics;
 
 namespace Kaiju
 {
+    public enum InputType
+    {
+        Keyboard,
+        GamePad
+    }
+
     public class GameWorld : Game
     {
         private static GameWorld instance;
@@ -58,14 +64,18 @@ namespace Kaiju
         {
             player1Go = new GameObject();
             player1 = player1Go.AddComponent<Player>();
+            player1.InputType = InputType.GamePad;
+            player1.GamePadIndex = PlayerIndex.One;
             player1Go.AddComponent<SpriteRenderer>();
             player1Go.AddComponent<Collider>();
             player1Go.AddComponent<Animator>();
-            player1.chr = player1Go.AddComponent<Gigan>();
+            player1.chr = player1Go.AddComponent<Godzilla>();
             gameObjects.Add(player1Go);
 
             player2Go = new GameObject();
             player2 = player2Go.AddComponent<Player>();
+            player2.InputType = InputType.GamePad;
+            player2.GamePadIndex = PlayerIndex.Two;
             player2Go.AddComponent<SpriteRenderer>();
             player2Go.AddComponent<Collider>();
             player2Go.AddComponent<Animator>();

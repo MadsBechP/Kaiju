@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 
 namespace Kaiju.Command
@@ -28,13 +29,6 @@ namespace Kaiju.Command
         private Dictionary<Keys, ICommand> keybindsUpdate = new Dictionary<Keys, ICommand>();
         private Dictionary<Keys, ICommand> keybindsButtonDown = new Dictionary<Keys, ICommand>();
         private KeyboardState previousKeyState;
-
-        //GamePad commands
-        private Dictionary<Buttons, ICommand> buttonbindsUpdate = new();
-        private Dictionary<Buttons, ICommand> buttonbindsButtonDown = new();
-        private GamePadState previousButtonState;
-        private PlayerIndex playerIndex = PlayerIndex.One;
-
         public void AddUpdateCommand(Keys inputKey, ICommand command)
         {
             keybindsUpdate.Add(inputKey, command);
@@ -45,14 +39,28 @@ namespace Kaiju.Command
             keybindsButtonDown.Add(inputKey, command);
         }
 
-        public void AddUpdateCommand(Buttons inputButton, ICommand command)
+        //GamePad commands
+        private Dictionary<PlayerIndex, Dictionary<Buttons, ICommand>> buttonbindsUpdate = new();
+        private Dictionary<PlayerIndex, Dictionary<Buttons, ICommand>> buttonbindsButtonDown = new();
+        private Dictionary<PlayerIndex, GamePadState> previousButtonStates = new();
+        private PlayerIndex[] supportedPlayers = new[] { PlayerIndex.One, PlayerIndex.Two };
+
+        public void AddUpdateCommand(PlayerIndex player, Buttons inputButton, ICommand command)
         {
-            buttonbindsUpdate.Add(inputButton, command);
+            if (!buttonbindsUpdate.ContainsKey(player))
+            {
+                buttonbindsUpdate[player] = new();
+            }
+            buttonbindsUpdate[player][inputButton] = command;
         }
 
-        public void AddButtonDownCommand(Buttons inputButton, ICommand command)
+        public void AddButtonDownCommand(PlayerIndex player, Buttons inputButton, ICommand command)
         {
-            buttonbindsButtonDown.Add(inputButton, command);
+            if (!buttonbindsButtonDown.ContainsKey(player))
+            {
+                buttonbindsButtonDown[player] = new();
+            }
+            buttonbindsButtonDown[player][inputButton] = command;
         }
 
         public void Execute()
@@ -77,27 +85,36 @@ namespace Kaiju.Command
             previousKeyState = keyState;
 
             //Gamepad input
-            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
-            if (gamePadState.IsConnected)
+            foreach (var player in supportedPlayers)
             {
-                foreach (Buttons button in System.Enum.GetValues(typeof(Buttons)))
+                var currentState = GamePad.GetState(player);
+
+                if (!previousButtonStates.ContainsKey(player))
                 {
-                    if (gamePadState.IsButtonDown(button))
+                    previousButtonStates[player] = currentState;
+                }
+
+                var previousButtonState = previousButtonStates[player];
+
+                if (currentState.IsConnected)
+                {
+                    foreach (Buttons button in Enum.GetValues(typeof(Buttons)))
                     {
-                        if (buttonbindsUpdate.TryGetValue(button, out var cmd))
+                        if (currentState.IsButtonDown(button))
                         {
-                            cmd.Execute();
-                        }
-                        if (!previousButtonState.IsButtonDown(button))
-                        {
-                            if (buttonbindsButtonDown.TryGetValue(button, out var cmdBd))
+                            if (buttonbindsUpdate.TryGetValue(player, out var updateDict) && updateDict.TryGetValue(button, out var cmd))
+                            {
+                                cmd.Execute();
+                            }
+
+                            if (!previousButtonState.IsButtonDown(button) && buttonbindsButtonDown.TryGetValue(player, out var downDict) && downDict.TryGetValue(button, out var cmdBd))
                             {
                                 cmdBd.Execute();
                             }
                         }
                     }
+                    previousButtonStates[player] = currentState;
                 }
-                previousButtonState = gamePadState;
             }
         }
     }
