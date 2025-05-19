@@ -4,12 +4,25 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Kaiju.ComponentPattern.Characters
 {
+    /// <summary>
+    /// Character class for Godzilla
+    /// Used to setup animations, input and character specific details for cleaner code
+    /// Inherits from Character
+    /// Made by: Mads
+    /// </summary>
     public class Godzilla : Character
     {
+        /// <summary>
+        /// Constuctor 
+        /// </summary>
+        /// <param name="gameObject">specifies which gameobject it is tied to</param>
         public Godzilla(GameObject gameObject) : base(gameObject)
         {
         }
 
+        /// <summary>
+        /// Sets up sprites, animations and controls
+        /// </summary>
         public override void Start()
         {
             base.Start();
@@ -107,6 +120,12 @@ namespace Kaiju.ComponentPattern.Characters
                 InputHandler.Instance.AddUpdateCommand(index, Buttons.RightTrigger, new BlockCommand(player));
             }
         }
+
+        /// <summary>
+        /// Sets the horizontal facing direction of the characters sprite
+        /// Godzillas and Gigans sprites face different directions so this is used to have them flip opposite of each other for example when spriteeffect.fliphorizontally is used
+        /// </summary>
+        /// <param name="x">if true it faces to the right</param>
         public override void FaceRight(bool x)
         {
             sr.SetFlipHorizontal(!x);
