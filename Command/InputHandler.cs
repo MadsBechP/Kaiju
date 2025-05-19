@@ -39,6 +39,7 @@ namespace Kaiju.Command
         private Dictionary<Keys, ICommand> keybindsUpdate = new Dictionary<Keys, ICommand>();
         private Dictionary<Keys, ICommand> keybindsButtonDown = new Dictionary<Keys, ICommand>();
         private KeyboardState previousKeyState;
+
         /// <summary>
         /// Binds a keyboard key to a command that runs continuously while held
         /// </summary>
