@@ -1,7 +1,6 @@
 ﻿using Kaiju.Command;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using SharpDX.Direct2D1;
 
 namespace Kaiju.ComponentPattern.Characters
 {

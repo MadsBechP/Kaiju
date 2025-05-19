@@ -5,6 +5,12 @@ using System.Collections.Generic;
 
 namespace Kaiju.Command
 {
+    /// <summary>
+    /// InputHandler is in charge of player input
+    /// Supports both Keyboard and Gamepad input
+    /// Is based on the Inputhandler design pattern
+    /// Made by: Julius
+    /// </summary>
     public class InputHandler
     {
         private static InputHandler instance;
@@ -20,6 +26,10 @@ namespace Kaiju.Command
                 return instance;
             }
         }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         private InputHandler()
         {
 
@@ -29,11 +39,21 @@ namespace Kaiju.Command
         private Dictionary<Keys, ICommand> keybindsUpdate = new Dictionary<Keys, ICommand>();
         private Dictionary<Keys, ICommand> keybindsButtonDown = new Dictionary<Keys, ICommand>();
         private KeyboardState previousKeyState;
+        /// <summary>
+        /// Binds a keyboard key to a command that runs continuously while held
+        /// </summary>
+        /// <param name="inputKey">The keyboard key that is pressed</param>
+        /// <param name="command">The command that runs when activated</param>
         public void AddUpdateCommand(Keys inputKey, ICommand command)
         {
             keybindsUpdate.Add(inputKey, command);
         }
 
+        /// <summary>
+        /// Binds a keyboard key to a command that runs once when pressed
+        /// </summary>
+        /// <param name="inputKey">The keyboard key that is pressed</param>
+        /// <param name="command">The command that runs when activated</param>
         public void AddButtonDownCommand(Keys inputKey, ICommand command)
         {
             keybindsButtonDown.Add(inputKey, command);
@@ -45,6 +65,12 @@ namespace Kaiju.Command
         private Dictionary<PlayerIndex, GamePadState> previousButtonStates = new();
         private PlayerIndex[] supportedPlayers = new[] { PlayerIndex.One, PlayerIndex.Two };
 
+        /// <summary>
+        /// Binds a gamepad button to a command that runs continuously while held
+        /// </summary>
+        /// <param name="player">The player that presses the button</param>
+        /// <param name="inputButton">The Gamepad key that is pressed</param>
+        /// <param name="command">The command that runs when activated</param>
         public void AddUpdateCommand(PlayerIndex player, Buttons inputButton, ICommand command)
         {
             if (!buttonbindsUpdate.ContainsKey(player))
@@ -54,6 +80,12 @@ namespace Kaiju.Command
             buttonbindsUpdate[player][inputButton] = command;
         }
 
+        /// <summary>
+        /// Binds a gamepad button to a command that runs once when pressed
+        /// </summary>
+        /// <param name="player">The player that presses the button</param>
+        /// <param name="inputButton">The Gamepad key that is pressed</param>
+        /// <param name="command">The command that runs when activated</param>
         public void AddButtonDownCommand(PlayerIndex player, Buttons inputButton, ICommand command)
         {
             if (!buttonbindsButtonDown.ContainsKey(player))
@@ -63,6 +95,10 @@ namespace Kaiju.Command
             buttonbindsButtonDown[player][inputButton] = command;
         }
 
+        /// <summary>
+        /// Executes input checks and fires off relevant commands
+        /// Handles both keyboard and gamepad input for all supported players
+        /// </summary>
         public void Execute()
         {
             //Keyboard input

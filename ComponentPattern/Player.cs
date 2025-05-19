@@ -2,10 +2,7 @@
 using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.Direct3D11;
-using SharpDX.Direct3D9;
 using System;
-using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -297,7 +294,7 @@ namespace Kaiju.ComponentPattern
         }
 
         public void Special(int specialNumber)
-        {            
+        {
             switch (specialNumber)
             {
                 case 1:

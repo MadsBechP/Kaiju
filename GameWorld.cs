@@ -1,7 +1,6 @@
 ﻿using Kaiju.Command;
 using Kaiju.ComponentPattern;
 using Kaiju.ComponentPattern.Characters;
-using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -45,7 +44,7 @@ namespace Kaiju
         public GameObject player2Go;
         public Player player2;
 
-       
+
         private InputHandler inputHandler = InputHandler.Instance;
 
         public float DeltaTime { get; private set; }
@@ -142,7 +141,7 @@ namespace Kaiju
                 player1Profile,
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 750, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 735, Graphics.PreferredBackBufferHeight - 80), // namePos
-                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 1000,Graphics.PreferredBackBufferHeight - 250), // hudPos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 1000, Graphics.PreferredBackBufferHeight - 250), // hudPos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 950, Graphics.PreferredBackBufferHeight - 200) // profilePos
                );
 
@@ -163,7 +162,7 @@ namespace Kaiju
             player1DamageMeterGo.Awake();
             player2DamageMeterGo.Awake();
 
-            
+
             playerDamageMeter.SetSubject(player1);
             player2DamageMeter.SetSubject(player2);
 
@@ -176,7 +175,7 @@ namespace Kaiju
             {
                 gameObject.Start();
             }
-                        
+
         }
 
         protected override void Update(GameTime gameTime)
@@ -301,6 +300,6 @@ namespace Kaiju
             return animation;
         }
 
-       
+
     }
 }

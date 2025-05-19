@@ -1,8 +1,6 @@
 ﻿using Kaiju.Command;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using SharpDX.Direct2D1;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Kaiju.ComponentPattern.Characters
 {
