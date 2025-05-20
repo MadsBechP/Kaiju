@@ -184,11 +184,11 @@ namespace Kaiju
                 Exit();
 
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            InputHandler.Instance.Execute();
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Update();
             }
+            InputHandler.Instance.Execute();
             CheckCollision();
             Cleanup();
 

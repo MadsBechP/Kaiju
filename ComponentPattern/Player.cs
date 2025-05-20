@@ -27,6 +27,12 @@ namespace Kaiju.ComponentPattern
         private bool hit = false;
         private float hitTimer;
 
+        private bool blocking;
+        private float maxblockhp = 30;
+        private float blockhp;
+
+        private float secondTimer;
+
         private List<IObserver> observers = new List<IObserver>();
 
         public InputType InputType { get; set; }
@@ -60,6 +66,12 @@ namespace Kaiju.ComponentPattern
 
         public override void Update()
         {
+            secondTimer += GameWorld.Instance.DeltaTime;
+            if (secondTimer >= 1)
+            {
+                secondTimer = 0;
+            }
+
             if (specialActive)
             {
                 specialTime += GameWorld.Instance.DeltaTime;
@@ -69,6 +81,19 @@ namespace Kaiju.ComponentPattern
                     specialTime = 0;
                 }
             }
+
+            if (!blocking)
+            {
+                if (secondTimer >= 1)
+                {
+                    secondTimer = 0;
+                    if (blockhp <= maxblockhp)
+                    {
+                        blockhp += 1;
+                    }
+                }
+            }
+            blocking = false;
 
             // Moves player according to its current velocity
             gameObject.Transform.Translate();
@@ -268,30 +293,49 @@ namespace Kaiju.ComponentPattern
 
         public void Block()
         {
+            //if (blockhp >= 1)
+            //{
+            //    blocking = true;
+            //}
+            blocking = true;
             animator.PlayAnimation("Block");
         }
 
         public override void OnCollisionEnter(Collider collider)
         {
-            if (collider.isAttack && !hit)
+            if (!blocking)
             {
-                GameWorld.Instance.Destroy(collider.gameObject);
+                if (collider.isAttack && !hit)
+                {
+                    GameWorld.Instance.Destroy(collider.gameObject);
 
+                    TakeDamage(collider.Damage);
+                    hit = true;
+                    hitTimer = 0.5f;
+                    Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
+                    knockback.Normalize();
+
+                    gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 50 * Damage;
+                    gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime * 10 * Damage);
+                }
+            }
+            else
+            {
                 TakeDamage(collider.Damage);
-                hit = true;
-                hitTimer = 0.5f;
-                Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
-                knockback.Normalize();
-
-                gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 50 * Damage;
-                gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime * 10 * Damage);
             }
         }
         public void TakeDamage(int amount)
         {
-            Damage += amount;
-            Debug.WriteLine($"{this} took damage: {Damage}"); // tjek om TakeDamage faktisk bliver kaldt
-            Notify();
+            if (blocking)
+            {
+                blockhp -= amount;
+            }
+            else
+            {
+                Damage += amount;
+                Debug.WriteLine($"{this} took damage: {Damage}"); // tjek om TakeDamage faktisk bliver kaldt
+                Notify();
+            }
         }
 
         public void Attach(IObserver observer)
