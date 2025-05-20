@@ -2,6 +2,7 @@
 using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,9 +30,9 @@ namespace Kaiju.ComponentPattern
 
         private bool blocking;
         private float maxblockhp = 30;
-        private float blockhp;
+        private float blockhp = 30;
 
-        private float secondTimer;
+        private float secondTimer = 1;
 
         private List<IObserver> observers = new List<IObserver>();
 
@@ -48,6 +49,8 @@ namespace Kaiju.ComponentPattern
 
         public override void Start()
         {
+            
+
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
             animator = gameObject.GetComponent<Animator>() as Animator;
 
@@ -66,11 +69,21 @@ namespace Kaiju.ComponentPattern
 
         public override void Update()
         {
-            secondTimer += GameWorld.Instance.DeltaTime;
-            if (secondTimer >= 1)
+            
+            
+            if (!blocking)
             {
-                secondTimer = 0;
+                if (secondTimer > 0)
+                {
+                    secondTimer -= GameWorld.Instance.DeltaTime;
+                }
+                else if (blockhp < maxblockhp)
+                {
+                    blockhp += 1;
+                    secondTimer = 1;
+                }
             }
+            Debug.WriteLine(blockhp);
 
             if (specialActive)
             {
@@ -82,18 +95,11 @@ namespace Kaiju.ComponentPattern
                 }
             }
 
-            if (!blocking)
+            KeyboardState keystate = Keyboard.GetState();
+            if (keystate.IsKeyUp(Keys.LeftShift))
             {
-                if (secondTimer >= 1)
-                {
-                    secondTimer = 0;
-                    if (blockhp <= maxblockhp)
-                    {
-                        blockhp += 1;
-                    }
-                }
+                blocking = false;
             }
-            blocking = false;
 
             // Moves player according to its current velocity
             gameObject.Transform.Translate();
@@ -293,19 +299,22 @@ namespace Kaiju.ComponentPattern
 
         public void Block()
         {
-            //if (blockhp >= 1)
-            //{
-            //    blocking = true;
-            //}
-            blocking = true;
-            animator.PlayAnimation("Block");
+            if (blockhp >= 1)
+            {
+                blocking = true;
+            }
+            else
+            {
+                blocking = false;
+            }
+                animator.PlayAnimation("Block");
         }
 
         public override void OnCollisionEnter(Collider collider)
         {
-            if (!blocking)
+            if (collider.isAttack && !hit)
             {
-                if (collider.isAttack && !hit)
+                if (!blocking || blockhp < collider.Damage)
                 {
                     GameWorld.Instance.Destroy(collider.gameObject);
 
@@ -318,23 +327,30 @@ namespace Kaiju.ComponentPattern
                     gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 50 * Damage;
                     gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime * 10 * Damage);
                 }
+                else
+                {
+                    TakeDamage(collider.Damage);
+                    GameWorld.Instance.Destroy(collider.gameObject);
+                }
             }
-            else
-            {
-                TakeDamage(collider.Damage);
-            }
+
+
         }
         public void TakeDamage(int amount)
         {
-            if (blocking)
-            {
-                blockhp -= amount;
-            }
-            else
+            if (!blocking || blockhp < amount)
             {
                 Damage += amount;
                 Debug.WriteLine($"{this} took damage: {Damage}"); // tjek om TakeDamage faktisk bliver kaldt
                 Notify();
+            }
+            else
+            {
+                blockhp -= amount;
+                if (blockhp < 0)
+                {
+                    blockhp = 0;
+                }
             }
         }
 

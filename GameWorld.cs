@@ -233,7 +233,6 @@ namespace Kaiju
                             {
                                 if (rects1.Rectangle.Intersects(rects2.Rectangle))
                                 {
-                                    Debug.WriteLine($"Collision with {go1} and {go2}");
                                     handledCollision = true;
                                     break;
                                 }
