@@ -14,10 +14,11 @@ namespace Kaiju.ComponentPattern
     public class Player : Component, ISubject
     {
         protected float speed;
-        private bool grounded = false;
+        public bool grounded = false;
 
         protected SpriteRenderer sr;
         private Animator animator;
+        public Collider collider;
         public Character chr;
         public bool facingRight;
         private bool lastPunchRight;
@@ -55,9 +56,18 @@ namespace Kaiju.ComponentPattern
 
         public override void Update()
         {
-            // Moves player according to its current velocity
-            gameObject.Transform.Translate();
 
+
+            if (gameObject.Transform.CurrentVelocity.Y < 50)
+            {
+            gameObject.Transform.AddVelocity(new Vector2(0, 2f));
+            }
+            gameObject.Transform.Translate(collider);
+            if (gameObject.Transform.Position.Y > GameWorld.Instance.Graphics.PreferredBackBufferHeight)
+            {
+                gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+                gameObject.Transform.CurrentVelocity = Vector2.Zero;
+            }
             // Timer for hitstun
             if (hitTimer > 0)
             {
@@ -76,22 +86,9 @@ namespace Kaiju.ComponentPattern
             // Timer for attack
             if (atkCooldown > 0)
             {
-            atkCooldown -= GameWorld.Instance.DeltaTime;
+                atkCooldown -= GameWorld.Instance.DeltaTime;
             }
 
-
-            // Adds gravity
-            if (gameObject.Transform.Position.Y < GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - (sr.Origin.Y * gameObject.Transform.Scale.Y))
-            {
-                gameObject.Transform.AddVelocity(new Vector2(0, 2f));
-                grounded = false;
-            }
-            else
-            {
-                gameObject.Transform.Position = new Vector2(gameObject.Transform.Position.X, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - (sr.Origin.Y * gameObject.Transform.Scale.Y));
-                gameObject.Transform.CurrentVelocity = new Vector2(gameObject.Transform.CurrentVelocity.X, 0);
-                grounded = true;
-            }
 
             // Velocity resistance depending on players state
             if (hit)
@@ -100,7 +97,7 @@ namespace Kaiju.ComponentPattern
             }
             else if (grounded)
             {
-                gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.5f), gameObject.Transform.CurrentVelocity.Y);
+                gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.3f), gameObject.Transform.CurrentVelocity.Y);
                 hit = false;
             }
             else
@@ -117,11 +114,8 @@ namespace Kaiju.ComponentPattern
             {
                 chr.FaceRight(false);
             }
-
-            
-            
-
         }
+        
 
         public void Move(Vector2 velocity)
         {
@@ -129,8 +123,7 @@ namespace Kaiju.ComponentPattern
             {
                 return;
             }
-
-            if (velocity != Vector2.Zero)
+            else
             {
                 velocity.Normalize();
             }
@@ -171,8 +164,8 @@ namespace Kaiju.ComponentPattern
             GameObject attackGo = new();
             Rectangle position = new Rectangle();
             int damage = 0;
-            
-            
+
+
 
             switch (atkNumber)
             {

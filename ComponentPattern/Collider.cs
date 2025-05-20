@@ -20,7 +20,8 @@ namespace Kaiju.ComponentPattern
         public List<RectangleData> PixelPerfectRectangles { get => pixelPerfectRectangles; }
         private Dictionary<Texture2D, List<RectangleData>> colliderChache = new();
 
-        public bool isAttack;
+        public bool isAttack = false;
+        private bool forStage = false;
         private float currentTime;
         private float maxTime;
         private Rectangle position;
@@ -32,6 +33,18 @@ namespace Kaiju.ComponentPattern
         {
 
         }
+        /// <summary>
+        /// Stage collider
+        /// </summary>
+        public Collider(GameObject gameObject, Player owner) : base(gameObject)
+        {
+            this.Owner = owner;
+            forStage = true;
+
+        }
+        /// <summary>
+        /// Attack collider
+        /// </summary>
         public Collider(GameObject gameObject, float maxTime, Rectangle position, Player owner, int damage) : base(gameObject)
         {
             this.isAttack = true;
@@ -49,6 +62,10 @@ namespace Kaiju.ComponentPattern
                 {
                     return position;
                 }
+                else if (forStage)
+                {
+                    return new Rectangle((int)Math.Round(gameObject.Transform.Position.X) - 50, (int)Math.Round(gameObject.Transform.Position.Y) - 100, 100, 200);
+                }
                 else
                 {
                     float scaleX = gameObject.Transform.Scale.X;
@@ -60,7 +77,7 @@ namespace Kaiju.ComponentPattern
 
                     return new Rectangle(x, y, scaledWidth, scaledHeight);
                 }
-                   
+
             }
         }
 
@@ -83,43 +100,55 @@ namespace Kaiju.ComponentPattern
 
         public override void Update()
         {
-            if (!isAttack)
+            if (!forStage)
             {
-                if (sr.Sprite != previousSprite)
+                if (!isAttack)
                 {
-                    previousSprite = sr.Sprite;
-                    if (!colliderChache.TryGetValue(sr.Sprite, out pixelPerfectRectangles))
+                    if (sr.Sprite != previousSprite)
                     {
-                        pixelPerfectRectangles = CreateRectangles(sr.Sprite);
-                        colliderChache[sr.Sprite] = pixelPerfectRectangles;
+                        previousSprite = sr.Sprite;
+                        if (!colliderChache.TryGetValue(sr.Sprite, out pixelPerfectRectangles))
+                        {
+                            pixelPerfectRectangles = CreateRectangles(sr.Sprite);
+                            colliderChache[sr.Sprite] = pixelPerfectRectangles;
+                        }
+
+                        pixelPerfectRectangles = pixelPerfectRectangles.Select(p => new RectangleData(p.X, p.Y)).ToList();
                     }
 
-                    pixelPerfectRectangles = pixelPerfectRectangles.Select(p => new RectangleData(p.X, p.Y)).ToList();
+                    UpdatePixelCollider();
                 }
-
-                UpdatePixelCollider(); 
-            }
-            else
-            {
-                currentTime += GameWorld.Instance.DeltaTime;
-                if (currentTime > maxTime)
+                else
                 {
-                    GameWorld.Instance.Destroy(gameObject);
+                    currentTime += GameWorld.Instance.DeltaTime;
+                    if (currentTime > maxTime)
+                    {
+                        GameWorld.Instance.Destroy(gameObject);
+                    }
                 }
             }
         }
 
         private void DrawRectangle(Rectangle collisionBox, SpriteBatch spriteBatch)
         {
+            Color color = Color.Red;
+            if (isAttack)
+            {
+                color = Color.DarkGreen;
+            }
+            if (forStage)
+            {
+                color = Color.Yellow;
+            }
             Rectangle topLine = new Rectangle(collisionBox.X, collisionBox.Y, collisionBox.Width, 1);
             Rectangle bottomLine = new Rectangle(collisionBox.X, collisionBox.Y + collisionBox.Height, collisionBox.Width, 1);
             Rectangle rightLine = new Rectangle(collisionBox.X + collisionBox.Width, collisionBox.Y, 1, collisionBox.Height);
             Rectangle leftLine = new Rectangle(collisionBox.X, collisionBox.Y, 1, collisionBox.Height);
 
-            spriteBatch.Draw(pixel, topLine, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
-            spriteBatch.Draw(pixel, bottomLine, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
-            spriteBatch.Draw(pixel, rightLine, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
-            spriteBatch.Draw(pixel, leftLine, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
+            spriteBatch.Draw(pixel, topLine, null, color, 0, Vector2.Zero, SpriteEffects.None, 1);
+            spriteBatch.Draw(pixel, bottomLine, null, color, 0, Vector2.Zero, SpriteEffects.None, 1);
+            spriteBatch.Draw(pixel, rightLine, null, color, 0, Vector2.Zero, SpriteEffects.None, 1);
+            spriteBatch.Draw(pixel, leftLine, null, color, 0, Vector2.Zero, SpriteEffects.None, 1);
         }
 
         public void UpdatePixelCollider()

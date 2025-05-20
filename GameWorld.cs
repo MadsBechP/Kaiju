@@ -64,6 +64,7 @@ namespace Kaiju
             player1 = player1Go.AddComponent<Player>();
             player1Go.AddComponent<SpriteRenderer>();
             player1Go.AddComponent<Collider>();
+            player1.collider = player1Go.AddComponent<Collider>(player1);
             player1Go.AddComponent<Animator>();
             player1.chr = player1Go.AddComponent<Godzilla>();
             gameObjects.Add(player1Go);
@@ -72,6 +73,7 @@ namespace Kaiju
             player2 = player2Go.AddComponent<Player>();
             player2Go.AddComponent<SpriteRenderer>();
             player2Go.AddComponent<Collider>();
+            player2.collider = player2Go.AddComponent<Collider>(player2);
             player2Go.AddComponent<Animator>();
             player2.chr = player2Go.AddComponent<Gigan>();
             gameObjects.Add(player2Go);
@@ -285,6 +287,35 @@ namespace Kaiju
                     }
                 }
             }
+        }
+        public bool CheckCollision(Collider col)
+        {
+            foreach (GameObject go2 in gameObjects)
+            {
+                if (go2.GetComponent<Stage>() as Stage == null)
+                {
+                    continue;
+                }
+                Collider col2 = go2.GetComponent<Collider>() as Collider;
+
+                if (col != null && col2 != null && col.CollisionBox.Intersects(col2.CollisionBox))
+                {
+                                return true;
+
+                    foreach (RectangleData rects1 in col.PixelPerfectRectangles)
+                    {
+                        foreach (RectangleData rects2 in col2.PixelPerfectRectangles)
+                        {
+                            if (rects1.Rectangle.Intersects(rects2.Rectangle))
+                            {
+                            }
+                        }
+                        
+                    }
+                    
+                }
+            }
+            return false;
         }
 
         public void Instantiate(GameObject gameObjectToInstantiate)
