@@ -151,13 +151,14 @@ namespace Kaiju.ComponentPattern
                 {
                     if (lines[y][x].A != 0)
                     {
-                        if ((x == 0)
-                            || (x == lines[y].Length)
-                            || (x > 0 && lines[y][x - 1].A == 0)
-                            || (x < lines[y].Length - 1 && lines[y][x + 1].A == 0)
-                            || (y == 0)
-                            || (y > 0 && lines[y - 1][x].A == 0)
-                            || (y < lines.Count - 1 && lines[y + 1][x].A == 0))
+                        if ((x == 0
+                            || lines[y][x - 1].A == 0)
+                            || (x == texture.Width - 1
+                            || lines[y][x + 1].A == 0)
+                            || (y == 0 || lines[y - 1][x].A == 0)
+                            || (y == texture.Height - 1
+                            || lines[y + 1][x].A == 0))
+
                         {
                             rectangles.Add(new RectangleData(x, y));
                         }
