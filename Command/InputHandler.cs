@@ -55,5 +55,15 @@ namespace Kaiju.Command
             previousKeyState = keyState;
 
         }
+
+        /// <summary>
+        /// A method that clears key-bindings, so there won't be a problem when 
+        /// a character gets created again
+        /// </summary>
+        public void ClearBindings()
+        {
+            keybindsUpdate.Clear();
+            keybindsButtonDown.Clear();
+        }
     }
 }
