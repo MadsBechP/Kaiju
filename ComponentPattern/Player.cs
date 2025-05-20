@@ -186,111 +186,69 @@ namespace Kaiju.ComponentPattern
             }
             atkCooldown = 0.5f;
 
-            GameObject attackGo = new();
-            Rectangle position = new Rectangle();
-            int damage = 0;
-
-
-
             switch (atkNumber)
             {
                 case 1:
-                    {
-                        if (facingRight)
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
-                        }
-                        else
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
-                        }
+                    SpawnHitbox(atkNumber);
 
-                        if (lastPunchRight)
-                        {
-                            animator.PlayAnimation("LPunch");
-                            lastPunchRight = false;
-                        }
-                        else
-                        {
-                            animator.PlayAnimation("RPunch");
-                            lastPunchRight = true;
-                        }
-                        damage = 5;
-                        break;
+                    if (lastPunchRight)
+                    {
+                        animator.PlayAnimation("LPunch");
+                        lastPunchRight = false;
                     }
+                    else
+                    {
+                        animator.PlayAnimation("RPunch");
+                        lastPunchRight = true;
+                    }
+                    break;
+
                 case 2:
-                    {
-                        if (facingRight)
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
-                        }
-                        else
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
-                        }
+                    SpawnHitbox(atkNumber);
 
-                        if (lastPunchRight)
-                        {
-                            animator.PlayAnimation("LKick");
-                            lastPunchRight = false;
-                        }
-                        else
-                        {
-                            animator.PlayAnimation("RKick");
-                            lastPunchRight = true;
-                        }
-                        damage = 5;
-                        break;
+                    if (lastPunchRight)
+                    {
+                        animator.PlayAnimation("LKick");
+                        lastPunchRight = false;
                     }
+                    else
+                    {
+                        animator.PlayAnimation("RKick");
+                        lastPunchRight = true;
+                    }
+                    break;
+
                 case 3:
-                    {
-                        if (facingRight)
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
-                        }
-                        else
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
-                        }
+                    animator.PlayAnimation("TailSwipe");
+                    animator.RegisterFrameEvent("TailSwipe", 3, () => SpawnHitbox(atkNumber));
+                    break;
 
-                        animator.PlayAnimation("TailSwipe");
-                        damage = 10;
-                        break;
-                    }
                 case 4:
-                    {
-                        if (facingRight)
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
-                        }
-                        else
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
-                        }
+                    SpawnHitbox(atkNumber);
 
-                        animator.PlayAnimation("Kick");
-                        damage = 10;
-                        break;
+                    if (lastPunchRight)
+                    {
+                        animator.PlayAnimation("LPunch");
+                        lastPunchRight = false;
                     }
+                    else
+                    {
+                        animator.PlayAnimation("RPunch");
+                        lastPunchRight = true;
+
+                    }
+                    break;
+
                 case 5:
-                    {
-                        if (facingRight)
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
-                        }
-                        else
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
-                        }
+                    SpawnHitbox(atkNumber);
+                    animator.PlayAnimation("Kick");
+                    break;
 
-                        animator.PlayAnimation("Beam");
-                        damage = 10;
-                        break;
-                    }
+                case 6:
+                    animator.PlayAnimation("Beam");
+                    break;
+
             }
-            attackGo.AddComponent<Collider>(0.2f, position, this, damage);
-            GameWorld.Instance.Instantiate(attackGo);
-
         }
 
         public void Special(int specialNumber)
@@ -352,6 +310,86 @@ namespace Kaiju.ComponentPattern
             foreach (var observer in observers)
             {
                 observer.Updated();
+            }
+        }
+
+        public void SpawnHitbox(int atkNumber)
+        {
+            GameObject attackGo = new();
+            Rectangle position = new Rectangle();
+            int damage = 0;
+
+            switch (atkNumber)
+            {
+                case 1:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 75), 50, 50);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 150), (int)Math.Round(gameObject.Transform.Position.Y - 75), 50, 50);
+                    }
+                    damage = 5;
+                    break;
+                case 2:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 15), 50, 50);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 150), (int)Math.Round(gameObject.Transform.Position.Y - 15), 50, 50);
+                    }
+                    damage = 5;
+                    break;
+                case 3:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X), (int)Math.Round(gameObject.Transform.Position.Y - 50), 150, 100);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 150), (int)Math.Round(gameObject.Transform.Position.Y - 50), 150, 100);
+                    }
+                    damage = 10;
+                    break;
+                case 4:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 75), (int)Math.Round(gameObject.Transform.Position.Y - 75), 50, 50);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 125), (int)Math.Round(gameObject.Transform.Position.Y - 75), 50, 50);
+                    }
+                    damage = 5;
+                    break;
+                case 5:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 85), (int)Math.Round(gameObject.Transform.Position.Y), 50, 50);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 135), (int)Math.Round(gameObject.Transform.Position.Y), 50, 50);
+                    }
+                    damage = 10;
+                    break;
+            }
+            attackGo.AddComponent<Collider>(0.2f, position, this, damage);
+            GameWorld.Instance.Instantiate(attackGo);
+        }
+
+        public void SpawnProjectile(int atkNumber)
+        {
+            switch (atkNumber)
+            {
+                case 1:
+                    break;
+
+                case 6:
+                    break;
             }
         }
     }

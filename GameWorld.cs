@@ -63,7 +63,7 @@ namespace Kaiju
         {
             player1Go = new GameObject();
             player1 = player1Go.AddComponent<Player>();
-            player1.InputType = InputType.GamePad;
+            player1.InputType = InputType.Keyboard;
             player1.GamePadIndex = PlayerIndex.One;
             player1Go.AddComponent<SpriteRenderer>();
             player1Go.AddComponent<Collider>();
@@ -73,7 +73,7 @@ namespace Kaiju
 
             player2Go = new GameObject();
             player2 = player2Go.AddComponent<Player>();
-            player2.InputType = InputType.GamePad;
+            player2.InputType = InputType.Keyboard;
             player2.GamePadIndex = PlayerIndex.Two;
             player2Go.AddComponent<SpriteRenderer>();
             player2Go.AddComponent<Collider>();

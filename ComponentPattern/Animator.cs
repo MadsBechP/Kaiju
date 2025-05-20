@@ -13,6 +13,9 @@ namespace Kaiju.ComponentPattern
         private Animation currentAnimation;
         private bool held = false;
 
+        private Dictionary<string, Dictionary<int, System.Action>> animationEvents = new();
+        private int lastFrameIndex = -1;
+
         public Animator(GameObject gameObject) : base(gameObject)
         {
             spriteRenderer = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
@@ -22,6 +25,18 @@ namespace Kaiju.ComponentPattern
         {
             elapsed += GameWorld.Instance.DeltaTime;
             CurrentIndex = (int)(elapsed * currentAnimation.FPS);
+
+            if (CurrentIndex != lastFrameIndex)
+            {
+                lastFrameIndex = CurrentIndex;
+                if (animationEvents.TryGetValue(currentAnimation.Name, out var frameEvents))
+                {
+                    if (frameEvents.TryGetValue(CurrentIndex, out var callback))
+                    {
+                        callback.Invoke();
+                    }
+                }
+            }
 
             if (currentAnimation.HeldAnimation && held && CurrentIndex > currentAnimation.Sprites.Length - 1)
             {
@@ -63,6 +78,16 @@ namespace Kaiju.ComponentPattern
                     held = true;
                 }
             }
+        }
+
+        public void RegisterFrameEvent(string animationName, int frameIndex, System.Action callback)
+        {
+            if (!animationEvents.ContainsKey(animationName))
+            {
+                animationEvents[animationName] = new Dictionary<int, System.Action>();
+            }
+
+            animationEvents[animationName][frameIndex] = callback;
         }
     }
 
