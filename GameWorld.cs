@@ -40,6 +40,8 @@ namespace Kaiju
         public GameObject player2Go;
         public Player player2;
 
+        public GameObject stageGo;
+        public Stage stage;
        
         private InputHandler inputHandler = InputHandler.Instance;
         private Camera camera;
@@ -67,12 +69,19 @@ namespace Kaiju
             gameObjects.Add(player1Go);
 
             player2Go = new GameObject();
-            player2 = player2Go.AddComponent<AI>();
+            player2 = player2Go.AddComponent<Player>();
             player2Go.AddComponent<SpriteRenderer>();
             player2Go.AddComponent<Collider>();
             player2Go.AddComponent<Animator>();
             player2.chr = player2Go.AddComponent<Gigan>();
             gameObjects.Add(player2Go);
+
+            stageGo = new GameObject();
+            stageGo.AddComponent<SpriteRenderer>();
+            stageGo.AddComponent<Collider>();
+            stageGo.AddComponent<Stage>();
+            gameObjects.Add(stageGo);
+
 
             GameObject timerGo = new GameObject();
             timerGo.AddComponent<Timer>();
