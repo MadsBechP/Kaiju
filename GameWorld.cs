@@ -204,6 +204,8 @@ namespace Kaiju
             {
                 gameObject.Draw(_spriteBatch);
             }
+            player1.DrawShield(_spriteBatch);
+            player2.DrawShield(_spriteBatch);
             _spriteBatch.End();
 
             base.Draw(gameTime);

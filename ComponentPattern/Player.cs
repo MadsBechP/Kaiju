@@ -31,6 +31,8 @@ namespace Kaiju.ComponentPattern
         private bool blocking;
         private float maxblockhp = 30;
         private float blockhp = 30;
+        private Texture2D shieldTexture;
+        private float shieldMaxRadius = 100;
 
         private float secondTimer = 1;
 
@@ -49,8 +51,6 @@ namespace Kaiju.ComponentPattern
 
         public override void Start()
         {
-            
-
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
             animator = gameObject.GetComponent<Animator>() as Animator;
 
@@ -58,19 +58,19 @@ namespace Kaiju.ComponentPattern
             {
                 gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
                 facingRight = true;
+                shieldTexture = CreateCircleTexture(GameWorld.Instance.GraphicsDevice, (int)shieldMaxRadius, Color.Red);
             }
             else if (gameObject == GameWorld.Instance.player2Go)
             {
                 gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
                 facingRight = false;
+                shieldTexture = CreateCircleTexture(GameWorld.Instance.GraphicsDevice, (int)shieldMaxRadius, Color.Blue);
             }
             speed = 600;
         }
 
         public override void Update()
         {
-            
-            
             if (!blocking)
             {
                 if (secondTimer > 0)
@@ -79,7 +79,7 @@ namespace Kaiju.ComponentPattern
                 }
                 else if (blockhp < maxblockhp)
                 {
-                    blockhp += 1;
+                    blockhp += 3;
                     secondTimer = 1;
                 }
             }
@@ -307,7 +307,8 @@ namespace Kaiju.ComponentPattern
             {
                 blocking = false;
             }
-                animator.PlayAnimation("Block");
+
+            animator.PlayAnimation("Block");
         }
 
         public override void OnCollisionEnter(Collider collider)
@@ -451,6 +452,52 @@ namespace Kaiju.ComponentPattern
                 case 6:
                     break;
             }
+        }
+
+        public Texture2D CreateCircleTexture(GraphicsDevice graphicsDevice, int radius, Color color)
+        {
+            int diameter = radius * 2;
+            Texture2D texture = new Texture2D(graphicsDevice, diameter, diameter);
+            Color[] data = new Color[diameter * diameter];
+
+            float rSquared = radius * radius;
+
+            for (int y = 0; y < diameter; y++)
+            {
+                for (int x = 0; x < diameter; x++)
+                {
+                    int index = x + y * diameter;
+                    float dx = x - radius;
+                    float dy = y - radius;
+
+                    if (dx * dx + dy * dy <= rSquared)
+                    {
+                        data[index] = color;
+                    }
+                    else
+                    {
+                        data[index] = Color.Transparent;
+                    }
+                }
+            }
+            texture.SetData(data);
+            return texture;
+        }
+
+        public void DrawShield(SpriteBatch spriteBatch)
+        {
+            if (!blocking || shieldTexture == null)
+            {
+                return;
+            }
+
+            float shieldRatio = blockhp / maxblockhp;
+            float scale = shieldRatio;
+
+            Vector2 position = gameObject.Transform.Position;
+            Vector2 origin = new Vector2(shieldTexture.Width / 2, shieldTexture.Height / 2);
+
+            spriteBatch.Draw(shieldTexture, position, null, Color.White * 0.5f, 0, origin, scale, SpriteEffects.None, 0);
         }
     }
 }
