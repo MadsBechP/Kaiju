@@ -13,6 +13,10 @@ using System.Xml.Linq;
 
 namespace Kaiju.State
 {    
+    /// <summary>
+    /// BattleState keeps track of the creation of the battle scene. 
+    /// This include the player, timer and HUD 
+    /// </summary>
     public class BattleState : IGameState
     {
         private GameWorld game;
@@ -29,7 +33,7 @@ namespace Kaiju.State
         {
             this.game = game;
 
-            InputHandler.Instance.ClearBindings();
+            InputHandler.Instance.ClearBindings(); // so that it won't try and create binding that are already there
             CreatePlayers();
             CreateTimer();
             LoadContent();
@@ -37,7 +41,38 @@ namespace Kaiju.State
         }
         public void Update(GameTime gameTime)
         {
-           
+            // Find the Timer-component among the stateObjects
+            Timer timer = null;
+            foreach (GameObject go in stateObjects)
+            {
+                Timer t = go.GetComponent<Timer>() as Timer;
+                if(t != null)
+                {
+                    timer = t;
+                    break; // only need one timer
+                }
+            }
+
+            // If a timer has been found and timer has run out, change to VictoryState
+            if(timer != null && timer.TimeRanOut)
+            {
+                // change this to health when health has been created (this is for testing)
+                float player1Damage = game.player1.Damage;
+                float player2Damage = game.player2.Damage;
+
+                if(player1Damage == player2Damage)
+                {
+                    game.ChangeGameState(new VictoryState(game, "", true));
+                }
+                else if(player1Damage < player2Damage)
+                {
+                    game.ChangeGameState(new VictoryState(game, $"{name1}", false));
+                }
+                else
+                {
+                    game.ChangeGameState(new VictoryState(game, $"{name2}", false));
+                }
+            }
         }
 
         private void LoadContent()

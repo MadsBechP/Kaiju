@@ -8,22 +8,38 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Kaiju.State
-{    
+{   
+    /// <summary>
+    /// VictoryState is the ending scene where
+    /// you can see who won and start a new fight.
+    /// This class stands for the creation of the victory scene.
+    /// </summary>
     public class VictoryState : IGameState
     {
         private GameWorld game;
         private SpriteFont victoryFont;
         private string winText;
-        private string text;
-
+        private string promptText;
+        private bool isDraw;
+        
         public Color BackgoundColor => Color.DarkSlateGray;
 
-        public VictoryState(GameWorld game, string winnerName)
+        public VictoryState(GameWorld game, string winnerName, bool isDraw)
         {
             this.game = game;
-            winText = $"A New King Has Risen!\nKneel Before {winnerName}";
+            
             victoryFont = game.Content.Load<SpriteFont>("VictoryFont");
-            text = "press ENTER to start new battle";
+            promptText = "press ENTER to start new battle";
+            
+
+            if (isDraw)
+            {
+                winText = "You Where Too Weak";
+            }
+            else
+            {
+                winText = $"A New King Has Risen!\nKneel Before {winnerName}";
+            }
 
         }
         
@@ -37,8 +53,10 @@ namespace Kaiju.State
         }
         public void Draw(SpriteBatch spriteBatch)
         {
-            
-            spriteBatch.DrawString(victoryFont, text, new Vector2(500,500), Color.White);
+
+            spriteBatch.DrawString(victoryFont, winText, new Vector2(825, 500), Color.White);;
+
+            spriteBatch.DrawString(victoryFont, promptText, new Vector2(800,700), Color.White);
         }
 
         public void Exit()

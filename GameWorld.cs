@@ -60,27 +60,6 @@ namespace Kaiju
         protected override void Initialize()
         {
             
-            //player1Go = new GameObject();
-            //player1 = player1Go.AddComponent<Player>();
-            //player1Go.AddComponent<SpriteRenderer>();
-            //player1Go.AddComponent<Collider>();
-            //player1Go.AddComponent<Animator>();
-            //player1.chr = player1Go.AddComponent<Godzilla>();
-            //gameObjects.Add(player1Go);
-
-            //player2Go = new GameObject();
-            //player2 = player2Go.AddComponent<Player>();
-            //player2Go.AddComponent<SpriteRenderer>();
-            //player2Go.AddComponent<Collider>();
-            //player2Go.AddComponent<Animator>();
-            //player2.chr = player2Go.AddComponent<Gigan>();
-            //gameObjects.Add(player2Go);
-
-            //GameObject timerGo = new GameObject();
-            //timerGo.AddComponent<Timer>();
-            //gameObjects.Add(timerGo);
-
-
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Awake();

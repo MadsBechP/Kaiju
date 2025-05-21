@@ -14,7 +14,9 @@ namespace Kaiju.ComponentPattern
         private SpriteFont hudFont;
         private string text;
         private Vector2 position = new Vector2(GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2, 20);
-        private float timeLeft = 3f; //remember to change to 120f
+        private float timeLeft = 5f; //remember to change to 120f
+
+        public bool TimeRanOut { get; private set; } = false;
 
         public Timer(GameObject gameObject) : base(gameObject)
         {
@@ -33,8 +35,9 @@ namespace Kaiju.ComponentPattern
             {
                 timeLeft -= GameWorld.Instance.DeltaTime;
                 if (timeLeft < 0f)
-                {                    
-                    GameWorld.Instance.ChangeGameState(new VictoryState(GameWorld.Instance,"You Are Too Weak"));
+                {
+                    //GameWorld.Instance.ChangeGameState(new VictoryState(GameWorld.Instance,"",true));
+                    TimeRanOut = true;
                 }
                 TimeSpan time = TimeSpan.FromSeconds(timeLeft);
                 text = $"{time.Minutes:D2}:{time.Seconds:D2}";
