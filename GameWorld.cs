@@ -1,7 +1,6 @@
 ﻿using Kaiju.Command;
 using Kaiju.ComponentPattern;
 using Kaiju.ComponentPattern.Characters;
-using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,6 +10,12 @@ using System.Diagnostics;
 
 namespace Kaiju
 {
+    public enum InputType
+    {
+        Keyboard,
+        GamePad
+    }
+
     public class GameWorld : Game
     {
         private static GameWorld instance;
@@ -65,6 +70,8 @@ namespace Kaiju
         {
             player1Go = new GameObject();
             player1 = player1Go.AddComponent<Player>();
+            player1.InputType = InputType.Keyboard;
+            player1.GamePadIndex = PlayerIndex.One;
             player1Go.AddComponent<SpriteRenderer>();
             player1Go.AddComponent<Collider>();
             player1.collider = player1Go.AddComponent<Collider>(player1);
@@ -74,6 +81,8 @@ namespace Kaiju
 
             player2Go = new GameObject();
             player2 = player2Go.AddComponent<Player>();
+            player2.InputType = InputType.Keyboard;
+            player2.GamePadIndex = PlayerIndex.Two;
             player2Go.AddComponent<SpriteRenderer>();
             player2Go.AddComponent<Collider>();
             player2.collider = player2Go.AddComponent<Collider>(player2);
@@ -203,8 +212,6 @@ namespace Kaiju
             }
 
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            InputHandler.Instance.Execute();
-
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Update();
@@ -215,6 +222,7 @@ namespace Kaiju
             }
 
             camera.MoveToward((float)gameTime.ElapsedGameTime.TotalMilliseconds);
+            InputHandler.Instance.Execute();
             CheckCollision();
             Cleanup();
 
@@ -232,6 +240,8 @@ namespace Kaiju
             {
                 gameObject.Draw(_spriteBatch);
             }
+            player1.DrawShield(_spriteBatch);
+            player2.DrawShield(_spriteBatch);
             _spriteBatch.End();
 
             _spriteBatch.Begin();

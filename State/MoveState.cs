@@ -1,9 +1,4 @@
 ﻿using Kaiju.ComponentPattern;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kaiju.State
 {
@@ -20,12 +15,12 @@ namespace Kaiju.State
 
         public void Execute()
         {
-            
+
         }
 
         public void Exit()
         {
-            
+
         }
     }
 }

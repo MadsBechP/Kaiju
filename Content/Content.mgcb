@@ -20,7 +20,7 @@
 /processorParam:TextureFormat=Compressed
 /build:DamageFont.spritefont
 
-#begin GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Dia_01.png
+#begin GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_01.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -30,9 +30,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Dia_01.png;GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Dia_01
+/build:GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_01.png;GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_01
 
-#begin GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Dia_02.png
+#begin GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_02.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -42,55 +42,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Dia_02.png;GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Dia_02
-
-#begin GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Hor_01.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Hor_01.png;GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Hor_01
-
-#begin GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Hor_02.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Hor_02.png;GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Hor_02
-
-#begin GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Mix_01.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Mix_01.png;GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Mix_01
-
-#begin GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Mix_02.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Mix_02.png;GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_Mix_02
+/build:GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_02.png;GG_Sprites/GG_Beam_Proj/GG_Beam_Proj_02
 
 #begin GG_Sprites/GG_Beam/GG_Beam_01.png
 /importer:TextureImporter
