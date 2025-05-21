@@ -8,7 +8,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Kaiju.ComponentPattern
-{
+{ 
+
     public class Player : Component, ISubject
     {
         protected float speed;
