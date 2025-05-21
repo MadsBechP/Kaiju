@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace Kaiju.ComponentPattern
             sr.SetSprite("Stage\\Stage");
             gameObject.Transform.Scale = new Vector2(6f, 6f);
 
-            gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight + sr.Sprite.Height);
+            gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2), GameWorld.Instance.GraphicsDevice.Viewport.Height + sr.Sprite.Height);
 
         }
     }

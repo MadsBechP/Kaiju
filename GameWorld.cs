@@ -5,6 +5,7 @@ using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -26,7 +27,7 @@ namespace Kaiju
             }
         }
 
-        private GraphicsDeviceManager _graphics;
+        public GraphicsDeviceManager _graphics;
         public GraphicsDeviceManager Graphics { get { return _graphics; } }
         private SpriteBatch _spriteBatch;
 
@@ -42,7 +43,8 @@ namespace Kaiju
 
         public GameObject stageGo;
         public Stage stage;
-       
+        private Texture2D background;
+
         private InputHandler inputHandler = InputHandler.Instance;
         private Camera camera;
 
@@ -50,10 +52,11 @@ namespace Kaiju
         private GameWorld()
         {
             _graphics = new GraphicsDeviceManager(this);
-            _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-            _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            _graphics.PreferredBackBufferHeight = 1440;
+            _graphics.PreferredBackBufferWidth = 2560;
+            _graphics.ApplyChanges();
             _graphics.ToggleFullScreen();
-            Window.AllowUserResizing = true;
+            //Window.AllowUserResizing = true;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -87,7 +90,7 @@ namespace Kaiju
 
             GameObject timerGo = new GameObject();
             timerGo.AddComponent<Timer>();
-            
+
             UIObjects.Add(timerGo);
             timerGo.Awake();
 
@@ -101,7 +104,7 @@ namespace Kaiju
 
         protected override void LoadContent()
         {
-            
+            background = Content.Load<Texture2D>("GZProfile");
             Texture2D player1Profile = Content.Load<Texture2D>("GZProfile");
             Texture2D player2Profile = Content.Load<Texture2D>("GZProfile");
             string name1 = "null";
@@ -147,7 +150,7 @@ namespace Kaiju
                 player1Profile,
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 750, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 735, Graphics.PreferredBackBufferHeight - 80), // namePos
-                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 1000,Graphics.PreferredBackBufferHeight - 250), // hudPos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 1000, Graphics.PreferredBackBufferHeight - 250), // hudPos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 950, Graphics.PreferredBackBufferHeight - 200) // profilePos
                );
 
@@ -168,7 +171,7 @@ namespace Kaiju
             player1DamageMeterGo.Awake();
             player2DamageMeterGo.Awake();
 
-            
+
             playerDamageMeter.SetSubject(player1);
             player2DamageMeter.SetSubject(player2);
 
@@ -185,7 +188,7 @@ namespace Kaiju
             {
                 gameObject.Start();
             }
-            camera = new Camera(_graphics);
+            camera = new Camera();
 
         }
 
@@ -223,8 +226,8 @@ namespace Kaiju
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             Matrix transform = Matrix.CreateTranslation(-camera.GetTopLeft().X, -camera.GetTopLeft().Y, 0);
-            //transform += Matrix.CreateScale(0.5f);
             _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, transform);
+            _spriteBatch.Draw(background, new Rectangle((int)Math.Round(camera.Center.X) - GraphicsDevice.Viewport.Width / 2, (int)Math.Round(camera.Center.Y) - GraphicsDevice.Viewport.Height / 2, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Draw(_spriteBatch);
@@ -300,19 +303,7 @@ namespace Kaiju
 
                 if (col != null && col2 != null && col.CollisionBox.Intersects(col2.CollisionBox))
                 {
-                                return true;
-
-                    foreach (RectangleData rects1 in col.PixelPerfectRectangles)
-                    {
-                        foreach (RectangleData rects2 in col2.PixelPerfectRectangles)
-                        {
-                            if (rects1.Rectangle.Intersects(rects2.Rectangle))
-                            {
-                            }
-                        }
-                        
-                    }
-                    
+                    return true;
                 }
             }
             return false;
@@ -361,6 +352,6 @@ namespace Kaiju
             return animation;
         }
 
-       
+
     }
 }

@@ -60,10 +60,10 @@ namespace Kaiju.ComponentPattern
 
             if (gameObject.Transform.CurrentVelocity.Y < 50)
             {
-            gameObject.Transform.AddVelocity(new Vector2(0, 2f));
+                gameObject.Transform.AddVelocity(new Vector2(0, 2f));
             }
             gameObject.Transform.Translate(collider);
-            if (gameObject.Transform.Position.Y > GameWorld.Instance.Graphics.PreferredBackBufferHeight)
+            if (gameObject.Transform.Position.Y > GameWorld.Instance.GraphicsDevice.Viewport.Height*1.5f)
             {
                 gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
                 gameObject.Transform.CurrentVelocity = Vector2.Zero;
@@ -115,7 +115,7 @@ namespace Kaiju.ComponentPattern
                 chr.FaceRight(false);
             }
         }
-        
+
 
         public void Move(Vector2 velocity)
         {
