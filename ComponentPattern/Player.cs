@@ -83,7 +83,6 @@ namespace Kaiju.ComponentPattern
                     secondTimer = 1;
                 }
             }
-            Debug.WriteLine(blockhp);
 
             if (specialActive)
             {
@@ -277,6 +276,8 @@ namespace Kaiju.ComponentPattern
 
                 case 6:
                     animator.PlayAnimation("Beam");
+                    Vector2 fireDirection = facingRight ? Vector2.UnitX : -Vector2.UnitX;
+                    animator.RegisterFrameEvent("Beam", 5, () => SpawnProjectile(fireDirection, atkNumber));
                     break;
 
             }
@@ -442,8 +443,27 @@ namespace Kaiju.ComponentPattern
             GameWorld.Instance.Instantiate(attackGo);
         }
 
-        public void SpawnProjectile(int atkNumber)
+        public void SpawnProjectile(Vector2 direction, int atkNumber)
         {
+            GameObject projectile = new();
+            var projComponent = projectile.AddComponent<Projectile>();
+            projComponent.direction = direction;
+            projComponent.speed = 10;
+            projComponent.owner = this;
+
+            projectile.Transform.Position = this.gameObject.Transform.Position + new Vector2(facingRight ? 50 : -50, 0);
+
+            var spriteRenderer = projectile.AddComponent<SpriteRenderer>();
+            spriteRenderer.Sprite = GameWorld.Instance.Content.Load<Texture2D>("GG_Sprites\\GG_Beam_Proj\\GG_Beam_Proj_Hor_01");
+
+            var collider = projectile.AddComponent<Collider>();
+            collider.isAttack = true;
+            collider.maxTime = 5;
+            collider.Owner = this;
+
+            GameWorld.Instance.Instantiate(projectile);
+
+            //Specify which character is doing which attack
             switch (atkNumber)
             {
                 case 1:

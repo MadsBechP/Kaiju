@@ -53,7 +53,7 @@ namespace Kaiju
             _graphics = new GraphicsDeviceManager(this);
             _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            _graphics.ToggleFullScreen();
+            //_graphics.ToggleFullScreen();
             Window.AllowUserResizing = true;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -235,6 +235,7 @@ namespace Kaiju
                             {
                                 if (rects1.Rectangle.Intersects(rects2.Rectangle))
                                 {
+                                    Debug.WriteLine($"Collision with {go1} and {go2}");
                                     handledCollision = true;
                                     break;
                                 }

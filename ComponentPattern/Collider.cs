@@ -17,7 +17,7 @@ namespace Kaiju.ComponentPattern
 
         public bool isAttack;
         private float currentTime;
-        private float maxTime;
+        public float maxTime;
         private Rectangle position;
         public Player Owner { get; set; }
         public int Damage { get; private set; }
