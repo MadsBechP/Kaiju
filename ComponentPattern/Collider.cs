@@ -16,6 +16,7 @@ namespace Kaiju.ComponentPattern
         private Dictionary<Texture2D, List<RectangleData>> colliderChache = new();
 
         public bool isAttack;
+        public bool isProjectile;
         private float currentTime;
         public float maxTime;
         private Rectangle position;
@@ -27,9 +28,9 @@ namespace Kaiju.ComponentPattern
         {
 
         }
-        public Collider(GameObject gameObject, float maxTime, Rectangle position, Player owner, int damage) : base(gameObject)
+        public Collider(GameObject gameObject, bool isAttack, float maxTime, Rectangle position, Player owner, int damage) : base(gameObject)
         {
-            this.isAttack = true;
+            this.isAttack = isAttack;
             this.maxTime = maxTime;
             this.position = position;
             this.Owner = owner;
