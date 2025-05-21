@@ -113,7 +113,7 @@ namespace Kaiju
 
         protected override void LoadContent()
         {
-            background = Content.Load<Texture2D>("GZProfile");
+            background = Content.Load<Texture2D>("City");
             Texture2D player1Profile = Content.Load<Texture2D>("GZProfile");
             Texture2D player2Profile = Content.Load<Texture2D>("GZProfile");
             string name1 = "null";

@@ -17,6 +17,10 @@ namespace Kaiju
         {
             CurrentVelocity += translation;
         }
+        public void Translate(Vector2 translation)
+        {
+            Position += translation;
+        }
         public void Translate(Collider col)
         {
             TranslateX(col);
@@ -35,6 +39,7 @@ namespace Kaiju
 
                     if (GameWorld.Instance.CheckCollision(col))
                     {
+                        CurrentVelocity = new Vector2(0, CurrentVelocity.Y);
                         Position = new Vector2(Position.X - sign, Position.Y);
                         return;
                     }
@@ -60,7 +65,7 @@ namespace Kaiju
 
                     if (GameWorld.Instance.CheckCollision(col))
                     {
-                        CurrentVelocity = Vector2.Zero;
+                        CurrentVelocity = new Vector2 (CurrentVelocity.X, 0);
                         Position = new Vector2(Position.X, Position.Y - sign);
                         if (col.Owner != null)
                         {

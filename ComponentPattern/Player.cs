@@ -101,8 +101,7 @@ namespace Kaiju.ComponentPattern
                 blocking = false;
             }
 
-            // Moves player according to its current velocity
-            gameObject.Transform.Translate();
+            
 
 
             if (gameObject.Transform.CurrentVelocity.Y < 50)
@@ -141,11 +140,6 @@ namespace Kaiju.ComponentPattern
             if (hit)
             {
                 gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.1f), gameObject.Transform.CurrentVelocity.Y);
-            }
-            else if (grounded)
-            {
-                gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.3f), gameObject.Transform.CurrentVelocity.Y);
-                hit = false;
             }
             else
             {
@@ -309,6 +303,7 @@ namespace Kaiju.ComponentPattern
             }
 
             animator.PlayAnimation("Block");
+            sr.Origin = new Vector2(sr.Origin.X, sr.Origin.Y-10);
         }
 
         public override void OnCollisionEnter(Collider collider)
@@ -521,7 +516,7 @@ namespace Kaiju.ComponentPattern
             float scale = shieldRatio;
 
             Vector2 position = gameObject.Transform.Position;
-            Vector2 origin = new Vector2(shieldTexture.Width / 2, shieldTexture.Height / 2);
+            Vector2 origin = new Vector2(shieldTexture.Width / 2, (shieldTexture.Height / 2)- sr.Origin.Y);
 
             spriteBatch.Draw(shieldTexture, position, null, Color.White * 0.5f, 0, origin, scale, SpriteEffects.None, 0);
         }
