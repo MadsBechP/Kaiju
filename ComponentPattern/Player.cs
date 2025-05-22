@@ -319,34 +319,37 @@ namespace Kaiju.ComponentPattern
 
         public override void OnCollisionEnter(Collider collider)
         {
-            if ((collider.isAttack && !hit) || (collider.isProjectile && !hit))
+            if (collider.Owner != this)
             {
-                if (!blocking || blockhp < collider.Damage)
+                if ((collider.isAttack && !hit) || (collider.isProjectile && !hit))
                 {
-                    if (!collider.isProjectile)
+                    if (!blocking || blockhp < collider.Damage)
                     {
-                        GameWorld.Instance.Destroy(collider.gameObject);
+                        if (!collider.isProjectile)
+                        {
+                            GameWorld.Instance.Destroy(collider.gameObject);
+                        }
+
+                        TakeDamage(collider.Damage);
+                        hit = true;
+                        hitTimer = 1f;
+                        Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
+                        knockback.Normalize();
+
+                        gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 50 * Damage;
+                        gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime * 10 * Damage);
                     }
-
-                    TakeDamage(collider.Damage);
-                    hit = true;
-                    hitTimer = 1f;
-                    Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
-                    knockback.Normalize();
-
-                    gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 50 * Damage;
-                    gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime * 10 * Damage);
-                }
-                else
-                {
-                    TakeDamage(collider.Damage);
-                    hit = true;
-                    hitTimer = 0.5f;
-                    if (!collider.isProjectile)
+                    else
                     {
-                        GameWorld.Instance.Destroy(collider.gameObject);
+                        TakeDamage(collider.Damage);
+                        hit = true;
+                        hitTimer = 0.5f;
+                        if (!collider.isProjectile)
+                        {
+                            GameWorld.Instance.Destroy(collider.gameObject);
+                        }
                     }
-                }
+                } 
             }
         }
 
@@ -472,6 +475,7 @@ namespace Kaiju.ComponentPattern
                     beam.Transform.Scale = new Vector2(3);
 
                     spriteRenderer = beam.AddComponent<SpriteRenderer>();
+                    beamComponent.spriteRenderer = spriteRenderer;
                     spriteRenderer.SetSprite("GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01");
                     spriteRenderer.SetFlipHorizontal(!facingRight);
 
@@ -493,19 +497,15 @@ namespace Kaiju.ComponentPattern
                     GameObject projectile = new();
                     var projComponent = projectile.AddComponent<Projectile>();
                     projComponent.direction = direction;
-                    projComponent.speed = 250;
+                    projComponent.speed = 1000;
                     projComponent.owner = this;
 
                     projectile.Transform.Position = (this.gameObject.Transform.Position + new Vector2(0, -75)) + new Vector2(facingRight ? 100 : -100, 0);
                     projectile.Transform.Scale = new Vector2(2);
 
-                    var spriteRendererProj = projectile.AddComponent<SpriteRenderer>();
-                    spriteRendererProj.SetSprite("GG_Sprites\\GG_Beam_Proj\\GG_Beam_Proj_01");
-
-                    if (facingRight)
-                    {
-                        spriteRendererProj.SetFlipHorizontal(true);
-                    }
+                    spriteRenderer = projectile.AddComponent<SpriteRenderer>();
+                    spriteRenderer.SetSprite("GG_Sprites\\GG_Beam_Proj\\GG_Beam_Proj_01");
+                    spriteRenderer.SetFlipHorizontal(facingRight);
 
                     damage = 5;
                     position = new();

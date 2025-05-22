@@ -23,16 +23,5 @@ namespace Kaiju.ComponentPattern
         {
             gameObject.Transform.Position += direction * speed * GameWorld.Instance.DeltaTime;
         }
-
-        public override void OnCollisionEnter(Collider collider)
-        {
-            Debug.WriteLine($"Projectile collided with {collider}");
-            if (collider.Owner == owner)
-            {
-                return;
-            }
-
-            GameWorld.Instance.Destroy(gameObject);
-        }
     }
 }
