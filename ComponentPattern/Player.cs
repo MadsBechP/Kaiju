@@ -219,31 +219,32 @@ namespace Kaiju.ComponentPattern
             switch (atkNumber)
             {
                 case 1:
-                    SpawnHitbox(atkNumber);
-
                     if (lastPunchRight)
                     {
                         animator.PlayAnimation("LPunch");
+                        animator.RegisterFrameEvent("LPunch", 1, () => SpawnHitbox(atkNumber));
                         lastPunchRight = false;
                     }
                     else
                     {
                         animator.PlayAnimation("RPunch");
+                        animator.RegisterFrameEvent("RPunch", 1, () => SpawnHitbox(atkNumber));
                         lastPunchRight = true;
                     }
                     break;
 
                 case 2:
-                    SpawnHitbox(atkNumber);
-
                     if (lastPunchRight)
                     {
                         animator.PlayAnimation("LKick");
+                        animator.RegisterFrameEvent("LKick", 1, () => SpawnHitbox(atkNumber));
+
                         lastPunchRight = false;
                     }
                     else
                     {
                         animator.PlayAnimation("RKick");
+                        animator.RegisterFrameEvent("RKick", 1, () => SpawnHitbox(atkNumber));
                         lastPunchRight = true;
                     }
                     break;
@@ -254,24 +255,25 @@ namespace Kaiju.ComponentPattern
                     break;
 
                 case 4:
-                    SpawnHitbox(atkNumber);
-
                     if (lastPunchRight)
                     {
                         animator.PlayAnimation("LPunch");
+                        animator.RegisterFrameEvent("LPunch", 1, () => SpawnHitbox(atkNumber));
                         lastPunchRight = false;
                     }
                     else
                     {
                         animator.PlayAnimation("RPunch");
+                        animator.RegisterFrameEvent("RPunch", 1, () => SpawnHitbox(atkNumber));
+
                         lastPunchRight = true;
 
                     }
                     break;
 
                 case 5:
-                    SpawnHitbox(atkNumber);
                     animator.PlayAnimation("Kick");
+                    animator.RegisterFrameEvent("Kick", 1, () => SpawnHitbox(atkNumber));
                     break;
 
                 case 6:
