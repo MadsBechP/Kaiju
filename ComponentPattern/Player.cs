@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO.Pipes;
 
 namespace Kaiju.ComponentPattern
 { 
@@ -291,6 +292,8 @@ namespace Kaiju.ComponentPattern
             {
                 case 1:
                     animator.PlayAnimation("Special");
+                    Vector2 fireDirection = facingRight ? Vector2.UnitX : -Vector2.UnitX;
+                    animator.RegisterFrameEvent("Special", 4, () => SpawnProjectile(fireDirection, specialNumber));
                     break;
 
                 case 2:
@@ -447,38 +450,56 @@ namespace Kaiju.ComponentPattern
 
         public void SpawnProjectile(Vector2 direction, int atkNumber)
         {
+            int damage;
+            Rectangle position;
+            SpriteRenderer spriteRenderer;
+            Collider collider;
             switch (atkNumber)
             {
                 case 1:
+                    GameObject beam = new();
+                    var beamComponent = beam.AddComponent<Beam>();
+                    beamComponent.owner = this;
+
+                    beam.Transform.Position = this.gameObject.Transform.Position + new Vector2(facingRight ? 300 : -300, -25);
+                    beam.Transform.Scale = new Vector2(3);
+
+                    spriteRenderer = beam.AddComponent<SpriteRenderer>();
+                    spriteRenderer.SetSprite("GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01");
+                    spriteRenderer.SetFlipHorizontal(!facingRight);
+
+                    damage = 10;
+                    position = new Rectangle((int)gameObject.Transform.Position.X, (int)gameObject.Transform.Position.Y - 80, 300, 160);
+                    collider = beam.AddComponent<Collider>(false, 5, position, this, damage);
+                    collider.isProjectile = true;
+
+                    GameWorld.Instance.Instantiate(beam);
                     break;
 
                 case 6:
                     GameObject projectile = new();
                     var projComponent = projectile.AddComponent<Projectile>();
                     projComponent.direction = direction;
-                    projComponent.speed = 500;
+                    projComponent.speed = 100;
                     projComponent.owner = this;
 
                     projectile.Transform.Position = (this.gameObject.Transform.Position + new Vector2(0, -75)) + new Vector2(facingRight ? 100 : -100, 0);
                     projectile.Transform.Scale = new Vector2(2);
 
-                    var spriteRenderer = projectile.AddComponent<SpriteRenderer>();
-                    spriteRenderer.SetSprite("GG_Sprites\\GG_Beam_Proj\\GG_Beam_Proj_01");
+                    var spriteRendererProj = projectile.AddComponent<SpriteRenderer>();
+                    spriteRendererProj.SetSprite("GG_Sprites\\GG_Beam_Proj\\GG_Beam_Proj_01");
 
                     if (facingRight)
                     {
-                        spriteRenderer.SetFlipHorizontal(true);
+                        spriteRendererProj.SetFlipHorizontal(true);
                     }
 
-                    int damage = 5;
-                    Rectangle position = new();
-                    var collider = projectile.AddComponent<Collider>(false, 0.2f, position, this, damage);
+                    damage = 5;
+                    position = new();
+                    collider = projectile.AddComponent<Collider>(false, 5, position, this, damage);
                     collider.isProjectile = true;
-                    collider.maxTime = 5;
-                    collider.Owner = this;
 
                     GameWorld.Instance.Instantiate(projectile);
-
                     break;
             }
         }

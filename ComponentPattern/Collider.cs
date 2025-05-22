@@ -94,6 +94,14 @@ namespace Kaiju.ComponentPattern
                 }
 
                 UpdatePixelCollider();
+                if (isProjectile)
+                {
+                    currentTime += GameWorld.Instance.DeltaTime;
+                    if (currentTime > maxTime)
+                    {
+                        GameWorld.Instance.Destroy(gameObject);
+                    }
+                }
             }
             else
             {
