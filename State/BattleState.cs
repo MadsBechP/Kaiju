@@ -53,18 +53,17 @@ namespace Kaiju.State
                 }
             }
 
-            // If a timer has been found and timer has run out, change to VictoryState
+            // If a timer has been found and the timer has run out, change to VictoryState
             if(timer != null && timer.TimeRanOut)
-            {
-                // change this to health when health has been created (this is for testing)
-                float player1Damage = game.player1.Damage;
-                float player2Damage = game.player2.Damage;
+            {                
+                float player1Lives = game.player1.Lives;
+                float player2Lives = game.player2.Lives;
 
-                if(player1Damage == player2Damage)
+                if(player1Lives == player2Lives)
                 {
                     game.ChangeGameState(new VictoryState(game, "", true));
                 }
-                else if(player1Damage < player2Damage)
+                else if(player1Lives > player2Lives)
                 {
                     game.ChangeGameState(new VictoryState(game, $"{name1}", false));
                 }
@@ -72,7 +71,9 @@ namespace Kaiju.State
                 {
                     game.ChangeGameState(new VictoryState(game, $"{name2}", false));
                 }
+                
             }
+
         }
 
         private void LoadContent()
@@ -111,15 +112,18 @@ namespace Kaiju.State
         }
         private void HUDSetup()
         {
+            var width = game.Graphics.PreferredBackBufferWidth;
+            var height = game.Graphics.PreferredBackBufferHeight;
+
             GameObject player1DamageMeterGo = new GameObject();
             var playerDamageMeter = player1DamageMeterGo.AddComponent<DamageMeter>();
             playerDamageMeter.Setup(
                 name1,
                 player1Profile,
-                new Vector2((game.Graphics.PreferredBackBufferWidth / 2) - 750, game.Graphics.PreferredBackBufferHeight - 185), // damageFontPos
-                new Vector2((game.Graphics.PreferredBackBufferWidth / 2) - 735, game.Graphics.PreferredBackBufferHeight - 80), // namePos
-                new Vector2((game.Graphics.PreferredBackBufferWidth / 2) - 1000, game.Graphics.PreferredBackBufferHeight - 250), // hudPos
-                new Vector2((game.Graphics.PreferredBackBufferWidth / 2) - 950, game.Graphics.PreferredBackBufferHeight - 200) // profilePos
+                new Vector2((width / 2) - 750, height - 185), // damageFontPos
+                new Vector2((width / 2) - 735, height - 80), // namePos
+                new Vector2((width / 2) - 1000, height - 250), // hudPos
+                new Vector2((width / 2) - 950, height - 200) // profilePos
                );
 
             GameObject player2DamageMeterGo = new GameObject();
@@ -127,10 +131,10 @@ namespace Kaiju.State
             player2DamageMeter.Setup(
                 name2,
                 player2Profile,
-                new Vector2((game.Graphics.PreferredBackBufferWidth / 2) + 790, game.Graphics.PreferredBackBufferHeight - 185), // damageFontPos
-                new Vector2((game.Graphics.PreferredBackBufferWidth / 2) + 780, game.Graphics.PreferredBackBufferHeight - 80), // namePos
-                new Vector2((game.Graphics.PreferredBackBufferWidth / 2) + 550, game.Graphics.PreferredBackBufferHeight - 250), // hudPos
-                new Vector2((game.Graphics.PreferredBackBufferWidth / 2) + 610, game.Graphics.PreferredBackBufferHeight - 200) // profilePos
+                new Vector2((width / 2) + 790, height - 185), // damageFontPos
+                new Vector2((width / 2) + 780, height - 80), // namePos
+                new Vector2((width / 2) + 550, height - 250), // hudPos
+                new Vector2((width / 2) + 610, height - 200) // profilePos
                );
 
 

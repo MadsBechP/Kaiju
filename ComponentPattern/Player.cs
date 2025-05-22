@@ -8,6 +8,7 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Kaiju.State;
 
 namespace Kaiju.ComponentPattern
 {
@@ -28,6 +29,7 @@ namespace Kaiju.ComponentPattern
 
         private List<IObserver> observers = new List<IObserver>();
         public int Damage { get; private set; }
+        public int Lives { get; private set; } = 3;
 
 
         public Player(GameObject gameObject) : base(gameObject)
@@ -197,7 +199,7 @@ namespace Kaiju.ComponentPattern
                             animator.PlayAnimation("RPunch");
                             lastPunchRight = true;
                         }
-                        damage = 5;
+                        damage = 85;
                         break;
                     }
                 case 2:
@@ -212,7 +214,7 @@ namespace Kaiju.ComponentPattern
                         }
 
                         animator.PlayAnimation("TailSwipe");
-                        damage = 10;
+                        damage = 15;
                         break;
                     }
             }
@@ -241,12 +243,47 @@ namespace Kaiju.ComponentPattern
                 gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime * 10 * Damage);
             }
         }
+       
         public void TakeDamage(int amount)
         {
             Damage += amount;
             Debug.WriteLine($"{this} took damage: {Damage}"); // tjek om TakeDamage faktisk bliver kaldt
+
+            if(Damage > 100)
+            {
+                Lives--;
+                if(Lives > 0)
+                {
+                    Damage = 0;
+                    // Set a Respawn here
+                }
+                else
+                {
+                    // player is dead and the other player won. Change to VictoryState
+                    GameWorld.Instance.ChangeGameState(new VictoryState(GameWorld.Instance, GetOpponentsName(), false));
+                }
+            }
             Notify();
         }
+
+        /// <summary>
+        /// Gets the name of the on who won the battle.
+        /// fx. if this is player1 , the method will return the name of player2.
+        /// (used to give the correct name to VictoryState)
+        /// </summary>
+        /// <returns></returns>
+        private string GetOpponentsName()
+        {
+            if(this == GameWorld.Instance.player1)
+            {
+                return GameWorld.Instance.player2.chr.GetType().Name;
+            }
+            else
+            {
+                return GameWorld.Instance.player1.chr.GetType().Name;
+            }
+        }
+        
 
         public void Attach(IObserver observer)
         {

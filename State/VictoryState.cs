@@ -34,11 +34,11 @@ namespace Kaiju.State
 
             if (isDraw)
             {
-                winText = "You Where Too Weak";
+                winText = "You Are Too Weak To Be King";
             }
             else
             {
-                winText = $"A New King Has Risen!\nKneel Before {winnerName}";
+                winText = $"A New King Has Risen !\n  Kneel Before {winnerName}";
             }
 
         }
@@ -53,10 +53,13 @@ namespace Kaiju.State
         }
         public void Draw(SpriteBatch spriteBatch)
         {
+            var width = GameWorld.Instance.Graphics.PreferredBackBufferWidth;
+            var height = GameWorld.Instance.Graphics.PreferredBackBufferHeight;
+                        
 
-            spriteBatch.DrawString(victoryFont, winText, new Vector2(825, 500), Color.White);;
+            spriteBatch.DrawString(victoryFont, winText, new Vector2((width / 2), (height / 2)-100), Color.White);;
 
-            spriteBatch.DrawString(victoryFont, promptText, new Vector2(800,700), Color.White);
+            spriteBatch.DrawString(victoryFont, promptText, new Vector2((width / 2), (height / 2)+50), Color.White);
         }
 
         public void Exit()

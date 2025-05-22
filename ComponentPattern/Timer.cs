@@ -20,7 +20,6 @@ namespace Kaiju.ComponentPattern
 
         public Timer(GameObject gameObject) : base(gameObject)
         {
-
         }
 
         public override void Awake()
@@ -36,7 +35,6 @@ namespace Kaiju.ComponentPattern
                 timeLeft -= GameWorld.Instance.DeltaTime;
                 if (timeLeft < 0f)
                 {
-                    //GameWorld.Instance.ChangeGameState(new VictoryState(GameWorld.Instance,"",true));
                     TimeRanOut = true;
                 }
                 TimeSpan time = TimeSpan.FromSeconds(timeLeft);
