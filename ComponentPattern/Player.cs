@@ -479,11 +479,11 @@ namespace Kaiju.ComponentPattern
                     spriteRenderer.SetSprite("GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01");
                     spriteRenderer.SetFlipHorizontal(!facingRight);
 
-                    //var animator = beam.AddComponent<Animator>();
-                    //animator.AddAnimation(GameWorld.Instance.BuildAnimation("Breath", new string[] {
-                    //    "GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01",
-                    //    "GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01" }, 5, true));
-                    //animator.PlayAnimation("Breath");
+                    var animator = beam.AddComponent<Animator>();
+                    animator.AddAnimation(GameWorld.Instance.BuildAnimation("Breath", new string[] {
+                        "GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01",
+                        "GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_02" }, 5, false));
+                    animator.PlayAnimation("Breath");
 
                     damage = 10;
                     position = new Rectangle((int)gameObject.Transform.Position.X, (int)gameObject.Transform.Position.Y - 80, 300, 160);

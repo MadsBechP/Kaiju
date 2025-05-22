@@ -47,7 +47,10 @@ namespace Kaiju.ComponentPattern
             {
                 elapsed = 0;
                 CurrentIndex = 0;
-                PlayAnimation("Idle");
+                if (currentAnimation.Name != "Breath")
+                {
+                    PlayAnimation("Idle");
+                }
             }
             spriteRenderer.Sprite = currentAnimation.Sprites[CurrentIndex];
             spriteRenderer.Source = new Rectangle(0, 0, spriteRenderer.Sprite.Width, spriteRenderer.Sprite.Height);
