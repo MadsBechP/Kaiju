@@ -9,11 +9,10 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>godzilla_head__transparent__by_raptorjux_dhwyjwj_375w_2x_RoT_icon.ico</ApplicationIcon>
+    <ApplicationIcon>GojiHead.ico</ApplicationIcon>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="godzilla_head__transparent__by_raptorjux_dhwyjwj_375w_2x_RoT_icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.*" />

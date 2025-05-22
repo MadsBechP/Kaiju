@@ -1,12 +1,7 @@
 ﻿using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kaiju.ComponentPattern
 {
@@ -28,11 +23,11 @@ namespace Kaiju.ComponentPattern
         private Vector2 profilePos;
 
         private ISubject subject;
-        
+
         public DamageMeter(GameObject gameObject) : base(gameObject)
-        {            
+        {
         }
-        
+
         public void Setup(string playerName, Texture2D profileTexture, Vector2 damageFontPos, Vector2 namePos, Vector2 hudPos, Vector2 profilePos)
         {
             this.playerName = playerName;
@@ -50,7 +45,7 @@ namespace Kaiju.ComponentPattern
         }
 
         public override void Start()
-        {  
+        {
             damageFont = GameWorld.Instance.Content.Load<SpriteFont>("DamageFont");
             playerNameFont = GameWorld.Instance.Content.Load<SpriteFont>("playerNameFont");
             playerHUD = GameWorld.Instance.Content.Load<Texture2D>("playerHUD");
@@ -90,7 +85,7 @@ namespace Kaiju.ComponentPattern
             damageText = $"{damageTaken:D2}%";
             Debug.WriteLine($"DamageMeter Updated: {damageText}");
         }
-       
+
         public void Updated()
         {
             UpdateDamage();
