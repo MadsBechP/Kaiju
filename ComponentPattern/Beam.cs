@@ -18,7 +18,7 @@ namespace Kaiju.ComponentPattern
 
         public override void OnCollisionEnter(Collider collider)
         {
-            Debug.WriteLine("Beam colliding");
+            Debug.WriteLine($"Beam collided with {collider}");
             if (collider.Owner == owner)
             {
                 return;

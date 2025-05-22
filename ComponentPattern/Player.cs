@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.IO.Pipes;
 
 namespace Kaiju.ComponentPattern
-{ 
+{
     public class Player : Component, ISubject
     {
         protected float speed;
@@ -323,11 +323,14 @@ namespace Kaiju.ComponentPattern
             {
                 if (!blocking || blockhp < collider.Damage)
                 {
-                    GameWorld.Instance.Destroy(collider.gameObject);
+                    if (!collider.isProjectile)
+                    {
+                        GameWorld.Instance.Destroy(collider.gameObject);
+                    }
 
                     TakeDamage(collider.Damage);
                     hit = true;
-                    hitTimer = 0.5f;
+                    hitTimer = 1f;
                     Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
                     knockback.Normalize();
 
@@ -337,12 +340,16 @@ namespace Kaiju.ComponentPattern
                 else
                 {
                     TakeDamage(collider.Damage);
-                    GameWorld.Instance.Destroy(collider.gameObject);
+                    hit = true;
+                    hitTimer = 0.5f;
+                    if (!collider.isProjectile)
+                    {
+                        GameWorld.Instance.Destroy(collider.gameObject);
+                    }
                 }
             }
-
-
         }
+
         public void TakeDamage(int amount)
         {
             if (!blocking || blockhp < amount)
@@ -468,9 +475,15 @@ namespace Kaiju.ComponentPattern
                     spriteRenderer.SetSprite("GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01");
                     spriteRenderer.SetFlipHorizontal(!facingRight);
 
+                    //var animator = beam.AddComponent<Animator>();
+                    //animator.AddAnimation(GameWorld.Instance.BuildAnimation("Breath", new string[] {
+                    //    "GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01",
+                    //    "GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01" }, 5, true));
+                    //animator.PlayAnimation("Breath");
+
                     damage = 10;
                     position = new Rectangle((int)gameObject.Transform.Position.X, (int)gameObject.Transform.Position.Y - 80, 300, 160);
-                    collider = beam.AddComponent<Collider>(false, 5, position, this, damage);
+                    collider = beam.AddComponent<Collider>(false, 2, position, this, damage);
                     collider.isProjectile = true;
 
                     GameWorld.Instance.Instantiate(beam);
@@ -480,7 +493,7 @@ namespace Kaiju.ComponentPattern
                     GameObject projectile = new();
                     var projComponent = projectile.AddComponent<Projectile>();
                     projComponent.direction = direction;
-                    projComponent.speed = 100;
+                    projComponent.speed = 250;
                     projComponent.owner = this;
 
                     projectile.Transform.Position = (this.gameObject.Transform.Position + new Vector2(0, -75)) + new Vector2(facingRight ? 100 : -100, 0);

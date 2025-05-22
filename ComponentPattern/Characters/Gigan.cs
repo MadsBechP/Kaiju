@@ -38,7 +38,7 @@ namespace Kaiju.ComponentPattern.Characters
                 "GG_Sprites\\GG_Walk\\GG_Walk_04"}, 5, true));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("Hit", new string[] {
                 "GG_Sprites\\GG_Big_Hit\\GG_Big_Hit_01",
-                "GG_Sprites\\GG_Big_Hit\\GG_Big_Hit_02"}, 4, false));
+                "GG_Sprites\\GG_Big_Hit\\GG_Big_Hit_02"}, 2, false));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("LPunch", new string[] {
                 "GG_Sprites\\GG_Punch_L\\GG_Punch_L_01",
                 "GG_Sprites\\GG_Punch_L\\GG_Punch_L_02"}, 5, false));
