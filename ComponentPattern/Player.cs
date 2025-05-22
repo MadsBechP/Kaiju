@@ -25,6 +25,7 @@ namespace Kaiju.ComponentPattern
         private bool specialActive;
         private float SpecialDuration = 3;
         private float specialTime;
+        private float specialCooldown;
 
         private bool hit = false;
         private float hitTimer;
@@ -92,7 +93,13 @@ namespace Kaiju.ComponentPattern
                 {
                     specialActive = false;
                     specialTime = 0;
+                    animator.PlayAnimation("Idle");
                 }
+            }
+
+            if (specialCooldown > 0)
+            {
+                specialCooldown -= GameWorld.Instance.DeltaTime;
             }
 
             KeyboardState keystate = Keyboard.GetState();
@@ -209,6 +216,7 @@ namespace Kaiju.ComponentPattern
                 gameObject.Transform.AddVelocity(new Vector2(0, -2000f) * GameWorld.Instance.DeltaTime);
             }
         }
+
         public void Attack(int atkNumber)
         {
             if (atkCooldown > 0 || hit)
@@ -288,6 +296,12 @@ namespace Kaiju.ComponentPattern
 
         public void Special(int specialNumber)
         {
+            if (specialCooldown > 0 || hit)
+            {
+                return;
+            }
+            specialCooldown = 5f;
+
             switch (specialNumber)
             {
                 case 1:
@@ -298,6 +312,9 @@ namespace Kaiju.ComponentPattern
 
                 case 2:
                     animator.PlayAnimation("SawStill");
+                    animator.RegisterFrameEvent("SawStill", 3, () => animator.PlayAnimation("SawCont"));
+                    specialNumber = 6;
+                    SpawnHitbox(specialNumber);
                     specialActive = true;
                     break;
             }
@@ -395,6 +412,7 @@ namespace Kaiju.ComponentPattern
             GameObject attackGo = new();
             Rectangle position = new Rectangle();
             int damage = 0;
+            float maxTime = 0.2f;
 
             switch (atkNumber)
             {
@@ -453,8 +471,21 @@ namespace Kaiju.ComponentPattern
                     }
                     damage = 10;
                     break;
+                case 6:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 55), (int)Math.Round(gameObject.Transform.Position.Y - 50), 50, 125);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 105), (int)Math.Round(gameObject.Transform.Position.Y - 50), 50, 125);
+                    }
+
+                    damage = 10;
+                    maxTime = SpecialDuration;
+                    break;
             }
-            attackGo.AddComponent<Collider>(true, 0.2f, position, this, damage);
+            attackGo.AddComponent<Collider>(true, maxTime, position, this, damage);
             GameWorld.Instance.Instantiate(attackGo);
         }
 

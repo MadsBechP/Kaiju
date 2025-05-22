@@ -58,6 +58,9 @@ namespace Kaiju.ComponentPattern.Characters
                 "GG_Sprites\\GG_Saw_Still\\GG_Saw_Still_01",
                 "GG_Sprites\\GG_Saw_Still\\GG_Saw_Still_02",
                 "GG_Sprites\\GG_Saw_Still\\GG_Saw_Still_03", }, 5, false));
+            ani.AddAnimation(GameWorld.Instance.BuildAnimation("SawCont", new string[] {
+                "GG_Sprites\\GG_Saw_Still\\GG_Saw_Still_02",
+                "GG_Sprites\\GG_Saw_Still\\GG_Saw_Still_03", }, 5, false));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("SawMove", new string[] {
                 "GG_Sprites\\GG_Saw_Move\\GG_Saw_Move_01",
                 "GG_Sprites\\GG_Saw_Move\\GG_Saw_Move_02",

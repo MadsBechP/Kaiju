@@ -47,7 +47,7 @@ namespace Kaiju.ComponentPattern
             {
                 elapsed = 0;
                 CurrentIndex = 0;
-                if (currentAnimation.Name != "Breath")
+                if (currentAnimation.Name != "Breath" && currentAnimation.Name != "SawCont")
                 {
                     PlayAnimation("Idle");
                 }
