@@ -17,6 +17,7 @@ namespace Kaiju.ComponentPattern
         protected SpriteRenderer sr;
         private Animator animator;
         public Collider collider;
+        public Collider stageCollider;
         public Character chr;
         public bool facingRight;
         private bool lastPunchRight;

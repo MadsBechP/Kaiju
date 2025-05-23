@@ -73,18 +73,18 @@ namespace Kaiju
             player1.InputType = InputType.Keyboard;
             player1.GamePadIndex = PlayerIndex.One;
             player1Go.AddComponent<SpriteRenderer>();
-            player1Go.AddComponent<Collider>();
+            player1.stageCollider = player1Go.AddComponent<Collider>();
             player1.collider = player1Go.AddComponent<Collider>(player1);
             player1Go.AddComponent<Animator>();
             player1.chr = player1Go.AddComponent<Godzilla>();
             gameObjects.Add(player1Go);
 
             player2Go = new GameObject();
-            player2 = player2Go.AddComponent<Player>();
+            player2 = player2Go.AddComponent<AI>();
             player2.InputType = InputType.Keyboard;
             player2.GamePadIndex = PlayerIndex.Two;
             player2Go.AddComponent<SpriteRenderer>();
-            player2Go.AddComponent<Collider>();
+            player2.stageCollider = player2Go.AddComponent<Collider>();
             player2.collider = player2Go.AddComponent<Collider>(player2);
             player2Go.AddComponent<Animator>();
             player2.chr = player2Go.AddComponent<Gigan>();
@@ -312,6 +312,23 @@ namespace Kaiju
                 Collider col2 = go2.GetComponent<Collider>() as Collider;
 
                 if (col != null && col2 != null && col.CollisionBox.Intersects(col2.CollisionBox))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public bool CheckCollision(Rectangle rect)
+        {
+            foreach (GameObject go2 in gameObjects)
+            {
+                if (go2.GetComponent<Stage>() as Stage == null)
+                {
+                    continue;
+                }
+                Collider col2 = go2.GetComponent<Collider>() as Collider;
+
+                if (col2 != null && rect.Intersects(col2.CollisionBox))
                 {
                     return true;
                 }
