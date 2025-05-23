@@ -119,7 +119,10 @@ namespace Kaiju.State
         {
             var width = game.GraphicsDevice.Viewport.Width;
             var height = game.GraphicsDevice.Viewport.Height;
-            
+
+            //var width = game.Graphics.PreferredBackBufferWidth;
+            //var height = game.Graphics.PreferredBackBufferHeight;
+
             GameObject player1DamageMeterGo = new GameObject();
             var playerDamageMeter = player1DamageMeterGo.AddComponent<DamageMeter>();
             
@@ -139,7 +142,7 @@ namespace Kaiju.State
             player2DamageMeter.Setup(
                 name2,
                 player2Profile,
-                new Vector2(width * 0.844f, height * 0.895f), // damageFontPos: 84.4% fra venstre, 89.5% ned 
+                new Vector2(width * 0.844f, height * 0.895f), // damageFontPos: 89.4% fra venstre, 89.5% ned 
                 new Vector2(width * 0.845f, height * 0.956f), // namePos: 84.4% fra venstre, 95.6% ned
                 new Vector2(width * 0.75f, height * 0.85f), // hudPos: 75% fra venstre, 85% ned
                 new Vector2(width * 0.775f, height * 0.883f) // profilePos: 77.5% fra venstre, 88.3% ned
