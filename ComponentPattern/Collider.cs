@@ -112,15 +112,22 @@ namespace Kaiju.ComponentPattern
                         pixelPerfectRectangles = pixelPerfectRectangles.Select(p => new RectangleData(p.X, p.Y)).ToList();
                     }
 
-                    UpdatePixelCollider();
-                }
-                else
+                UpdatePixelCollider();
+                if (isProjectile)
                 {
                     currentTime += GameWorld.Instance.DeltaTime;
                     if (currentTime > maxTime)
                     {
                         GameWorld.Instance.Destroy(gameObject);
                     }
+                }
+            }
+            else
+            {
+                currentTime += GameWorld.Instance.DeltaTime;
+                if (currentTime > maxTime)
+                {
+                    GameWorld.Instance.Destroy(gameObject);
                 }
             }
         }
@@ -192,6 +199,14 @@ namespace Kaiju.ComponentPattern
             }
 
             return rectangles;
+        }
+
+        public void SetPosition(Rectangle newPosition)
+        {
+            if (isAttack)
+            {
+                position = newPosition;
+            }
         }
     }
 

@@ -6,9 +6,10 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO.Pipes;
 
 namespace Kaiju.ComponentPattern
-{ 
+{
     public class Player : Component, ISubject
     {
         protected float speed;
@@ -26,6 +27,8 @@ namespace Kaiju.ComponentPattern
         private bool specialActive;
         private float SpecialDuration = 3;
         private float specialTime;
+        private float specialCooldown;
+        private GameObject sawHitBox;
 
         private bool hit = false;
         private float hitTimer;
@@ -93,7 +96,34 @@ namespace Kaiju.ComponentPattern
                 {
                     specialActive = false;
                     specialTime = 0;
+                    animator.PlayAnimation("Idle");
+                    if (sawHitBox != null)
+                    {
+                        GameWorld.Instance.Destroy(sawHitBox);
+                        sawHitBox = null;
+                    }
                 }
+                else if (sawHitBox != null)
+                {
+                    var collider = sawHitBox.GetComponent<Collider>() as Collider;
+                    if (collider != null)
+                    {
+                        if (facingRight)
+                        {
+                            collider.SetPosition(new Rectangle((int)(gameObject.Transform.Position.X + 55), (int)(gameObject.Transform.Position.Y - 50), 50, 125));
+
+                        }
+                        else
+                        {
+                            collider.SetPosition(new Rectangle((int)(gameObject.Transform.Position.X - 105), (int)(gameObject.Transform.Position.Y - 50), 50, 125));
+                        }
+                    }
+                }
+            }
+
+            if (specialCooldown > 0)
+            {
+                specialCooldown -= GameWorld.Instance.DeltaTime;
             }
 
             KeyboardState keystate = Keyboard.GetState();
@@ -202,6 +232,7 @@ namespace Kaiju.ComponentPattern
                 gameObject.Transform.AddVelocity(new Vector2(0, -2000f) * GameWorld.Instance.DeltaTime);
             }
         }
+
         public void Attack(int atkNumber)
         {
             if (atkCooldown > 0 || hit)
@@ -213,31 +244,32 @@ namespace Kaiju.ComponentPattern
             switch (atkNumber)
             {
                 case 1:
-                    SpawnHitbox(atkNumber);
-
                     if (lastPunchRight)
                     {
                         animator.PlayAnimation("LPunch");
+                        animator.RegisterFrameEvent("LPunch", 1, () => SpawnHitbox(atkNumber));
                         lastPunchRight = false;
                     }
                     else
                     {
                         animator.PlayAnimation("RPunch");
+                        animator.RegisterFrameEvent("RPunch", 1, () => SpawnHitbox(atkNumber));
                         lastPunchRight = true;
                     }
                     break;
 
                 case 2:
-                    SpawnHitbox(atkNumber);
-
                     if (lastPunchRight)
                     {
                         animator.PlayAnimation("LKick");
+                        animator.RegisterFrameEvent("LKick", 1, () => SpawnHitbox(atkNumber));
+
                         lastPunchRight = false;
                     }
                     else
                     {
                         animator.PlayAnimation("RKick");
+                        animator.RegisterFrameEvent("RKick", 1, () => SpawnHitbox(atkNumber));
                         lastPunchRight = true;
                     }
                     break;
@@ -248,24 +280,25 @@ namespace Kaiju.ComponentPattern
                     break;
 
                 case 4:
-                    SpawnHitbox(atkNumber);
-
                     if (lastPunchRight)
                     {
                         animator.PlayAnimation("LPunch");
+                        animator.RegisterFrameEvent("LPunch", 1, () => SpawnHitbox(atkNumber));
                         lastPunchRight = false;
                     }
                     else
                     {
                         animator.PlayAnimation("RPunch");
+                        animator.RegisterFrameEvent("RPunch", 1, () => SpawnHitbox(atkNumber));
+
                         lastPunchRight = true;
 
                     }
                     break;
 
                 case 5:
-                    SpawnHitbox(atkNumber);
                     animator.PlayAnimation("Kick");
+                    animator.RegisterFrameEvent("Kick", 1, () => SpawnHitbox(atkNumber));
                     break;
 
                 case 6:
@@ -279,14 +312,25 @@ namespace Kaiju.ComponentPattern
 
         public void Special(int specialNumber)
         {
+            if (specialCooldown > 0 || hit)
+            {
+                return;
+            }
+            specialCooldown = 5f;
+
             switch (specialNumber)
             {
                 case 1:
                     animator.PlayAnimation("Special");
+                    Vector2 fireDirection = facingRight ? Vector2.UnitX : -Vector2.UnitX;
+                    animator.RegisterFrameEvent("Special", 4, () => SpawnProjectile(fireDirection, specialNumber));
                     break;
 
                 case 2:
                     animator.PlayAnimation("SawStill");
+                    animator.RegisterFrameEvent("SawStill", 3, () => animator.PlayAnimation("SawCont"));
+                    specialNumber = 6;
+                    SpawnHitbox(specialNumber);
                     specialActive = true;
                     break;
             }
@@ -309,30 +353,40 @@ namespace Kaiju.ComponentPattern
 
         public override void OnCollisionEnter(Collider collider)
         {
-            if ((collider.isAttack && !hit) || (collider.isProjectile && !hit))
+            if (collider.Owner != this)
             {
-                if (!blocking || blockhp < collider.Damage)
+                if ((collider.isAttack && !hit) || (collider.isProjectile && !hit))
                 {
-                    GameWorld.Instance.Destroy(collider.gameObject);
+                    if (!blocking || blockhp < collider.Damage)
+                    {
+                        if (!collider.isProjectile && collider.maxTime < 2)
+                        {
+                            GameWorld.Instance.Destroy(collider.gameObject);
+                        }
 
-                    TakeDamage(collider.Damage);
-                    hit = true;
-                    hitTimer = 0.5f;
-                    Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
-                    knockback.Normalize();
+                        TakeDamage(collider.Damage);
+                        hit = true;
+                        hitTimer = 1f;
+                        Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
+                        knockback.Normalize();
 
-                    gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 50 * Damage;
-                    gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime * 10 * Damage);
-                }
-                else
-                {
-                    TakeDamage(collider.Damage);
-                    GameWorld.Instance.Destroy(collider.gameObject);
+                        gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 50 * Damage;
+                        gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime * 10 * Damage);
+                    }
+                    else
+                    {
+                        TakeDamage(collider.Damage);
+                        hit = true;
+                        hitTimer = 0.5f;
+                        if (!collider.isProjectile && collider.maxTime < 2)
+                        {
+                            GameWorld.Instance.Destroy(collider.gameObject);
+                        }
+                    }
                 }
             }
-
-
         }
+
         public void TakeDamage(int amount)
         {
             if (!blocking || blockhp < amount)
@@ -375,6 +429,7 @@ namespace Kaiju.ComponentPattern
             GameObject attackGo = new();
             Rectangle position = new Rectangle();
             int damage = 0;
+            float maxTime = 0.2f;
 
             switch (atkNumber)
             {
@@ -433,45 +488,80 @@ namespace Kaiju.ComponentPattern
                     }
                     damage = 10;
                     break;
+                case 6:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 55), (int)Math.Round(gameObject.Transform.Position.Y - 50), 50, 125);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 105), (int)Math.Round(gameObject.Transform.Position.Y - 50), 50, 125);
+                    }
+
+                    damage = 10;
+                    maxTime = SpecialDuration;
+                    sawHitBox = attackGo;
+                    break;
             }
-            attackGo.AddComponent<Collider>(true, 0.2f, position, this, damage);
+            attackGo.AddComponent<Collider>(true, maxTime, position, this, damage);
             GameWorld.Instance.Instantiate(attackGo);
         }
 
         public void SpawnProjectile(Vector2 direction, int atkNumber)
         {
+            int damage;
+            Rectangle position;
+            SpriteRenderer spriteRenderer;
+            Collider collider;
             switch (atkNumber)
             {
                 case 1:
+                    GameObject beam = new();
+                    var beamComponent = beam.AddComponent<Beam>();
+                    beamComponent.owner = this;
+
+                    beam.Transform.Position = this.gameObject.Transform.Position + new Vector2(facingRight ? 300 : -300, -25);
+                    beam.Transform.Scale = new Vector2(3);
+
+                    spriteRenderer = beam.AddComponent<SpriteRenderer>();
+                    beamComponent.spriteRenderer = spriteRenderer;
+                    spriteRenderer.SetSprite("GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01");
+                    spriteRenderer.SetFlipHorizontal(!facingRight);
+
+                    var animator = beam.AddComponent<Animator>();
+                    animator.AddAnimation(GameWorld.Instance.BuildAnimation("Breath", new string[] {
+                        "GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01",
+                        "GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_02" }, 5, false));
+                    animator.PlayAnimation("Breath");
+
+                    damage = 10;
+                    position = new Rectangle((int)gameObject.Transform.Position.X, (int)gameObject.Transform.Position.Y - 80, 300, 160);
+                    collider = beam.AddComponent<Collider>(false, 2, position, this, damage);
+                    collider.isProjectile = true;
+
+                    GameWorld.Instance.Instantiate(beam);
                     break;
 
                 case 6:
                     GameObject projectile = new();
                     var projComponent = projectile.AddComponent<Projectile>();
                     projComponent.direction = direction;
-                    projComponent.speed = 500;
+                    projComponent.speed = 1000;
                     projComponent.owner = this;
 
                     projectile.Transform.Position = (this.gameObject.Transform.Position + new Vector2(0, -75)) + new Vector2(facingRight ? 100 : -100, 0);
                     projectile.Transform.Scale = new Vector2(2);
 
-                    var spriteRenderer = projectile.AddComponent<SpriteRenderer>();
+                    spriteRenderer = projectile.AddComponent<SpriteRenderer>();
                     spriteRenderer.SetSprite("GG_Sprites\\GG_Beam_Proj\\GG_Beam_Proj_01");
+                    spriteRenderer.SetFlipHorizontal(facingRight);
 
-                    if (facingRight)
-                    {
-                        spriteRenderer.SetFlipHorizontal(true);
-                    }
-
-                    int damage = 5;
-                    Rectangle position = new();
-                    var collider = projectile.AddComponent<Collider>(false, 0.2f, position, this, damage);
+                    damage = 5;
+                    position = new();
+                    collider = projectile.AddComponent<Collider>(false, 5, position, this, damage);
                     collider.isProjectile = true;
-                    collider.maxTime = 5;
-                    collider.Owner = this;
 
                     GameWorld.Instance.Instantiate(projectile);
-
                     break;
             }
         }

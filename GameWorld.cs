@@ -378,7 +378,5 @@ namespace Kaiju
 
             return animation;
         }
-
-
     }
 }
