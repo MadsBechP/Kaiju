@@ -13,10 +13,12 @@ namespace Kaiju.ComponentPattern
     public class Player : Component, ISubject
     {
         protected float speed;
-        private bool grounded = false;
+        public bool grounded = false;
 
         protected SpriteRenderer sr;
         private Animator animator;
+        public Collider collider;
+        public Collider stageCollider;
         public Character chr;
         public bool facingRight;
         private bool lastPunchRight;
@@ -130,9 +132,19 @@ namespace Kaiju.ComponentPattern
                 blocking = false;
             }
 
-            // Moves player according to its current velocity
-            gameObject.Transform.Translate();
+            
 
+
+            if (gameObject.Transform.CurrentVelocity.Y < 50)
+            {
+                gameObject.Transform.AddVelocity(new Vector2(0, 2f));
+            }
+            gameObject.Transform.Translate(collider);
+            if (gameObject.Transform.Position.Y > GameWorld.Instance.GraphicsDevice.Viewport.Height*1.5f)
+            {
+                gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+                gameObject.Transform.CurrentVelocity = Vector2.Zero;
+            }
             // Timer for hitstun
             if (hitTimer > 0)
             {
@@ -155,28 +167,10 @@ namespace Kaiju.ComponentPattern
             }
 
 
-            // Adds gravity
-            if (gameObject.Transform.Position.Y < GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - (sr.Origin.Y * gameObject.Transform.Scale.Y))
-            {
-                gameObject.Transform.AddVelocity(new Vector2(0, 2f));
-                grounded = false;
-            }
-            else
-            {
-                gameObject.Transform.Position = new Vector2(gameObject.Transform.Position.X, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - (sr.Origin.Y * gameObject.Transform.Scale.Y));
-                gameObject.Transform.CurrentVelocity = new Vector2(gameObject.Transform.CurrentVelocity.X, 0);
-                grounded = true;
-            }
-
             // Velocity resistance depending on players state
             if (hit)
             {
                 gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.1f), gameObject.Transform.CurrentVelocity.Y);
-            }
-            else if (grounded)
-            {
-                gameObject.Transform.CurrentVelocity = new Vector2(Single.Lerp(gameObject.Transform.CurrentVelocity.X, 0, 0.5f), gameObject.Transform.CurrentVelocity.Y);
-                hit = false;
             }
             else
             {
@@ -194,14 +188,14 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+
         public void Move(Vector2 velocity)
         {
             if (velocity == Vector2.Zero)
             {
                 return;
             }
-
-            if (velocity != Vector2.Zero)
+            else
             {
                 velocity.Normalize();
             }
@@ -354,6 +348,7 @@ namespace Kaiju.ComponentPattern
             }
 
             animator.PlayAnimation("Block");
+            sr.Origin = new Vector2(sr.Origin.X, sr.Origin.Y-10);
         }
 
         public override void OnCollisionEnter(Collider collider)
@@ -612,7 +607,7 @@ namespace Kaiju.ComponentPattern
             float scale = shieldRatio;
 
             Vector2 position = gameObject.Transform.Position;
-            Vector2 origin = new Vector2(shieldTexture.Width / 2, shieldTexture.Height / 2);
+            Vector2 origin = new Vector2(shieldTexture.Width / 2, (shieldTexture.Height / 2)- sr.Origin.Y);
 
             spriteBatch.Draw(shieldTexture, position, null, Color.White * 0.5f, 0, origin, scale, SpriteEffects.None, 0);
         }

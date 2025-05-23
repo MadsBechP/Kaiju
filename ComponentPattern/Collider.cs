@@ -15,7 +15,8 @@ namespace Kaiju.ComponentPattern
         public List<RectangleData> PixelPerfectRectangles { get => pixelPerfectRectangles; }
         private Dictionary<Texture2D, List<RectangleData>> colliderChache = new();
 
-        public bool isAttack;
+        public bool isAttack = false;
+        private bool forStage = false;
         public bool isProjectile;
         private float currentTime;
         public float maxTime;
@@ -28,6 +29,18 @@ namespace Kaiju.ComponentPattern
         {
 
         }
+        /// <summary>
+        /// Stage collider
+        /// </summary>
+        public Collider(GameObject gameObject, Player owner) : base(gameObject)
+        {
+            this.Owner = owner;
+            forStage = true;
+
+        }
+        /// <summary>
+        /// Attack collider
+        /// </summary>
         public Collider(GameObject gameObject, bool isAttack, float maxTime, Rectangle position, Player owner, int damage) : base(gameObject)
         {
             this.isAttack = isAttack;
@@ -44,6 +57,10 @@ namespace Kaiju.ComponentPattern
                 if (isAttack)
                 {
                     return position;
+                }
+                else if (forStage)
+                {
+                    return new Rectangle((int)Math.Round(gameObject.Transform.Position.X) - 50, (int)Math.Round(gameObject.Transform.Position.Y) - 100, 100, 200);
                 }
                 else
                 {
@@ -79,22 +96,33 @@ namespace Kaiju.ComponentPattern
 
         public override void Update()
         {
-            if (!isAttack)
+            if (!forStage)
             {
-                if (sr.Sprite != previousSprite)
+                if (!isAttack)
                 {
-                    previousSprite = sr.Sprite;
-                    if (!colliderChache.TryGetValue(sr.Sprite, out pixelPerfectRectangles))
+                    if (sr.Sprite != previousSprite)
                     {
-                        pixelPerfectRectangles = CreateRectangles(sr.Sprite);
-                        colliderChache[sr.Sprite] = pixelPerfectRectangles;
+                        previousSprite = sr.Sprite;
+                        if (!colliderChache.TryGetValue(sr.Sprite, out pixelPerfectRectangles))
+                        {
+                            pixelPerfectRectangles = CreateRectangles(sr.Sprite);
+                            colliderChache[sr.Sprite] = pixelPerfectRectangles;
+                        }
+
+                        pixelPerfectRectangles = pixelPerfectRectangles.Select(p => new RectangleData(p.X, p.Y)).ToList();
                     }
 
-                    pixelPerfectRectangles = pixelPerfectRectangles.Select(p => new RectangleData(p.X, p.Y)).ToList();
+                    UpdatePixelCollider();
+                    if (isProjectile)
+                    {
+                        currentTime += GameWorld.Instance.DeltaTime;
+                        if (currentTime > maxTime)
+                        {
+                            GameWorld.Instance.Destroy(gameObject);
+                        }
+                    }
                 }
-
-                UpdatePixelCollider();
-                if (isProjectile)
+                else
                 {
                     currentTime += GameWorld.Instance.DeltaTime;
                     if (currentTime > maxTime)
@@ -103,27 +131,28 @@ namespace Kaiju.ComponentPattern
                     }
                 }
             }
-            else
-            {
-                currentTime += GameWorld.Instance.DeltaTime;
-                if (currentTime > maxTime)
-                {
-                    GameWorld.Instance.Destroy(gameObject);
-                }
-            }
         }
 
         private void DrawRectangle(Rectangle collisionBox, SpriteBatch spriteBatch)
         {
+            Color color = Color.Red;
+            if (isAttack)
+            {
+                color = Color.DarkGreen;
+            }
+            if (forStage)
+            {
+                color = Color.Yellow;
+            }
             Rectangle topLine = new Rectangle(collisionBox.X, collisionBox.Y, collisionBox.Width, 1);
             Rectangle bottomLine = new Rectangle(collisionBox.X, collisionBox.Y + collisionBox.Height, collisionBox.Width, 1);
             Rectangle rightLine = new Rectangle(collisionBox.X + collisionBox.Width, collisionBox.Y, 1, collisionBox.Height);
             Rectangle leftLine = new Rectangle(collisionBox.X, collisionBox.Y, 1, collisionBox.Height);
 
-            spriteBatch.Draw(pixel, topLine, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
-            spriteBatch.Draw(pixel, bottomLine, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
-            spriteBatch.Draw(pixel, rightLine, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
-            spriteBatch.Draw(pixel, leftLine, null, Color.Red, 0, Vector2.Zero, SpriteEffects.None, 1);
+            spriteBatch.Draw(pixel, topLine, null, color, 0, Vector2.Zero, SpriteEffects.None, 1);
+            spriteBatch.Draw(pixel, bottomLine, null, color, 0, Vector2.Zero, SpriteEffects.None, 1);
+            spriteBatch.Draw(pixel, rightLine, null, color, 0, Vector2.Zero, SpriteEffects.None, 1);
+            spriteBatch.Draw(pixel, leftLine, null, color, 0, Vector2.Zero, SpriteEffects.None, 1);
         }
 
         public void UpdatePixelCollider()
@@ -155,13 +184,14 @@ namespace Kaiju.ComponentPattern
                 {
                     if (lines[y][x].A != 0)
                     {
-                        if ((x == 0)
-                            || (x == lines[y].Length)
-                            || (x > 0 && lines[y][x - 1].A == 0)
-                            || (x < lines[y].Length - 1 && lines[y][x + 1].A == 0)
-                            || (y == 0)
-                            || (y > 0 && lines[y - 1][x].A == 0)
-                            || (y < lines.Count - 1 && lines[y + 1][x].A == 0))
+                        if ((x == 0
+                            || lines[y][x - 1].A == 0)
+                            || (x == texture.Width - 1
+                            || lines[y][x + 1].A == 0)
+                            || (y == 0 || lines[y - 1][x].A == 0)
+                            || (y == texture.Height - 1
+                            || lines[y + 1][x].A == 0))
+
                         {
                             rectangles.Add(new RectangleData(x, y));
                         }

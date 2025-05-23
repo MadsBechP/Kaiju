@@ -4,6 +4,7 @@ using Kaiju.ComponentPattern.Characters;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -31,30 +32,35 @@ namespace Kaiju
             }
         }
 
-        private GraphicsDeviceManager _graphics;
+        public GraphicsDeviceManager _graphics;
         public GraphicsDeviceManager Graphics { get { return _graphics; } }
         private SpriteBatch _spriteBatch;
 
         private List<GameObject> gameObjects = new List<GameObject>();
         private List<GameObject> newGameObjects = new List<GameObject>();
         private List<GameObject> destroyedGameObjects = new List<GameObject>();
+        private List<GameObject> UIObjects = new List<GameObject>();
 
         public GameObject player1Go;
         public Player player1;
         public GameObject player2Go;
         public Player player2;
 
+        public GameObject stageGo;
+        public Stage stage;
+        private Texture2D background;
 
         private InputHandler inputHandler = InputHandler.Instance;
+        private Camera camera;
 
         public float DeltaTime { get; private set; }
         private GameWorld()
         {
             _graphics = new GraphicsDeviceManager(this);
-            _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-            _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            _graphics.ToggleFullScreen();
-            Window.AllowUserResizing = true;
+            _graphics.PreferredBackBufferHeight = 1440;
+            _graphics.PreferredBackBufferWidth = 2560;
+            _graphics.ApplyChanges();
+            //_graphics.ToggleFullScreen();
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -66,25 +72,35 @@ namespace Kaiju
             player1.InputType = InputType.Keyboard;
             player1.GamePadIndex = PlayerIndex.One;
             player1Go.AddComponent<SpriteRenderer>();
-            player1Go.AddComponent<Collider>();
+            player1.stageCollider = player1Go.AddComponent<Collider>();
+            player1.collider = player1Go.AddComponent<Collider>(player1);
             player1Go.AddComponent<Animator>();
             player1.chr = player1Go.AddComponent<Godzilla>();
             gameObjects.Add(player1Go);
 
             player2Go = new GameObject();
-            player2 = player2Go.AddComponent<Player>();
+            player2 = player2Go.AddComponent<AI>();
             player2.InputType = InputType.Keyboard;
             player2.GamePadIndex = PlayerIndex.Two;
             player2Go.AddComponent<SpriteRenderer>();
-            player2Go.AddComponent<Collider>();
+            player2.stageCollider = player2Go.AddComponent<Collider>();
+            player2.collider = player2Go.AddComponent<Collider>(player2);
             player2Go.AddComponent<Animator>();
             player2.chr = player2Go.AddComponent<Gigan>();
             gameObjects.Add(player2Go);
 
+            stageGo = new GameObject();
+            stageGo.AddComponent<SpriteRenderer>();
+            stageGo.AddComponent<Collider>();
+            stageGo.AddComponent<Stage>();
+            gameObjects.Add(stageGo);
+
+
             GameObject timerGo = new GameObject();
             timerGo.AddComponent<Timer>();
-            gameObjects.Add(timerGo);
 
+            UIObjects.Add(timerGo);
+            timerGo.Awake();
 
             foreach (var gameObject in gameObjects)
             {
@@ -96,6 +112,7 @@ namespace Kaiju
 
         protected override void LoadContent()
         {
+            background = Content.Load<Texture2D>("City");
             Texture2D player1Profile = Content.Load<Texture2D>("GZProfile");
             Texture2D player2Profile = Content.Load<Texture2D>("GZProfile");
             string name1 = "null";
@@ -156,8 +173,8 @@ namespace Kaiju
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) + 610, Graphics.PreferredBackBufferHeight - 200) // profilePos
                );
 
-            gameObjects.Add(player1DamageMeterGo);
-            gameObjects.Add(player2DamageMeterGo);
+            UIObjects.Add(player1DamageMeterGo);
+            UIObjects.Add(player2DamageMeterGo);
 
             player1DamageMeterGo.Awake();
             player2DamageMeterGo.Awake();
@@ -175,6 +192,11 @@ namespace Kaiju
             {
                 gameObject.Start();
             }
+            foreach (var gameObject in UIObjects)
+            {
+                gameObject.Start();
+            }
+            camera = new Camera();
 
         }
 
@@ -182,12 +204,23 @@ namespace Kaiju
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+            if (Keyboard.GetState().IsKeyDown(Keys.M))
+            {
+                Graphics.PreferredBackBufferWidth++;
+                Graphics.PreferredBackBufferHeight++;
+            }
 
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Update();
             }
+            foreach (var gameObject in UIObjects)
+            {
+                gameObject.Update();
+            }
+
+            camera.MoveToward((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             InputHandler.Instance.Execute();
             CheckCollision();
             Cleanup();
@@ -199,13 +232,22 @@ namespace Kaiju
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, null);
+            Matrix transform = Matrix.CreateTranslation(-camera.GetTopLeft().X, -camera.GetTopLeft().Y, 0);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, transform);
+            _spriteBatch.Draw(background, new Rectangle((int)Math.Round(camera.Center.X) - GraphicsDevice.Viewport.Width / 2, (int)Math.Round(camera.Center.Y) - GraphicsDevice.Viewport.Height / 2, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Draw(_spriteBatch);
             }
             player1.DrawShield(_spriteBatch);
             player2.DrawShield(_spriteBatch);
+            _spriteBatch.End();
+
+            _spriteBatch.Begin();
+            foreach (var gameObject in UIObjects)
+            {
+                gameObject.Draw(_spriteBatch);
+            }
             _spriteBatch.End();
 
             base.Draw(gameTime);
@@ -257,6 +299,40 @@ namespace Kaiju
                     }
                 }
             }
+        }
+        public bool CheckCollision(Collider col)
+        {
+            foreach (GameObject go2 in gameObjects)
+            {
+                if (go2.GetComponent<Stage>() as Stage == null)
+                {
+                    continue;
+                }
+                Collider col2 = go2.GetComponent<Collider>() as Collider;
+
+                if (col != null && col2 != null && col.CollisionBox.Intersects(col2.CollisionBox))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public bool CheckCollision(Rectangle rect)
+        {
+            foreach (GameObject go2 in gameObjects)
+            {
+                if (go2.GetComponent<Stage>() as Stage == null)
+                {
+                    continue;
+                }
+                Collider col2 = go2.GetComponent<Collider>() as Collider;
+
+                if (col2 != null && rect.Intersects(col2.CollisionBox))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void Instantiate(GameObject gameObjectToInstantiate)
