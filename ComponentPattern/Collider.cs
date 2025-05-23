@@ -171,6 +171,14 @@ namespace Kaiju.ComponentPattern
 
             return rectangles;
         }
+
+        public void SetPosition(Rectangle newPosition)
+        {
+            if (isAttack)
+            {
+                position = newPosition;
+            }
+        }
     }
 
     public class RectangleData

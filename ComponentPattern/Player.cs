@@ -26,6 +26,7 @@ namespace Kaiju.ComponentPattern
         private float SpecialDuration = 3;
         private float specialTime;
         private float specialCooldown;
+        private GameObject sawHitBox;
 
         private bool hit = false;
         private float hitTimer;
@@ -94,6 +95,27 @@ namespace Kaiju.ComponentPattern
                     specialActive = false;
                     specialTime = 0;
                     animator.PlayAnimation("Idle");
+                    if (sawHitBox != null)
+                    {
+                        GameWorld.Instance.Destroy(sawHitBox);
+                        sawHitBox = null;
+                    }
+                }
+                else if (sawHitBox != null)
+                {
+                    var collider = sawHitBox.GetComponent<Collider>() as Collider;
+                    if (collider != null)
+                    {
+                        if (facingRight)
+                        {
+                            collider.SetPosition(new Rectangle((int)(gameObject.Transform.Position.X + 55), (int)(gameObject.Transform.Position.Y - 50), 50, 125));
+
+                        }
+                        else
+                        {
+                            collider.SetPosition(new Rectangle((int)(gameObject.Transform.Position.X - 105), (int)(gameObject.Transform.Position.Y - 50), 50, 125));
+                        }
+                    }
                 }
             }
 
@@ -342,7 +364,7 @@ namespace Kaiju.ComponentPattern
                 {
                     if (!blocking || blockhp < collider.Damage)
                     {
-                        if (!collider.isProjectile)
+                        if (!collider.isProjectile && collider.maxTime < 2)
                         {
                             GameWorld.Instance.Destroy(collider.gameObject);
                         }
@@ -361,12 +383,12 @@ namespace Kaiju.ComponentPattern
                         TakeDamage(collider.Damage);
                         hit = true;
                         hitTimer = 0.5f;
-                        if (!collider.isProjectile)
+                        if (!collider.isProjectile && collider.maxTime < 2)
                         {
                             GameWorld.Instance.Destroy(collider.gameObject);
                         }
                     }
-                } 
+                }
             }
         }
 
@@ -483,6 +505,7 @@ namespace Kaiju.ComponentPattern
 
                     damage = 10;
                     maxTime = SpecialDuration;
+                    sawHitBox = attackGo;
                     break;
             }
             attackGo.AddComponent<Collider>(true, maxTime, position, this, damage);
