@@ -60,7 +60,7 @@ namespace Kaiju
             _graphics.PreferredBackBufferHeight = 1440;
             _graphics.PreferredBackBufferWidth = 2560;
             _graphics.ApplyChanges();
-            //_graphics.ToggleFullScreen();
+            _graphics.ToggleFullScreen();
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -79,7 +79,7 @@ namespace Kaiju
             gameObjects.Add(player1Go);
 
             player2Go = new GameObject();
-            player2 = player2Go.AddComponent<AI>();
+            player2 = player2Go.AddComponent<Player>();
             player2.InputType = InputType.Keyboard;
             player2.GamePadIndex = PlayerIndex.Two;
             player2Go.AddComponent<SpriteRenderer>();

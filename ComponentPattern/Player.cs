@@ -348,7 +348,6 @@ namespace Kaiju.ComponentPattern
             }
 
             animator.PlayAnimation("Block");
-            sr.Origin = new Vector2(sr.Origin.X, sr.Origin.Y-10);
         }
 
         public override void OnCollisionEnter(Collider collider)
@@ -607,7 +606,7 @@ namespace Kaiju.ComponentPattern
             float scale = shieldRatio;
 
             Vector2 position = gameObject.Transform.Position;
-            Vector2 origin = new Vector2(shieldTexture.Width / 2, (shieldTexture.Height / 2)- sr.Origin.Y);
+            Vector2 origin = new Vector2(shieldTexture.Width / 2, shieldTexture.Height / 2);
 
             spriteBatch.Draw(shieldTexture, position, null, Color.White * 0.5f, 0, origin, scale, SpriteEffects.None, 0);
         }
