@@ -41,10 +41,10 @@ namespace Kaiju.State
             LoadContent();
             HUDSetup();
 
-            //foreach (var obj in stateObjects)
-            //{
-            //    game.Instantiate(obj);
-            //}
+            foreach (var obj in stateObjects)
+            {
+                game.Instantiate(obj);
+            }
             game.Cleanup();
         }
         public void Update(GameTime gameTime)
@@ -62,7 +62,11 @@ namespace Kaiju.State
             }
 
             // If a timer has been found and the timer has run out, change to VictoryState
-            if(timer != null && timer.TimeRanOut)
+
+            bool player1Dead = game.player1.Lives <= 0;
+            bool player2Dead = game.player2.Lives <= 0;
+
+            if (timer != null && timer.TimeRanOut || player1Dead || player2Dead )
             {                
                 float player1Lives = game.player1.Lives;
                 float player2Lives = game.player2.Lives;
@@ -120,18 +124,18 @@ namespace Kaiju.State
         }
         private void HUDSetup()
         {
-            var width = game.Graphics.PreferredBackBufferWidth;
-            var height = game.Graphics.PreferredBackBufferHeight;
+            var width = game.GraphicsDevice.Viewport.Width;
+            var height = game.GraphicsDevice.Viewport.Height;
 
             GameObject player1DamageMeterGo = new GameObject();
             var playerDamageMeter = player1DamageMeterGo.AddComponent<DamageMeter>();
             playerDamageMeter.Setup(
                 name1,
                 player1Profile,
-                new Vector2((width / 2) - 750, height - 185), // damageFontPos
-                new Vector2((width / 2) - 735, height - 80), // namePos
-                new Vector2((width / 2) - 1000, height - 250), // hudPos
-                new Vector2((width / 2) - 950, height - 200) // profilePos
+                new Vector2((width / 2) - 754, height + 323), // damageFontPos
+                new Vector2((width / 2) - 755, height + 420), // namePos
+                new Vector2((width / 2) - 1000, height + 250), // hudPos
+                new Vector2((width / 2) - 955, height + 300) // profilePos
                );
 
             GameObject player2DamageMeterGo = new GameObject();
@@ -139,22 +143,15 @@ namespace Kaiju.State
             player2DamageMeter.Setup(
                 name2,
                 player2Profile,
-                new Vector2((width / 2) + 790, height - 185), // damageFontPos
-                new Vector2((width / 2) + 780, height - 80), // namePos
-                new Vector2((width / 2) + 550, height - 250), // hudPos
-                new Vector2((width / 2) + 610, height - 200) // profilePos
+                new Vector2((width / 2) + 790, height + 323), // damageFontPos
+                new Vector2((width / 2) + 790, height + 420), // namePos
+                new Vector2((width / 2) + 550, height + 250), // hudPos
+                new Vector2((width / 2) + 620, height + 315) // profilePos
                );
 
-
-            game.Instantiate(player1DamageMeterGo);
-            game.Instantiate(player2DamageMeterGo);
             
-            //player1DamageMeterGo.Awake();
-            //player2DamageMeterGo.Awake();
-
             stateObjects.Add(player1DamageMeterGo);
             stateObjects.Add(player2DamageMeterGo);
-
 
             playerDamageMeter.SetSubject(game.player1);
             player2DamageMeter.SetSubject(game.player2);
@@ -170,9 +167,7 @@ namespace Kaiju.State
             game.player1.chr = game.player1Go.AddComponent<Godzilla>();
 
             stateObjects.Add(game.player1Go);
-            game.Instantiate(game.player1Go);
-            //game.player1Go.Start();
-
+            
             game.player2Go = new GameObject();
             game.player2 = game.player2Go.AddComponent<Player>();
             game.player2Go.AddComponent<SpriteRenderer>();
@@ -180,18 +175,13 @@ namespace Kaiju.State
             game.player2Go.AddComponent<Animator>();
             game.player2.chr = game.player2Go.AddComponent<Gigan>();
 
-            stateObjects.Add(game.player2Go);
-            game.Instantiate(game.player2Go);
-            //game.player2Go.Start();
-
+            stateObjects.Add(game.player2Go);            
         }
         public void CreateTimer()
         {
             GameObject timerGo = new GameObject();
             timerGo.AddComponent<Timer>();
-            stateObjects.Add(timerGo);
-            game.Instantiate(timerGo);
-            //timerGo.Awake();
+            stateObjects.Add(timerGo);            
         }
         public void CreateStage()
         {
@@ -199,10 +189,7 @@ namespace Kaiju.State
             game.stageGo.AddComponent<SpriteRenderer>();
             game.stageGo.AddComponent<Collider>();
             game.stageGo.AddComponent<Stage>();
-            stateObjects.Add(game.stageGo);
-            game.Instantiate(game.stageGo);
-            //game.stageGo.Start();
-
+            stateObjects.Add(game.stageGo);            
         }
 
         public void Draw(SpriteBatch spriteBatch)

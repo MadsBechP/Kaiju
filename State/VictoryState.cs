@@ -18,8 +18,10 @@ namespace Kaiju.State
     public class VictoryState : IGameState
     {
         private GameWorld game;
-        private SpriteFont victoryFont;
+        private SpriteFont winFont;
+        private SpriteFont promptFont;
         private string winText;
+        private string nameText;
         private string promptText;
         private bool isDraw;
         
@@ -29,17 +31,20 @@ namespace Kaiju.State
         {
             this.game = game;
 
-            victoryFont = game.Content.Load<SpriteFont>("VictoryFont");
+            winFont = game.Content.Load<SpriteFont>("VictoryFont");
+            promptFont = game.Content.Load<SpriteFont>("promptFont"); 
             promptText = "press ENTER to start new battle";
             
 
             if (isDraw)
             {
                 winText = "You Are Too Weak To Be King";
+                nameText = "";
             }
             else
             {
-                winText = $"A New King Has Risen !\n  Kneel Before {winnerName}";
+                winText = $"A New King Has Risen !\n    Kneel Before {winnerName}";
+                //nameText = $"Kneel Before {winnerName}";
             }
 
         }
@@ -57,8 +62,10 @@ namespace Kaiju.State
             var width = GameWorld.Instance.GraphicsDevice.Viewport.Width;
             var height = GameWorld.Instance.GraphicsDevice.Viewport.Height;
 
-            spriteBatch.DrawString(victoryFont, winText, new Vector2((width / 2), (height / 2)-100), Color.White);
-            spriteBatch.DrawString(victoryFont, promptText, new Vector2((width / 2), (height / 2)+50), Color.White);
+            spriteBatch.DrawString(winFont, winText, new Vector2((width / 2) - 425, (height / 2) - 325), Color.White);
+            //spriteBatch.DrawString(winFont, nameText, new Vector2((width / 2) - 410, (height / 2) - 285), Color.White);
+
+            spriteBatch.DrawString(promptFont, promptText, new Vector2((width / 2) - 450, (height / 2) + 165), Color.White);
         }
 
         public void Exit()

@@ -41,7 +41,6 @@ namespace Kaiju
         private List<GameObject> gameObjects = new List<GameObject>();
         private List<GameObject> newGameObjects = new List<GameObject>();
         private List<GameObject> destroyedGameObjects = new List<GameObject>();
-        //private List<GameObject> UIObjects = new List<GameObject>();
 
         public GameObject player1Go;
         public Player player1;
@@ -55,7 +54,7 @@ namespace Kaiju
         private IGameState currentState;
        
         private InputHandler inputHandler = InputHandler.Instance;
-        public Camera camera;
+        private Camera camera;
 
         public float DeltaTime { get; private set; }
         private GameWorld()
@@ -75,14 +74,6 @@ namespace Kaiju
            
             currentState = new BattleState(this); // starter scenen
             
-            //foreach (var gameObject in newGameObjects)
-            //{
-            //    gameObjects.Add(gameObject);
-            //    gameObject.Awake();
-            //    gameObject.Start();
-            //}
-            //newGameObjects.Clear();
-
             base.Initialize();
         }
 
@@ -92,14 +83,6 @@ namespace Kaiju
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            //foreach (var gameObject in gameObjects)
-            //{
-            //    gameObject.Start();
-            //}
-            //foreach (var gameObject in UIObjects)
-            //{
-            //    gameObject.Start();
-            //}
             camera = new Camera();
 
         }
@@ -141,7 +124,16 @@ namespace Kaiju
 
             Matrix transform = Matrix.CreateTranslation(-camera.GetTopLeft().X, -camera.GetTopLeft().Y, 0);
             _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, transform);
-            _spriteBatch.Draw(background, new Rectangle((int)Math.Round(camera.Center.X) - GraphicsDevice.Viewport.Width / 2, (int)Math.Round(camera.Center.Y) - GraphicsDevice.Viewport.Height / 2, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
+
+            //draw background
+            _spriteBatch.Draw(background, 
+                new Rectangle(
+                    (int)Math.Round(camera.Center.X) - GraphicsDevice.Viewport.Width / 2, 
+                    (int)Math.Round(camera.Center.Y) - GraphicsDevice.Viewport.Height / 2, 
+                    GraphicsDevice.Viewport.Width, 
+                    GraphicsDevice.Viewport.Height), 
+                Color.White);
+
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Draw(_spriteBatch);

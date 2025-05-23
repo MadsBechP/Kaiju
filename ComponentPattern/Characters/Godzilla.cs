@@ -27,7 +27,6 @@ namespace Kaiju.ComponentPattern.Characters
         {
             base.Start();
             Player player = (Player)gameObject.GetComponent<Player>();
-            InputHandler.Instance.ClearBindings();
             sr.SetSprite("GZ_Sprites\\GZ_Walk\\GZ_Walk_01");
             gameObject.Transform.Scale = new Vector2(3f, 3f);
 

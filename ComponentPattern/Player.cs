@@ -116,6 +116,10 @@ namespace Kaiju.ComponentPattern
             {
                 gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
                 gameObject.Transform.CurrentVelocity = Vector2.Zero;
+                                
+                Lives--;
+                Damage = 0;
+                Notify();
             }
             // Timer for hitstun
             if (hitTimer > 0)
@@ -159,7 +163,6 @@ namespace Kaiju.ComponentPattern
                 chr.FaceRight(false);
             }
         }
-
 
         public void Move(Vector2 velocity)
         {
