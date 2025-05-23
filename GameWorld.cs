@@ -41,6 +41,7 @@ namespace Kaiju
         private List<GameObject> gameObjects = new List<GameObject>();
         private List<GameObject> newGameObjects = new List<GameObject>();
         private List<GameObject> destroyedGameObjects = new List<GameObject>();
+        private List<GameObject> UIObjects = new List<GameObject>();
 
         public GameObject player1Go;
         public Player player1;
@@ -54,7 +55,7 @@ namespace Kaiju
         private IGameState currentState;
        
         private InputHandler inputHandler = InputHandler.Instance;
-        private Camera camera;
+        public Camera camera;
 
         public float DeltaTime { get; private set; }
         private GameWorld()
@@ -79,7 +80,7 @@ namespace Kaiju
 
         protected override void LoadContent()
         {
-            background = Content.Load<Texture2D>("City");           
+            background = Content.Load<Texture2D>("City");
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -102,7 +103,12 @@ namespace Kaiju
             {
                 gameObject.Update();
             }
-            
+
+            foreach (var ui in UIObjects)
+            {
+                ui.Update();
+            }
+
             camera.MoveToward((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             InputHandler.Instance.Execute();
             CheckCollision();
@@ -134,6 +140,7 @@ namespace Kaiju
                     GraphicsDevice.Viewport.Height), 
                 Color.White);
 
+
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Draw(_spriteBatch);
@@ -142,13 +149,19 @@ namespace Kaiju
             player2.DrawShield(_spriteBatch);
             _spriteBatch.End();
 
+
             _spriteBatch.Begin();
-           
-            if (currentState != null)
+                        
+
+            foreach (var ui in UIObjects)
             {
-                currentState.Draw(_spriteBatch);                
+                ui.Draw(_spriteBatch);
             }
 
+            if (currentState != null)
+            {
+                currentState.Draw(_spriteBatch);
+            }
 
             _spriteBatch.End();
 
@@ -277,6 +290,22 @@ namespace Kaiju
             currentState = newState;
         }
 
+        public void AddUIObject(GameObject uiObject)
+        {
+            UIObjects.Add(uiObject);
+            uiObject.Awake();
+            uiObject.Start();
+
+            Debug.WriteLine($"UIObject added: {uiObject}");
+        }
         
+        public void DestroyUIObject(GameObject uiObjectToDestroy)
+        {
+            if (UIObjects.Contains(uiObjectToDestroy))
+            {
+                UIObjects.Remove(uiObjectToDestroy);
+                Destroy(uiObjectToDestroy);
+            }
+        }
     }
 }

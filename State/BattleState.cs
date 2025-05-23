@@ -24,9 +24,11 @@ namespace Kaiju.State
         private Texture2D player2Profile;
         string name1 = "null";
         string name2 = "null";
+        private Timer timer;
 
 
         private List<GameObject> stateObjects = new List<GameObject>();
+        private List<GameObject> UIObjects = new List<GameObject>();
 
         public Microsoft.Xna.Framework.Color BackgoundColor => Microsoft.Xna.Framework.Color.LightSlateGray;
 
@@ -48,18 +50,7 @@ namespace Kaiju.State
             game.Cleanup();
         }
         public void Update(GameTime gameTime)
-        {
-            // Find the Timer-component among the stateObjects
-            Timer timer = null;
-            foreach (GameObject go in stateObjects)
-            {
-                Timer t = go.GetComponent<Timer>() as Timer;
-                if(t != null)
-                {
-                    timer = t;
-                    break; // only need one timer
-                }
-            }
+        {            
 
             // If a timer has been found and the timer has run out, change to VictoryState
 
@@ -122,20 +113,25 @@ namespace Kaiju.State
                     }
             }
         }
+        
+        
         private void HUDSetup()
         {
             var width = game.GraphicsDevice.Viewport.Width;
             var height = game.GraphicsDevice.Viewport.Height;
-
+            
             GameObject player1DamageMeterGo = new GameObject();
             var playerDamageMeter = player1DamageMeterGo.AddComponent<DamageMeter>();
+            
+            //Note: HUD bliver placeres som en procentdel af skærmens bredde og højde
+
             playerDamageMeter.Setup(
                 name1,
                 player1Profile,
-                new Vector2((width / 2) - 754, height + 323), // damageFontPos
-                new Vector2((width / 2) - 755, height + 420), // namePos
-                new Vector2((width / 2) - 1000, height + 250), // hudPos
-                new Vector2((width / 2) - 955, height + 300) // profilePos
+                new Vector2(width * 0.145f, height * 0.895f), // damageFontPos: 14.5% fra venster, 89.5% ned
+                new Vector2(width * 0.14f, height * 0.956f), // namePos: 14% fra venstre, 95.6% ned
+                new Vector2(width * 0.05f, height * 0.85f), // hudPos: 5% fra venstre, 85% ned
+                new Vector2(width * 0.067f, height * 0.88f) // profilePos: 6.7% fra venstre, 88% ned
                );
 
             GameObject player2DamageMeterGo = new GameObject();
@@ -143,15 +139,18 @@ namespace Kaiju.State
             player2DamageMeter.Setup(
                 name2,
                 player2Profile,
-                new Vector2((width / 2) + 790, height + 323), // damageFontPos
-                new Vector2((width / 2) + 790, height + 420), // namePos
-                new Vector2((width / 2) + 550, height + 250), // hudPos
-                new Vector2((width / 2) + 620, height + 315) // profilePos
+                new Vector2(width * 0.844f, height * 0.895f), // damageFontPos: 84.4% fra venstre, 89.5% ned 
+                new Vector2(width * 0.845f, height * 0.956f), // namePos: 84.4% fra venstre, 95.6% ned
+                new Vector2(width * 0.75f, height * 0.85f), // hudPos: 75% fra venstre, 85% ned
+                new Vector2(width * 0.775f, height * 0.883f) // profilePos: 77.5% fra venstre, 88.3% ned
                );
 
             
-            stateObjects.Add(player1DamageMeterGo);
-            stateObjects.Add(player2DamageMeterGo);
+            game.AddUIObject(player1DamageMeterGo);
+            game.AddUIObject(player2DamageMeterGo);
+
+            UIObjects.Add(player1DamageMeterGo);
+            UIObjects.Add(player2DamageMeterGo);
 
             playerDamageMeter.SetSubject(game.player1);
             player2DamageMeter.SetSubject(game.player2);
@@ -180,8 +179,10 @@ namespace Kaiju.State
         public void CreateTimer()
         {
             GameObject timerGo = new GameObject();
-            timerGo.AddComponent<Timer>();
-            stateObjects.Add(timerGo);            
+            timer = timerGo.AddComponent<Timer>();
+            game.AddUIObject(timerGo);
+            UIObjects.Add(timerGo);
+
         }
         public void CreateStage()
         {
@@ -198,11 +199,17 @@ namespace Kaiju.State
 
         public void Exit()
         {
-            foreach (var o in stateObjects)
+            foreach (var obj in stateObjects)
             {
-                game.Destroy(o);
+                game.Destroy(obj);
             }
             stateObjects.Clear();
+
+            foreach (var ui in UIObjects)
+            {
+                game.DestroyUIObject(ui);
+            }
+            UIObjects.Clear();
         }
     }
 }

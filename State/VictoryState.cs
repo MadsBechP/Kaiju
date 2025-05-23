@@ -35,16 +35,14 @@ namespace Kaiju.State
             promptFont = game.Content.Load<SpriteFont>("promptFont"); 
             promptText = "press ENTER to start new battle";
             
-
+            //6 mellemrum
             if (isDraw)
             {
-                winText = "You Are Too Weak To Be King";
-                nameText = "";
+                winText = "You Are Too Weak\n           To Be King";
             }
             else
             {
-                winText = $"A New King Has Risen !\n    Kneel Before {winnerName}";
-                //nameText = $"Kneel Before {winnerName}";
+                winText = $"A New King Has Risen!\n       Kneel Before\n           {winnerName}";
             }
 
         }
@@ -62,10 +60,9 @@ namespace Kaiju.State
             var width = GameWorld.Instance.GraphicsDevice.Viewport.Width;
             var height = GameWorld.Instance.GraphicsDevice.Viewport.Height;
 
-            spriteBatch.DrawString(winFont, winText, new Vector2((width / 2) - 425, (height / 2) - 325), Color.White);
-            //spriteBatch.DrawString(winFont, nameText, new Vector2((width / 2) - 410, (height / 2) - 285), Color.White);
+            spriteBatch.DrawString(winFont, winText, new Vector2(width * 0.50f, height * 0.40f), Color.White);
 
-            spriteBatch.DrawString(promptFont, promptText, new Vector2((width / 2) - 450, (height / 2) + 165), Color.White);
+            spriteBatch.DrawString(promptFont, promptText, new Vector2(width * 0.50f, height * 0.65f), Color.White);
         }
 
         public void Exit()
