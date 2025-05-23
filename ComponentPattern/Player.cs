@@ -2,12 +2,11 @@
 using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.Direct3D11;
-using SharpDX.Direct3D9;
+using Microsoft.Xna.Framework.Input;
 using System;
-using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO.Pipes;
 
 namespace Kaiju.ComponentPattern
 {
@@ -23,10 +22,28 @@ namespace Kaiju.ComponentPattern
         private bool lastPunchRight;
         private float atkCooldown;
 
+        private bool specialActive;
+        private float SpecialDuration = 3;
+        private float specialTime;
+        private float specialCooldown;
+        private GameObject sawHitBox;
+
         private bool hit = false;
         private float hitTimer;
 
+        private bool blocking;
+        private float maxblockhp = 30;
+        private float blockhp = 30;
+        private Texture2D shieldTexture;
+        private float shieldMaxRadius = 100;
+
+        private float secondTimer = 1;
+
         private List<IObserver> observers = new List<IObserver>();
+
+        public InputType InputType { get; set; }
+        public PlayerIndex GamePadIndex { get; set; }
+
         public int Damage { get; private set; }
 
 
@@ -44,17 +61,75 @@ namespace Kaiju.ComponentPattern
             {
                 gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
                 facingRight = true;
+                shieldTexture = CreateCircleTexture(GameWorld.Instance.GraphicsDevice, (int)shieldMaxRadius, Color.Red);
             }
             else if (gameObject == GameWorld.Instance.player2Go)
             {
                 gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
                 facingRight = false;
+                shieldTexture = CreateCircleTexture(GameWorld.Instance.GraphicsDevice, (int)shieldMaxRadius, Color.Blue);
             }
             speed = 600;
         }
 
         public override void Update()
         {
+            if (!blocking)
+            {
+                if (secondTimer > 0)
+                {
+                    secondTimer -= GameWorld.Instance.DeltaTime;
+                }
+                else if (blockhp < maxblockhp)
+                {
+                    blockhp += 3;
+                    secondTimer = 1;
+                }
+            }
+
+            if (specialActive)
+            {
+                specialTime += GameWorld.Instance.DeltaTime;
+                if (specialTime > SpecialDuration)
+                {
+                    specialActive = false;
+                    specialTime = 0;
+                    animator.PlayAnimation("Idle");
+                    if (sawHitBox != null)
+                    {
+                        GameWorld.Instance.Destroy(sawHitBox);
+                        sawHitBox = null;
+                    }
+                }
+                else if (sawHitBox != null)
+                {
+                    var collider = sawHitBox.GetComponent<Collider>() as Collider;
+                    if (collider != null)
+                    {
+                        if (facingRight)
+                        {
+                            collider.SetPosition(new Rectangle((int)(gameObject.Transform.Position.X + 55), (int)(gameObject.Transform.Position.Y - 50), 50, 125));
+
+                        }
+                        else
+                        {
+                            collider.SetPosition(new Rectangle((int)(gameObject.Transform.Position.X - 105), (int)(gameObject.Transform.Position.Y - 50), 50, 125));
+                        }
+                    }
+                }
+            }
+
+            if (specialCooldown > 0)
+            {
+                specialCooldown -= GameWorld.Instance.DeltaTime;
+            }
+
+            KeyboardState keystate = Keyboard.GetState();
+            if (keystate.IsKeyUp(Keys.LeftShift))
+            {
+                blocking = false;
+            }
+
             // Moves player according to its current velocity
             gameObject.Transform.Translate();
 
@@ -76,7 +151,7 @@ namespace Kaiju.ComponentPattern
             // Timer for attack
             if (atkCooldown > 0)
             {
-            atkCooldown -= GameWorld.Instance.DeltaTime;
+                atkCooldown -= GameWorld.Instance.DeltaTime;
             }
 
 
@@ -117,10 +192,6 @@ namespace Kaiju.ComponentPattern
             {
                 chr.FaceRight(false);
             }
-
-            
-            
-
         }
 
         public void Move(Vector2 velocity)
@@ -150,7 +221,14 @@ namespace Kaiju.ComponentPattern
                 facingRight = true;
             }
 
-            animator.PlayAnimation("Walk");
+            if (specialActive)
+            {
+                animator.PlayAnimation("SawMove");
+            }
+            else
+            {
+                animator.PlayAnimation("Walk");
+            }
         }
 
         public void Jump()
@@ -160,6 +238,7 @@ namespace Kaiju.ComponentPattern
                 gameObject.Transform.AddVelocity(new Vector2(0, -2000f) * GameWorld.Instance.DeltaTime);
             }
         }
+
         public void Attack(int atkNumber)
         {
             if (atkCooldown > 0 || hit)
@@ -168,84 +247,167 @@ namespace Kaiju.ComponentPattern
             }
             atkCooldown = 0.5f;
 
-            GameObject attackGo = new();
-            Rectangle position = new Rectangle();
-            int damage = 0;
-            
-            
-
             switch (atkNumber)
             {
                 case 1:
+                    if (lastPunchRight)
                     {
-                        if (facingRight)
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
-                        }
-                        else
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y - 100), 100, 100);
-                        }
-
-                        if (lastPunchRight)
-                        {
-                            animator.PlayAnimation("LPunch");
-                            lastPunchRight = false;
-                        }
-                        else
-                        {
-                            animator.PlayAnimation("RPunch");
-                            lastPunchRight = true;
-                        }
-                        damage = 5;
-                        break;
+                        animator.PlayAnimation("LPunch");
+                        animator.RegisterFrameEvent("LPunch", 1, () => SpawnHitbox(atkNumber));
+                        lastPunchRight = false;
                     }
+                    else
+                    {
+                        animator.PlayAnimation("RPunch");
+                        animator.RegisterFrameEvent("RPunch", 1, () => SpawnHitbox(atkNumber));
+                        lastPunchRight = true;
+                    }
+                    break;
+
                 case 2:
+                    if (lastPunchRight)
                     {
-                        if (facingRight)
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
-                        }
-                        else
-                        {
-                            position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 200), (int)Math.Round(gameObject.Transform.Position.Y), 200, 100);
-                        }
+                        animator.PlayAnimation("LKick");
+                        animator.RegisterFrameEvent("LKick", 1, () => SpawnHitbox(atkNumber));
 
-                        animator.PlayAnimation("TailSwipe");
-                        damage = 10;
-                        break;
+                        lastPunchRight = false;
                     }
-            }
-            attackGo.AddComponent<Collider>(0.2f, position, this, damage);
-            GameWorld.Instance.Instantiate(attackGo);
+                    else
+                    {
+                        animator.PlayAnimation("RKick");
+                        animator.RegisterFrameEvent("RKick", 1, () => SpawnHitbox(atkNumber));
+                        lastPunchRight = true;
+                    }
+                    break;
 
+                case 3:
+                    animator.PlayAnimation("TailSwipe");
+                    animator.RegisterFrameEvent("TailSwipe", 3, () => SpawnHitbox(atkNumber));
+                    break;
+
+                case 4:
+                    if (lastPunchRight)
+                    {
+                        animator.PlayAnimation("LPunch");
+                        animator.RegisterFrameEvent("LPunch", 1, () => SpawnHitbox(atkNumber));
+                        lastPunchRight = false;
+                    }
+                    else
+                    {
+                        animator.PlayAnimation("RPunch");
+                        animator.RegisterFrameEvent("RPunch", 1, () => SpawnHitbox(atkNumber));
+
+                        lastPunchRight = true;
+
+                    }
+                    break;
+
+                case 5:
+                    animator.PlayAnimation("Kick");
+                    animator.RegisterFrameEvent("Kick", 1, () => SpawnHitbox(atkNumber));
+                    break;
+
+                case 6:
+                    animator.PlayAnimation("Beam");
+                    Vector2 fireDirection = facingRight ? Vector2.UnitX : -Vector2.UnitX;
+                    animator.RegisterFrameEvent("Beam", 5, () => SpawnProjectile(fireDirection, atkNumber));
+                    break;
+
+            }
         }
+
+        public void Special(int specialNumber)
+        {
+            if (specialCooldown > 0 || hit)
+            {
+                return;
+            }
+            specialCooldown = 5f;
+
+            switch (specialNumber)
+            {
+                case 1:
+                    animator.PlayAnimation("Special");
+                    Vector2 fireDirection = facingRight ? Vector2.UnitX : -Vector2.UnitX;
+                    animator.RegisterFrameEvent("Special", 4, () => SpawnProjectile(fireDirection, specialNumber));
+                    break;
+
+                case 2:
+                    animator.PlayAnimation("SawStill");
+                    animator.RegisterFrameEvent("SawStill", 3, () => animator.PlayAnimation("SawCont"));
+                    specialNumber = 6;
+                    SpawnHitbox(specialNumber);
+                    specialActive = true;
+                    break;
+            }
+        }
+
         public void Block()
         {
+            if (blockhp >= 1)
+            {
+                blocking = true;
+            }
+            else
+            {
+                blocking = false;
+            }
+
             animator.PlayAnimation("Block");
         }
 
         public override void OnCollisionEnter(Collider collider)
         {
-            if (collider.isAttack && !hit)
+            if (collider.Owner != this)
             {
-                GameWorld.Instance.Destroy(collider.gameObject);
+                if ((collider.isAttack && !hit) || (collider.isProjectile && !hit))
+                {
+                    if (!blocking || blockhp < collider.Damage)
+                    {
+                        if (!collider.isProjectile && collider.maxTime < 2)
+                        {
+                            GameWorld.Instance.Destroy(collider.gameObject);
+                        }
 
-                TakeDamage(collider.Damage);
-                hit = true;
-                hitTimer = 0.5f;
-                Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
-                knockback.Normalize();
+                        TakeDamage(collider.Damage);
+                        hit = true;
+                        hitTimer = 1f;
+                        Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
+                        knockback.Normalize();
 
-                gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 50 * Damage;
-                gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime * 10 * Damage);
+                        gameObject.Transform.CurrentVelocity = knockback * GameWorld.Instance.DeltaTime * 50 * Damage;
+                        gameObject.Transform.AddVelocity(new Vector2(0, -1) * GameWorld.Instance.DeltaTime * 10 * Damage);
+                    }
+                    else
+                    {
+                        TakeDamage(collider.Damage);
+                        hit = true;
+                        hitTimer = 0.5f;
+                        if (!collider.isProjectile && collider.maxTime < 2)
+                        {
+                            GameWorld.Instance.Destroy(collider.gameObject);
+                        }
+                    }
+                }
             }
         }
+
         public void TakeDamage(int amount)
         {
-            Damage += amount;
-            Debug.WriteLine($"{this} took damage: {Damage}"); // tjek om TakeDamage faktisk bliver kaldt
-            Notify();
+            if (!blocking || blockhp < amount)
+            {
+                Damage += amount;
+                Debug.WriteLine($"{this} took damage: {Damage}"); // tjek om TakeDamage faktisk bliver kaldt
+                Notify();
+            }
+            else
+            {
+                blockhp -= amount;
+                if (blockhp < 0)
+                {
+                    blockhp = 0;
+                }
+            }
         }
 
         public void Attach(IObserver observer)
@@ -265,6 +427,194 @@ namespace Kaiju.ComponentPattern
             {
                 observer.Updated();
             }
+        }
+
+        public void SpawnHitbox(int atkNumber)
+        {
+            GameObject attackGo = new();
+            Rectangle position = new Rectangle();
+            int damage = 0;
+            float maxTime = 0.2f;
+
+            switch (atkNumber)
+            {
+                case 1:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 75), 50, 50);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 150), (int)Math.Round(gameObject.Transform.Position.Y - 75), 50, 50);
+                    }
+                    damage = 5;
+                    break;
+                case 2:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 100), (int)Math.Round(gameObject.Transform.Position.Y - 15), 50, 50);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 150), (int)Math.Round(gameObject.Transform.Position.Y - 15), 50, 50);
+                    }
+                    damage = 5;
+                    break;
+                case 3:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X), (int)Math.Round(gameObject.Transform.Position.Y - 50), 150, 100);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 150), (int)Math.Round(gameObject.Transform.Position.Y - 50), 150, 100);
+                    }
+                    damage = 10;
+                    break;
+                case 4:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 75), (int)Math.Round(gameObject.Transform.Position.Y - 75), 50, 50);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 125), (int)Math.Round(gameObject.Transform.Position.Y - 75), 50, 50);
+                    }
+                    damage = 5;
+                    break;
+                case 5:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 85), (int)Math.Round(gameObject.Transform.Position.Y), 50, 50);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 135), (int)Math.Round(gameObject.Transform.Position.Y), 50, 50);
+                    }
+                    damage = 10;
+                    break;
+                case 6:
+                    if (facingRight)
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X + 55), (int)Math.Round(gameObject.Transform.Position.Y - 50), 50, 125);
+                    }
+                    else
+                    {
+                        position = new Rectangle((int)Math.Round(gameObject.Transform.Position.X - 105), (int)Math.Round(gameObject.Transform.Position.Y - 50), 50, 125);
+                    }
+
+                    damage = 10;
+                    maxTime = SpecialDuration;
+                    sawHitBox = attackGo;
+                    break;
+            }
+            attackGo.AddComponent<Collider>(true, maxTime, position, this, damage);
+            GameWorld.Instance.Instantiate(attackGo);
+        }
+
+        public void SpawnProjectile(Vector2 direction, int atkNumber)
+        {
+            int damage;
+            Rectangle position;
+            SpriteRenderer spriteRenderer;
+            Collider collider;
+            switch (atkNumber)
+            {
+                case 1:
+                    GameObject beam = new();
+                    var beamComponent = beam.AddComponent<Beam>();
+                    beamComponent.owner = this;
+
+                    beam.Transform.Position = this.gameObject.Transform.Position + new Vector2(facingRight ? 300 : -300, -25);
+                    beam.Transform.Scale = new Vector2(3);
+
+                    spriteRenderer = beam.AddComponent<SpriteRenderer>();
+                    beamComponent.spriteRenderer = spriteRenderer;
+                    spriteRenderer.SetSprite("GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01");
+                    spriteRenderer.SetFlipHorizontal(!facingRight);
+
+                    var animator = beam.AddComponent<Animator>();
+                    animator.AddAnimation(GameWorld.Instance.BuildAnimation("Breath", new string[] {
+                        "GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_01",
+                        "GZ_Sprites\\GZ_Beath_Proj\\GZ_Beath_Proj_02" }, 5, false));
+                    animator.PlayAnimation("Breath");
+
+                    damage = 10;
+                    position = new Rectangle((int)gameObject.Transform.Position.X, (int)gameObject.Transform.Position.Y - 80, 300, 160);
+                    collider = beam.AddComponent<Collider>(false, 2, position, this, damage);
+                    collider.isProjectile = true;
+
+                    GameWorld.Instance.Instantiate(beam);
+                    break;
+
+                case 6:
+                    GameObject projectile = new();
+                    var projComponent = projectile.AddComponent<Projectile>();
+                    projComponent.direction = direction;
+                    projComponent.speed = 1000;
+                    projComponent.owner = this;
+
+                    projectile.Transform.Position = (this.gameObject.Transform.Position + new Vector2(0, -75)) + new Vector2(facingRight ? 100 : -100, 0);
+                    projectile.Transform.Scale = new Vector2(2);
+
+                    spriteRenderer = projectile.AddComponent<SpriteRenderer>();
+                    spriteRenderer.SetSprite("GG_Sprites\\GG_Beam_Proj\\GG_Beam_Proj_01");
+                    spriteRenderer.SetFlipHorizontal(facingRight);
+
+                    damage = 5;
+                    position = new();
+                    collider = projectile.AddComponent<Collider>(false, 5, position, this, damage);
+                    collider.isProjectile = true;
+
+                    GameWorld.Instance.Instantiate(projectile);
+                    break;
+            }
+        }
+
+        public Texture2D CreateCircleTexture(GraphicsDevice graphicsDevice, int radius, Color color)
+        {
+            int diameter = radius * 2;
+            Texture2D texture = new Texture2D(graphicsDevice, diameter, diameter);
+            Color[] data = new Color[diameter * diameter];
+
+            float rSquared = radius * radius;
+
+            for (int y = 0; y < diameter; y++)
+            {
+                for (int x = 0; x < diameter; x++)
+                {
+                    int index = x + y * diameter;
+                    float dx = x - radius;
+                    float dy = y - radius;
+
+                    if (dx * dx + dy * dy <= rSquared)
+                    {
+                        data[index] = color;
+                    }
+                    else
+                    {
+                        data[index] = Color.Transparent;
+                    }
+                }
+            }
+            texture.SetData(data);
+            return texture;
+        }
+
+        public void DrawShield(SpriteBatch spriteBatch)
+        {
+            if (!blocking || shieldTexture == null)
+            {
+                return;
+            }
+
+            float shieldRatio = blockhp / maxblockhp;
+            float scale = shieldRatio;
+
+            Vector2 position = gameObject.Transform.Position;
+            Vector2 origin = new Vector2(shieldTexture.Width / 2, shieldTexture.Height / 2);
+
+            spriteBatch.Draw(shieldTexture, position, null, Color.White * 0.5f, 0, origin, scale, SpriteEffects.None, 0);
         }
     }
 }

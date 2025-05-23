@@ -1,13 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Kaiju.ComponentPattern
 {
@@ -21,8 +16,9 @@ namespace Kaiju.ComponentPattern
         private Dictionary<Texture2D, List<RectangleData>> colliderChache = new();
 
         public bool isAttack;
+        public bool isProjectile;
         private float currentTime;
-        private float maxTime;
+        public float maxTime;
         private Rectangle position;
         public Player Owner { get; set; }
         public int Damage { get; private set; }
@@ -32,9 +28,9 @@ namespace Kaiju.ComponentPattern
         {
 
         }
-        public Collider(GameObject gameObject, float maxTime, Rectangle position, Player owner, int damage) : base(gameObject)
+        public Collider(GameObject gameObject, bool isAttack, float maxTime, Rectangle position, Player owner, int damage) : base(gameObject)
         {
-            this.isAttack = true;
+            this.isAttack = isAttack;
             this.maxTime = maxTime;
             this.position = position;
             this.Owner = owner;
@@ -60,7 +56,7 @@ namespace Kaiju.ComponentPattern
 
                     return new Rectangle(x, y, scaledWidth, scaledHeight);
                 }
-                   
+
             }
         }
 
@@ -97,7 +93,15 @@ namespace Kaiju.ComponentPattern
                     pixelPerfectRectangles = pixelPerfectRectangles.Select(p => new RectangleData(p.X, p.Y)).ToList();
                 }
 
-                UpdatePixelCollider(); 
+                UpdatePixelCollider();
+                if (isProjectile)
+                {
+                    currentTime += GameWorld.Instance.DeltaTime;
+                    if (currentTime > maxTime)
+                    {
+                        GameWorld.Instance.Destroy(gameObject);
+                    }
+                }
             }
             else
             {
@@ -166,6 +170,14 @@ namespace Kaiju.ComponentPattern
             }
 
             return rectangles;
+        }
+
+        public void SetPosition(Rectangle newPosition)
+        {
+            if (isAttack)
+            {
+                position = newPosition;
+            }
         }
     }
 

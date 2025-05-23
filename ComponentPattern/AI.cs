@@ -1,9 +1,5 @@
 ﻿using Kaiju.Command;
-using Kaiju.Observer;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Kaiju.ComponentPattern
 {
@@ -15,12 +11,12 @@ namespace Kaiju.ComponentPattern
         ICommand attack;
         Player opponent;
 
-        Vector2 Pos { get {return gameObject.Transform.Position; } }
+        Vector2 Pos { get { return gameObject.Transform.Position; } }
         Vector2 OPos { get { return opponent.gameObject.Transform.Position; } }
 
         public AI(GameObject gameObject) : base(gameObject)
         {
-            
+
         }
 
         public override void Start()

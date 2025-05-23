@@ -1,7 +1,6 @@
 ﻿using Kaiju.Command;
 using Kaiju.ComponentPattern;
 using Kaiju.ComponentPattern.Characters;
-using Kaiju.Observer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -10,6 +9,12 @@ using System.Diagnostics;
 
 namespace Kaiju
 {
+    public enum InputType
+    {
+        Keyboard,
+        GamePad
+    }
+
     public class GameWorld : Game
     {
         private static GameWorld instance;
@@ -39,7 +44,7 @@ namespace Kaiju
         public GameObject player2Go;
         public Player player2;
 
-       
+
         private InputHandler inputHandler = InputHandler.Instance;
 
         public float DeltaTime { get; private set; }
@@ -58,6 +63,8 @@ namespace Kaiju
         {
             player1Go = new GameObject();
             player1 = player1Go.AddComponent<Player>();
+            player1.InputType = InputType.Keyboard;
+            player1.GamePadIndex = PlayerIndex.One;
             player1Go.AddComponent<SpriteRenderer>();
             player1Go.AddComponent<Collider>();
             player1Go.AddComponent<Animator>();
@@ -66,6 +73,8 @@ namespace Kaiju
 
             player2Go = new GameObject();
             player2 = player2Go.AddComponent<Player>();
+            player2.InputType = InputType.Keyboard;
+            player2.GamePadIndex = PlayerIndex.Two;
             player2Go.AddComponent<SpriteRenderer>();
             player2Go.AddComponent<Collider>();
             player2Go.AddComponent<Animator>();
@@ -132,7 +141,7 @@ namespace Kaiju
                 player1Profile,
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 750, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 735, Graphics.PreferredBackBufferHeight - 80), // namePos
-                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 1000,Graphics.PreferredBackBufferHeight - 250), // hudPos
+                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 1000, Graphics.PreferredBackBufferHeight - 250), // hudPos
                 new Vector2((Graphics.PreferredBackBufferWidth / 2) - 950, Graphics.PreferredBackBufferHeight - 200) // profilePos
                );
 
@@ -153,7 +162,7 @@ namespace Kaiju
             player1DamageMeterGo.Awake();
             player2DamageMeterGo.Awake();
 
-            
+
             playerDamageMeter.SetSubject(player1);
             player2DamageMeter.SetSubject(player2);
 
@@ -166,7 +175,7 @@ namespace Kaiju
             {
                 gameObject.Start();
             }
-                        
+
         }
 
         protected override void Update(GameTime gameTime)
@@ -175,11 +184,11 @@ namespace Kaiju
                 Exit();
 
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            InputHandler.Instance.Execute();
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Update();
             }
+            InputHandler.Instance.Execute();
             CheckCollision();
             Cleanup();
 
@@ -195,6 +204,8 @@ namespace Kaiju
             {
                 gameObject.Draw(_spriteBatch);
             }
+            player1.DrawShield(_spriteBatch);
+            player2.DrawShield(_spriteBatch);
             _spriteBatch.End();
 
             base.Draw(gameTime);
@@ -290,7 +301,5 @@ namespace Kaiju
 
             return animation;
         }
-
-       
     }
 }
