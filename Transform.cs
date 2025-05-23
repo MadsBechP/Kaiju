@@ -54,6 +54,11 @@ namespace Kaiju
                 col.Owner.grounded = false;
             }
 
+            while (GameWorld.Instance.CheckCollision(col))
+            {
+                Position = new Vector2(Position.X, Position.Y - 1);
+            }
+
             float yRemainder = (int)Math.Round(CurrentVelocity.Y);
             if (yRemainder != 0)
             {

@@ -60,7 +60,18 @@ namespace Kaiju.ComponentPattern
                 }
                 else if (forStage)
                 {
-                    return new Rectangle((int)Math.Round(gameObject.Transform.Position.X) - 50, (int)Math.Round(gameObject.Transform.Position.Y) - 100, 100, 200);
+                    float scaleY = gameObject.Transform.Scale.Y;
+                    int scaledHeight = (int)(sr.Sprite.Height * scaleY);
+                    int scaledWidth = 100;
+
+                    int bottom = (int)Math.Round(gameObject.Transform.Position.Y + scaledHeight / 2f);
+
+                    return new Rectangle(
+                        (int)Math.Round(gameObject.Transform.Position.X) - scaledWidth / 2,
+                        bottom - scaledHeight,
+                        scaledWidth,
+                        scaledHeight
+                    );
                 }
                 else
                 {
