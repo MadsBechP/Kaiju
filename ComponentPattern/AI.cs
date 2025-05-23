@@ -1,4 +1,5 @@
 ﻿using Kaiju.Command;
+using Kaiju.ComponentPattern.Characters;
 using Kaiju.State;
 using Kaiju.State.AIStates;
 using Microsoft.Xna.Framework;
@@ -39,10 +40,26 @@ namespace Kaiju.ComponentPattern
             left = new MoveCommand(this, new Vector2(-1, 0));
             right = new MoveCommand(this, new Vector2(1, 0));
             jump = new JumpCommand(this);
-            punch = new AttackCommand(this, 1);
-
-            gameObject.Transform.Scale = new Vector2(2f, 2f);
-
+            
+            switch (chr)
+            {
+                case Godzilla:
+                    {
+                        punch = new AttackCommand(this, 1);
+                        kick = new AttackCommand(this, 2);
+                        swipebeam = new AttackCommand(this, 3);
+                        special = new SpecialCommand(this, 1);
+                        break;
+                    }
+                case Gigan:
+                    {
+                        punch = new AttackCommand(this, 4);
+                        kick = new AttackCommand(this, 5);
+                        swipebeam = new AttackCommand(this, 6);
+                        special = new SpecialCommand(this, 2);
+                        break;
+                    }
+            }
 
             if (this.gameObject == GameWorld.Instance.player1Go)
             {

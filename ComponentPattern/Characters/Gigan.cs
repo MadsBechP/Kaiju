@@ -70,7 +70,7 @@ namespace Kaiju.ComponentPattern.Characters
                 "GG_Sprites\\GG_Saw_Still\\GG_Saw_Still_03" }, 5, true));
 
 
-            if (gameObject.GetComponent<Player>() as Player != null)
+            if (player != null)
             {
                 if (player.InputType == InputType.Keyboard)
                 {

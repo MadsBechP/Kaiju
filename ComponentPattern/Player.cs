@@ -32,6 +32,8 @@ namespace Kaiju.ComponentPattern
 
         private bool hit = false;
         private float hitTimer;
+        private bool iFrame = false;
+        private float iFrameTimer;
 
         private bool blocking;
         private float maxblockhp = 30;
@@ -39,7 +41,7 @@ namespace Kaiju.ComponentPattern
         private Texture2D shieldTexture;
         private float shieldMaxRadius = 100;
 
-        private float secondTimer = 1;
+        private float blockTimer = 1;
 
         private List<IObserver> observers = new List<IObserver>();
 
@@ -78,14 +80,14 @@ namespace Kaiju.ComponentPattern
         {
             if (!blocking)
             {
-                if (secondTimer > 0)
+                if (blockTimer > 0)
                 {
-                    secondTimer -= GameWorld.Instance.DeltaTime;
+                    blockTimer -= GameWorld.Instance.DeltaTime;
                 }
                 else if (blockhp < maxblockhp)
                 {
                     blockhp += 3;
-                    secondTimer = 1;
+                    blockTimer = 1;
                 }
             }
 
@@ -153,6 +155,15 @@ namespace Kaiju.ComponentPattern
             else if (hit)
             {
                 hit = false;
+            }
+            
+            if (iFrameTimer > 0)
+            {
+                iFrameTimer -= GameWorld.Instance.DeltaTime;
+            }
+            else if (iFrame)
+            {
+                iFrame = false;
             }
 
             // Plays animation when taking damage
@@ -348,14 +359,13 @@ namespace Kaiju.ComponentPattern
             }
 
             animator.PlayAnimation("Block");
-            sr.Origin = new Vector2(sr.Origin.X, sr.Origin.Y-10);
         }
 
         public override void OnCollisionEnter(Collider collider)
         {
             if (collider.Owner != this)
             {
-                if ((collider.isAttack && !hit) || (collider.isProjectile && !hit))
+                if ((collider.isAttack && !iFrame) || (collider.isProjectile && !iFrame))
                 {
                     if (!blocking || blockhp < collider.Damage)
                     {
@@ -367,6 +377,8 @@ namespace Kaiju.ComponentPattern
                         TakeDamage(collider.Damage);
                         hit = true;
                         hitTimer = 1f;
+                        iFrame = true;
+                        iFrameTimer = 1.5f;
                         Vector2 knockback = gameObject.Transform.Position - collider.Owner.gameObject.Transform.Position;
                         knockback.Normalize();
 
@@ -378,6 +390,8 @@ namespace Kaiju.ComponentPattern
                         TakeDamage(collider.Damage);
                         hit = true;
                         hitTimer = 0.5f;
+                        iFrame = true;
+                        iFrameTimer = 0.5f;
                         if (!collider.isProjectile && collider.maxTime < 2)
                         {
                             GameWorld.Instance.Destroy(collider.gameObject);
@@ -607,7 +621,7 @@ namespace Kaiju.ComponentPattern
             float scale = shieldRatio;
 
             Vector2 position = gameObject.Transform.Position;
-            Vector2 origin = new Vector2(shieldTexture.Width / 2, (shieldTexture.Height / 2)- sr.Origin.Y);
+            Vector2 origin = new Vector2(shieldTexture.Width / 2, shieldTexture.Height / 2);
 
             spriteBatch.Draw(shieldTexture, position, null, Color.White * 0.5f, 0, origin, scale, SpriteEffects.None, 0);
         }
