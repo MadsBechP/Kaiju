@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Kaiju.Command;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -27,7 +28,7 @@ namespace Kaiju.State
         public VictoryState(GameWorld game, string winnerName, bool isDraw)
         {
             this.game = game;
-            
+
             victoryFont = game.Content.Load<SpriteFont>("VictoryFont");
             promptText = "press ENTER to start new battle";
             
@@ -53,12 +54,10 @@ namespace Kaiju.State
         }
         public void Draw(SpriteBatch spriteBatch)
         {
-            var width = GameWorld.Instance.Graphics.PreferredBackBufferWidth;
-            var height = GameWorld.Instance.Graphics.PreferredBackBufferHeight;
-                        
+            var width = GameWorld.Instance.GraphicsDevice.Viewport.Width;
+            var height = GameWorld.Instance.GraphicsDevice.Viewport.Height;
 
-            spriteBatch.DrawString(victoryFont, winText, new Vector2((width / 2), (height / 2)-100), Color.White);;
-
+            spriteBatch.DrawString(victoryFont, winText, new Vector2((width / 2), (height / 2)-100), Color.White);
             spriteBatch.DrawString(victoryFont, promptText, new Vector2((width / 2), (height / 2)+50), Color.White);
         }
 

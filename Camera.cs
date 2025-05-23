@@ -2,7 +2,7 @@
 
 namespace Kaiju
 {
-    internal class Camera
+    public class Camera
     {
         public Vector2 Center { get; set; }
 

@@ -9,7 +9,7 @@ namespace Kaiju.ComponentPattern
     {
         private SpriteFont hudFont;
         private string text;
-        private Vector2 position = new Vector2(GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2, 20);
+        private Vector2 position = new Vector2(GameWorld.Instance.GraphicsDevice.Viewport.Width / 2, 20);
         private float timeLeft = 5f; //remember to change to 120f
 
         public bool TimeRanOut { get; private set; } = false;

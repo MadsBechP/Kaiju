@@ -56,10 +56,19 @@ namespace Kaiju.ComponentPattern
 
         public void AddAnimation(Animation animation)
         {
-            animations.Add(animation.Name, animation);
-            if (currentAnimation == null)
+            //animations.Add(animation.Name, animation);
+            //if (currentAnimation == null)
+            //{
+            //    currentAnimation = animation;
+            //}
+
+            if (!animations.ContainsKey(animation.Name))
             {
-                currentAnimation = animation;
+                animations.Add(animation.Name, animation);
+                if(currentAnimation == null)
+                {
+                    currentAnimation = animation;
+                }
             }
         }
 

@@ -25,6 +25,7 @@ namespace Kaiju.State
         string name1 = "null";
         string name2 = "null";
 
+
         private List<GameObject> stateObjects = new List<GameObject>();
 
         public Microsoft.Xna.Framework.Color BackgoundColor => Microsoft.Xna.Framework.Color.LightSlateGray;
@@ -32,12 +33,19 @@ namespace Kaiju.State
         public BattleState(GameWorld game)
         {
             this.game = game;
-
             InputHandler.Instance.ClearBindings(); // so that it won't try and create binding that are already there
+
+            CreateStage();
             CreatePlayers();
             CreateTimer();
             LoadContent();
             HUDSetup();
+
+            //foreach (var obj in stateObjects)
+            //{
+            //    game.Instantiate(obj);
+            //}
+            game.Cleanup();
         }
         public void Update(GameTime gameTime)
         {
@@ -140,12 +148,12 @@ namespace Kaiju.State
 
             game.Instantiate(player1DamageMeterGo);
             game.Instantiate(player2DamageMeterGo);
+            
+            //player1DamageMeterGo.Awake();
+            //player2DamageMeterGo.Awake();
 
             stateObjects.Add(player1DamageMeterGo);
             stateObjects.Add(player2DamageMeterGo);
-
-            player1DamageMeterGo.Awake();
-            player2DamageMeterGo.Awake();
 
 
             playerDamageMeter.SetSubject(game.player1);
@@ -160,8 +168,10 @@ namespace Kaiju.State
             game.player1Go.AddComponent<Collider>();
             game.player1Go.AddComponent<Animator>();
             game.player1.chr = game.player1Go.AddComponent<Godzilla>();
-            game.Instantiate(game.player1Go);
+
             stateObjects.Add(game.player1Go);
+            game.Instantiate(game.player1Go);
+            //game.player1Go.Start();
 
             game.player2Go = new GameObject();
             game.player2 = game.player2Go.AddComponent<Player>();
@@ -169,19 +179,34 @@ namespace Kaiju.State
             game.player2Go.AddComponent<Collider>();
             game.player2Go.AddComponent<Animator>();
             game.player2.chr = game.player2Go.AddComponent<Gigan>();
-            game.Instantiate(game.player2Go);
+
             stateObjects.Add(game.player2Go);
+            game.Instantiate(game.player2Go);
+            //game.player2Go.Start();
+
         }
         public void CreateTimer()
         {
             GameObject timerGo = new GameObject();
             timerGo.AddComponent<Timer>();
-            game.Instantiate(timerGo);
             stateObjects.Add(timerGo);
+            game.Instantiate(timerGo);
+            //timerGo.Awake();
+        }
+        public void CreateStage()
+        {
+            game.stageGo = new GameObject();
+            game.stageGo.AddComponent<SpriteRenderer>();
+            game.stageGo.AddComponent<Collider>();
+            game.stageGo.AddComponent<Stage>();
+            stateObjects.Add(game.stageGo);
+            game.Instantiate(game.stageGo);
+            //game.stageGo.Start();
+
         }
 
         public void Draw(SpriteBatch spriteBatch)
-        {           
+        {              
         }
 
         public void Exit()

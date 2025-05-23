@@ -56,6 +56,7 @@ namespace Kaiju.ComponentPattern
         {
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
             animator = gameObject.GetComponent<Animator>() as Animator;
+            collider = gameObject.GetComponent<Collider>() as Collider;
 
             if (gameObject == GameWorld.Instance.player1Go)
             {
