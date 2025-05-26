@@ -35,7 +35,7 @@ namespace Kaiju.State
             promptFont = game.Content.Load<SpriteFont>("promptFont"); 
             promptText = "press ENTER to start new battle";
             
-            //6 mellemrum
+            
             if (isDraw)
             {
                 winText = "You Are Too Weak\n           To Be King";
@@ -48,8 +48,7 @@ namespace Kaiju.State
         }
         
         public void Update(GameTime gameTime)
-        {
-            //Press ENTER to play new battle
+        {            
             if (Keyboard.GetState().IsKeyDown(Keys.Enter))
             {
                 game.ChangeGameState(new BattleState(game));
