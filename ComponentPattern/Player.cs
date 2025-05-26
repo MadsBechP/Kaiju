@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Kaiju.State;
 using System.IO.Pipes;
 
 namespace Kaiju.ComponentPattern
@@ -47,6 +48,7 @@ namespace Kaiju.ComponentPattern
         public PlayerIndex GamePadIndex { get; set; }
 
         public int Damage { get; private set; }
+        public int Lives { get; private set; } = 3;
 
 
         public Player(GameObject gameObject) : base(gameObject)
@@ -58,6 +60,7 @@ namespace Kaiju.ComponentPattern
         {
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
             animator = gameObject.GetComponent<Animator>() as Animator;
+            collider = gameObject.GetComponent<Collider>() as Collider;
 
             if (gameObject == GameWorld.Instance.player1Go)
             {
@@ -139,11 +142,15 @@ namespace Kaiju.ComponentPattern
             {
                 gameObject.Transform.AddVelocity(new Vector2(0, 2f));
             }
-            gameObject.Transform.Translate(collider);
+            gameObject.Transform.Translate(stageCollider);
             if (gameObject.Transform.Position.Y > GameWorld.Instance.GraphicsDevice.Viewport.Height*1.5f)
             {
                 gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
                 gameObject.Transform.CurrentVelocity = Vector2.Zero;
+                                
+                Lives--;
+                Damage = 0;
+                Notify();
             }
             // Timer for hitstun
             if (hitTimer > 0)
@@ -187,7 +194,6 @@ namespace Kaiju.ComponentPattern
                 chr.FaceRight(false);
             }
         }
-
 
         public void Move(Vector2 velocity)
         {

@@ -86,6 +86,9 @@ namespace Kaiju.ComponentPattern
             Debug.WriteLine($"DamageMeter Updated: {damageText}");
         }
 
+        /// <summary>
+        /// Updated the observer
+        /// </summary>
         public void Updated()
         {
             UpdateDamage();

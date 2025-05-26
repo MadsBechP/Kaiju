@@ -850,6 +850,13 @@
 /processorParam:TextureFormat=Compressed
 /build:playerNameFont.spritefont
 
+#begin promptFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:promptFont.spritefont
+
 #begin Stage/Stage.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -861,4 +868,11 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Stage/Stage.png
+
+#begin VictoryFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:VictoryFont.spritefont
 

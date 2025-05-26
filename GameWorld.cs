@@ -1,6 +1,8 @@
 ﻿using Kaiju.Command;
 using Kaiju.ComponentPattern;
 using Kaiju.ComponentPattern.Characters;
+using Kaiju.Observer;
+using Kaiju.State;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -35,7 +37,7 @@ namespace Kaiju
         public GraphicsDeviceManager _graphics;
         public GraphicsDeviceManager Graphics { get { return _graphics; } }
         private SpriteBatch _spriteBatch;
-
+        
         private List<GameObject> gameObjects = new List<GameObject>();
         private List<GameObject> newGameObjects = new List<GameObject>();
         private List<GameObject> destroyedGameObjects = new List<GameObject>();
@@ -50,8 +52,10 @@ namespace Kaiju
         public Stage stage;
         private Texture2D background;
 
+        private IGameState currentState;
+       
         private InputHandler inputHandler = InputHandler.Instance;
-        private Camera camera;
+        public Camera camera;
 
         public float DeltaTime { get; private set; }
         private GameWorld()
@@ -67,135 +71,18 @@ namespace Kaiju
 
         protected override void Initialize()
         {
-            player1Go = new GameObject();
-            player1 = player1Go.AddComponent<Player>();
-            player1.InputType = InputType.Keyboard;
-            player1.GamePadIndex = PlayerIndex.One;
-            player1Go.AddComponent<SpriteRenderer>();
-            player1.stageCollider = player1Go.AddComponent<Collider>();
-            player1.collider = player1Go.AddComponent<Collider>(player1);
-            player1Go.AddComponent<Animator>();
-            player1.chr = player1Go.AddComponent<Godzilla>();
-            gameObjects.Add(player1Go);
-
-            player2Go = new GameObject();
-            player2 = player2Go.AddComponent<Player>();
-            player2.InputType = InputType.Keyboard;
-            player2.GamePadIndex = PlayerIndex.Two;
-            player2Go.AddComponent<SpriteRenderer>();
-            player2.stageCollider = player2Go.AddComponent<Collider>();
-            player2.collider = player2Go.AddComponent<Collider>(player2);
-            player2Go.AddComponent<Animator>();
-            player2.chr = player2Go.AddComponent<Gigan>();
-            gameObjects.Add(player2Go);
-
-            stageGo = new GameObject();
-            stageGo.AddComponent<SpriteRenderer>();
-            stageGo.AddComponent<Collider>();
-            stageGo.AddComponent<Stage>();
-            gameObjects.Add(stageGo);
-
-
-            GameObject timerGo = new GameObject();
-            timerGo.AddComponent<Timer>();
-
-            UIObjects.Add(timerGo);
-            timerGo.Awake();
-
-            foreach (var gameObject in gameObjects)
-            {
-                gameObject.Awake();
-            }
-
+           
+            currentState = new BattleState(this); // starter scenen
+            
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
             background = Content.Load<Texture2D>("City");
-            Texture2D player1Profile = Content.Load<Texture2D>("GZProfile");
-            Texture2D player2Profile = Content.Load<Texture2D>("GZProfile");
-            string name1 = "null";
-            string name2 = "null";
-            switch (player1.chr)
-            {
-                case Godzilla:
-                    {
-                        player1Profile = Content.Load<Texture2D>("GZProfile");
-                        name1 = "Godzilla";
-                        break;
-                    }
-                case Gigan:
-                    {
-                        player1Profile = Content.Load<Texture2D>("GiganProfile");
-                        name1 = "Gigan";
-                        break;
-                    }
-            }
-            switch (player2.chr)
-            {
-                case Godzilla:
-                    {
-                        player2Profile = Content.Load<Texture2D>("GZProfile");
-                        name2 = "Godzilla";
-                        break;
-                    }
-                case Gigan:
-                    {
-                        player2Profile = Content.Load<Texture2D>("GiganProfile");
-                        name2 = "Gigan";
-                        break;
-                    }
-            }
-
-
-
-
-            GameObject player1DamageMeterGo = new GameObject();
-            var playerDamageMeter = player1DamageMeterGo.AddComponent<DamageMeter>();
-            playerDamageMeter.Setup(
-                name1,
-                player1Profile,
-                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 750, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
-                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 735, Graphics.PreferredBackBufferHeight - 80), // namePos
-                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 1000, Graphics.PreferredBackBufferHeight - 250), // hudPos
-                new Vector2((Graphics.PreferredBackBufferWidth / 2) - 950, Graphics.PreferredBackBufferHeight - 200) // profilePos
-               );
-
-            GameObject player2DamageMeterGo = new GameObject();
-            var player2DamageMeter = player2DamageMeterGo.AddComponent<DamageMeter>();
-            player2DamageMeter.Setup(
-                name2,
-                player2Profile,
-                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 790, Graphics.PreferredBackBufferHeight - 185), // damageFontPos
-                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 780, Graphics.PreferredBackBufferHeight - 80), // namePos
-                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 550, Graphics.PreferredBackBufferHeight - 250), // hudPos
-                new Vector2((Graphics.PreferredBackBufferWidth / 2) + 610, Graphics.PreferredBackBufferHeight - 200) // profilePos
-               );
-
-            UIObjects.Add(player1DamageMeterGo);
-            UIObjects.Add(player2DamageMeterGo);
-
-            player1DamageMeterGo.Awake();
-            player2DamageMeterGo.Awake();
-
-
-            playerDamageMeter.SetSubject(player1);
-            player2DamageMeter.SetSubject(player2);
-
-            //AIDamageMeter.Updated();
-            //playerDamageMeter.Updated();
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            foreach (var gameObject in gameObjects)
-            {
-                gameObject.Start();
-            }
-            foreach (var gameObject in UIObjects)
-            {
-                gameObject.Start();
-            }
             camera = new Camera();
 
         }
@@ -215,9 +102,10 @@ namespace Kaiju
             {
                 gameObject.Update();
             }
-            foreach (var gameObject in UIObjects)
+
+            foreach (var ui in UIObjects)
             {
-                gameObject.Update();
+                ui.Update();
             }
 
             camera.MoveToward((float)gameTime.ElapsedGameTime.TotalMilliseconds);
@@ -225,16 +113,33 @@ namespace Kaiju
             CheckCollision();
             Cleanup();
 
+            if(currentState != null)
+            {
+                currentState.Update(gameTime);
+            }
+
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            // if currentState is not null it will use the states BackgoundColor.
+            // If the currentState is null til will default to CornflowerBlue (it is like an if-else statement)
+            GraphicsDevice.Clear(currentState?.BackgoundColor ?? Color.CornflowerBlue);
 
             Matrix transform = Matrix.CreateTranslation(-camera.GetTopLeft().X, -camera.GetTopLeft().Y, 0);
             _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, transform);
-            _spriteBatch.Draw(background, new Rectangle((int)Math.Round(camera.Center.X) - GraphicsDevice.Viewport.Width / 2, (int)Math.Round(camera.Center.Y) - GraphicsDevice.Viewport.Height / 2, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
+
+            //draw background
+            _spriteBatch.Draw(background, 
+                new Rectangle(
+                    (int)Math.Round(camera.Center.X) - GraphicsDevice.Viewport.Width / 2, 
+                    (int)Math.Round(camera.Center.Y) - GraphicsDevice.Viewport.Height / 2, 
+                    GraphicsDevice.Viewport.Width, 
+                    GraphicsDevice.Viewport.Height), 
+                Color.White);
+
+
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Draw(_spriteBatch);
@@ -243,11 +148,20 @@ namespace Kaiju
             player2.DrawShield(_spriteBatch);
             _spriteBatch.End();
 
+
             _spriteBatch.Begin();
-            foreach (var gameObject in UIObjects)
+                        
+
+            foreach (var ui in UIObjects)
             {
-                gameObject.Draw(_spriteBatch);
+                ui.Draw(_spriteBatch);
             }
+
+            if (currentState != null)
+            {
+                currentState.Draw(_spriteBatch);
+            }
+
             _spriteBatch.End();
 
             base.Draw(gameTime);
@@ -302,6 +216,7 @@ namespace Kaiju
         }
         public bool CheckCollision(Collider col)
         {
+            
             foreach (GameObject go2 in gameObjects)
             {
                 if (go2.GetComponent<Stage>() as Stage == null)
@@ -345,7 +260,7 @@ namespace Kaiju
             destroyedGameObjects.Add(gameObjectToDestroy);
         }
 
-        private void Cleanup()
+        public void Cleanup()
         {
             for (int i = 0; i < newGameObjects.Count; i++)
             {
@@ -376,6 +291,37 @@ namespace Kaiju
             Animation animation = new Animation(animationName, sprites, fps, heldAnimation);
 
             return animation;
+        }
+
+       /// <summary>
+       /// changes the current state to the new state
+       /// </summary>
+       /// <param name="newState"> the new state the current state will change into</param>
+        public void ChangeGameState(IGameState newState)
+        {
+            if(currentState != null)
+            {
+                currentState.Exit();
+            }
+            currentState = newState;
+        }
+
+        public void AddUIObject(GameObject uiObject)
+        {
+            UIObjects.Add(uiObject);
+            uiObject.Awake();
+            uiObject.Start();
+
+            Debug.WriteLine($"UIObject added: {uiObject}");
+        }
+        
+        public void DestroyUIObject(GameObject uiObjectToDestroy)
+        {
+            if (UIObjects.Contains(uiObjectToDestroy))
+            {
+                UIObjects.Remove(uiObjectToDestroy);
+                Destroy(uiObjectToDestroy);
+            }
         }
     }
 }
