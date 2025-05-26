@@ -142,7 +142,7 @@ namespace Kaiju.ComponentPattern
             {
                 gameObject.Transform.AddVelocity(new Vector2(0, 2f));
             }
-            gameObject.Transform.Translate(collider);
+            gameObject.Transform.Translate(stageCollider);
             if (gameObject.Transform.Position.Y > GameWorld.Instance.GraphicsDevice.Viewport.Height*1.5f)
             {
                 gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
