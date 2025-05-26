@@ -44,7 +44,7 @@ namespace Kaiju.ComponentPattern.Characters
                 "GZ_Sprites\\GZ_Hit\\GZ_Hit_01",
                 "GZ_Sprites\\GZ_Hit\\GZ_Hit_02",
                 "GZ_Sprites\\GZ_Hit\\GZ_Hit_03",
-                "GZ_Sprites\\GZ_Hit\\GZ_Hit_04"}, 8, false));
+                "GZ_Sprites\\GZ_Hit\\GZ_Hit_04"}, 4, false));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("LPunch", new string[] {
                 "GZ_Sprites\\GZ_Punch_L\\GZ_Punch_L_01",
                 "GZ_Sprites\\GZ_Punch_L\\GZ_Punch_L_02"}, 5, false));

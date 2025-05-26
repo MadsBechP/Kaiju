@@ -65,7 +65,6 @@ namespace Kaiju
             _graphics.PreferredBackBufferWidth = 2560;
             _graphics.ApplyChanges();
             _graphics.ToggleFullScreen();
-            //Window.AllowUserResizing = true;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -227,6 +226,23 @@ namespace Kaiju
                 Collider col2 = go2.GetComponent<Collider>() as Collider;
 
                 if (col != null && col2 != null && col.CollisionBox.Intersects(col2.CollisionBox))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public bool CheckCollision(Rectangle rect)
+        {
+            foreach (GameObject go2 in gameObjects)
+            {
+                if (go2.GetComponent<Stage>() as Stage == null)
+                {
+                    continue;
+                }
+                Collider col2 = go2.GetComponent<Collider>() as Collider;
+
+                if (col2 != null && rect.Intersects(col2.CollisionBox))
                 {
                     return true;
                 }

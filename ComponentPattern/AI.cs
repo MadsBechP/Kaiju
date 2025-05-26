@@ -1,22 +1,35 @@
 ﻿using Kaiju.Command;
+using Kaiju.State;
+using Kaiju.State.AIStates;
 using Microsoft.Xna.Framework;
+using System.Windows.Forms;
 
 namespace Kaiju.ComponentPattern
 {
     public class AI : Player
     {
-        ICommand left;
-        ICommand right;
-        ICommand jump;
-        ICommand attack;
-        Player opponent;
+        private IState<AI> currentState;
 
-        Vector2 Pos { get { return gameObject.Transform.Position; } }
-        Vector2 OPos { get { return opponent.gameObject.Transform.Position; } }
+
+
+
+        public ICommand left;
+        public ICommand right;
+        public ICommand jump;
+        public ICommand punch;
+        public ICommand kick;
+        public ICommand swipebeam;
+        public ICommand special;
+        public ICommand shield;
+
+
+
+        public Player opponent { get; private set; }
+
+
 
         public AI(GameObject gameObject) : base(gameObject)
         {
-
         }
 
         public override void Start()
@@ -26,7 +39,7 @@ namespace Kaiju.ComponentPattern
             left = new MoveCommand(this, new Vector2(-1, 0));
             right = new MoveCommand(this, new Vector2(1, 0));
             jump = new JumpCommand(this);
-            attack = new AttackCommand(this, 1);
+            punch = new AttackCommand(this, 1);
 
             gameObject.Transform.Scale = new Vector2(2f, 2f);
 
@@ -40,27 +53,30 @@ namespace Kaiju.ComponentPattern
             {
                 opponent = GameWorld.Instance.player1;
             }
+            ChangeGameState(new IdleState());
             speed = 300;
         }
         public override void Update()
         {
             base.Update();
-            if (Pos.X < OPos.X - 200)
+            currentState.Execute();
+
+            Rectangle overVoidCheckLeft = new Rectangle(stageCollider.CollisionBox.X - 100, stageCollider.CollisionBox.Y, stageCollider.CollisionBox.Width, stageCollider.CollisionBox.Height + 1000);
+            Rectangle overVoidCheckRight = new Rectangle(stageCollider.CollisionBox.X + 100, stageCollider.CollisionBox.Y, stageCollider.CollisionBox.Width, stageCollider.CollisionBox.Height + 1000);
+            if (!GameWorld.Instance.CheckCollision(overVoidCheckLeft) || !GameWorld.Instance.CheckCollision(overVoidCheckRight))
             {
-                right.Execute();
+                ChangeGameState(new RecoveryState());
             }
-            else if (Pos.X > OPos.X + 200)
+
+        }
+        public void ChangeGameState(IState<AI> newState)
+        {
+            if (currentState != null)
             {
-                left.Execute();
+                currentState.Exit();
             }
-            else
-            {
-                attack.Execute();
-            }
-            if (Pos.Y > OPos.Y + 100)
-            {
-                jump.Execute();
-            }
+            currentState = newState;
+            currentState.Enter(this);
         }
     }
 }

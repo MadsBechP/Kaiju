@@ -14,26 +14,14 @@ namespace Kaiju.ComponentPattern
         public Vector2 direction;
         public float speed;
         public Player owner;
+
         public Projectile(GameObject gameObject) : base(gameObject)
         {
-            Debug.WriteLine("Projectile created");
         }
 
         public override void Update()
         {
             gameObject.Transform.Position += direction * speed * GameWorld.Instance.DeltaTime;
-            //Debug.WriteLine($"Projectile position: {gameObject.Transform.Position}");
-        }
-
-        public override void OnCollisionEnter(Collider collider)
-        {
-            Debug.WriteLine($"Projectile collided with {collider.Owner}");
-            if (collider.Owner == owner)
-            {
-                return;
-            }
-
-            GameWorld.Instance.Destroy(gameObject);
         }
     }
 }
