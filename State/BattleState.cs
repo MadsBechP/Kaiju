@@ -163,7 +163,7 @@ namespace Kaiju.State
         {
             game.player1Go = new GameObject();
             game.player1 = game.player1Go.AddComponent<Player>();
-            game.player1.InputType = InputType.GamePad;
+            game.player1.InputType = InputType.Keyboard;
             game.player1.GamePadIndex = PlayerIndex.One;
             game.player1Go.AddComponent<SpriteRenderer>();
             game.player1.collider = game.player1Go.AddComponent<Collider>();
@@ -175,7 +175,7 @@ namespace Kaiju.State
             
             game.player2Go = new GameObject();
             game.player2 = game.player2Go.AddComponent<Player>();
-            game.player2.InputType = InputType.GamePad;
+            game.player2.InputType = InputType.Keyboard;
             game.player2.GamePadIndex = PlayerIndex.Two;
             game.player2Go.AddComponent<SpriteRenderer>();
             game.player2.collider = game.player2Go.AddComponent<Collider>();
