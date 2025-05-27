@@ -8,7 +8,7 @@ namespace Kaiju.Command
     /// <summary>
     /// InputHandler is in charge of player input
     /// Supports both Keyboard and Gamepad input
-    /// Is based on the Inputhandler design pattern
+    /// Is based on the Command Design Pattern
     /// Made by: Julius
     /// </summary>
     public class InputHandler
