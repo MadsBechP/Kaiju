@@ -70,7 +70,7 @@ namespace Kaiju
 
                     if (GameWorld.Instance.CheckCollision(col))
                     {
-                        CurrentVelocity = new Vector2 (CurrentVelocity.X, 0);
+                        CurrentVelocity = new Vector2(CurrentVelocity.X, 0);
                         Position = new Vector2(Position.X, Position.Y - sign);
                         if (col.Owner != null)
                         {

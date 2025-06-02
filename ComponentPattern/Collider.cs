@@ -6,6 +6,12 @@ using System.Linq;
 
 namespace Kaiju.ComponentPattern
 {
+    /// <summary>
+    /// Handles collision detection, including pixel-perfect and rectangular collision boxes
+    /// Based on the Collider Design Pattern
+    /// Is part of Component Design Pattern
+    /// Made by: Mads & Julius
+    /// </summary>
     public class Collider : Component
     {
         private SpriteRenderer sr;
@@ -24,23 +30,36 @@ namespace Kaiju.ComponentPattern
         public Player Owner { get; set; }
         public int Damage { get; private set; }
 
-
+        /// <summary>
+        /// Constuctor 
+        /// </summary>
+        /// <param name="gameObject">specifies which gameobject it is tied to</param>
         public Collider(GameObject gameObject) : base(gameObject)
         {
 
         }
+
         /// <summary>
-        /// Stage collider
+        /// Stage Collider constructor
         /// </summary>
+        /// <param name="gameObject">specifies which gameobject it is tied to</param>
+        /// <param name="owner">specifies the owner of the collider</param>
         public Collider(GameObject gameObject, Player owner) : base(gameObject)
         {
             this.Owner = owner;
             forStage = true;
 
         }
+
         /// <summary>
-        /// Attack collider
+        /// Attack collider constuctor
         /// </summary>
+        /// <param name="gameObject">specifies which gameobject it is tied to</param>
+        /// <param name="isAttack">Specifies if it is an attack</param>
+        /// <param name="maxTime">The duration the collider is on the screen</param>
+        /// <param name="position">The position of the collider</param>
+        /// <param name="owner">specifies the owner of the collider</param>
+        /// <param name="damage">The damage of the collider</param>
         public Collider(GameObject gameObject, bool isAttack, float maxTime, Rectangle position, Player owner, int damage) : base(gameObject)
         {
             this.isAttack = isAttack;
@@ -50,6 +69,10 @@ namespace Kaiju.ComponentPattern
             this.Damage = damage;
         }
 
+        /// <summary>
+        /// Gets the bounding collision rectangle of the collider
+        /// Varies depending on whether it's for the stage, a normal sprite, or an attack
+        /// </summary>
         public Rectangle CollisionBox
         {
             get
@@ -88,12 +111,19 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// Starts the collider and loads the pixel texture and retrieves SpriteRenderer
+        /// </summary>
         public override void Start()
         {
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
             pixel = GameWorld.Instance.Content.Load<Texture2D>("pixel");
         }
 
+        /// <summary>
+        /// Draws the colliders if the game is debugging
+        /// </summary>
+        /// <param name="spriteBatch">The SpriteBatch used to render</param>
         public override void Draw(SpriteBatch spriteBatch)
         {
 #if DEBUG
@@ -105,6 +135,9 @@ namespace Kaiju.ComponentPattern
 #endif
         }
 
+        /// <summary>
+        /// Updates the collider including pixel-perfect colliders
+        /// </summary>
         public override void Update()
         {
             if (!forStage)
@@ -144,6 +177,11 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// Draws a colored rectangle outline around the specified collision box for debugging
+        /// </summary>
+        /// <param name="collisionBox">The rectangle representing the bounds of the collider to be drawn</param>
+        /// <param name="spriteBatch">The SpriteBatch used to render</param>
         private void DrawRectangle(Rectangle collisionBox, SpriteBatch spriteBatch)
         {
             Color color = Color.Red;
@@ -166,6 +204,9 @@ namespace Kaiju.ComponentPattern
             spriteBatch.Draw(pixel, leftLine, null, color, 0, Vector2.Zero, SpriteEffects.None, 1);
         }
 
+        /// <summary>
+        /// Updates the position of pixel-perfect rectangles based on the object's transform
+        /// </summary>
         public void UpdatePixelCollider()
         {
             Vector2 scale = gameObject.Transform.Scale;
@@ -177,6 +218,11 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// Creates a list of edge pixels from a sprite texture for pixel-perfect collision
+        /// </summary>
+        /// <param name="texture">The texture to create the pixelperfect rectangles around</param>
+        /// <returns>The list of rectangleData created</returns>
         private List<RectangleData> CreateRectangles(Texture2D texture)
         {
             List<RectangleData> rectangles = new();
@@ -213,6 +259,10 @@ namespace Kaiju.ComponentPattern
             return rectangles;
         }
 
+        /// <summary>
+        /// Updates the attack collider's position
+        /// </summary>
+        /// <param name="newPosition"></param>
         public void SetPosition(Rectangle newPosition)
         {
             if (isAttack)
@@ -222,6 +272,11 @@ namespace Kaiju.ComponentPattern
         }
     }
 
+    /// <summary>
+    /// Represents a single pixel-based rectangle used for pixel-perfect collision
+    ///Based on the Pixel Perfect Collider Design Pattern
+    /// Made by: Julius
+    /// </summary>
     public class RectangleData
     {
         public Rectangle Rectangle { get; set; }
@@ -229,6 +284,11 @@ namespace Kaiju.ComponentPattern
         public int X { get; set; }
         public int Y { get; set; }
 
+        /// <summary>
+        /// Constuctor
+        /// </summary>
+        /// <param name="x">X-coordinate</param>
+        /// <param name="y">Y-coordinate</param>
         public RectangleData(int x, int y)
         {
             this.Rectangle = new Rectangle();
@@ -236,6 +296,14 @@ namespace Kaiju.ComponentPattern
             this.Y = y;
         }
 
+        /// <summary>
+        /// Recalculates the rectangle's position and size based on transform, scaling, and flipping
+        /// </summary>
+        /// <param name="gameObject">The game object whose transform is used for positioning</param>
+        /// <param name="width">The original width of the sprite this rectangle belongs to</param>
+        /// <param name="height">The original height of the sprite this rectangle belongs to</param>
+        /// <param name="scale">The scale of the sprite</param>
+        /// <param name="isFlipped">Indicates if the sprite is flipped horizontally</param>
         public void UpdatePosition(GameObject gameObject, int width, int height, Vector2 scale, bool isFlipped)
         {
             int finalX = X;

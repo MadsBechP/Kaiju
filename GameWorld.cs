@@ -1,7 +1,5 @@
 ﻿using Kaiju.Command;
 using Kaiju.ComponentPattern;
-using Kaiju.ComponentPattern.Characters;
-using Kaiju.Observer;
 using Kaiju.State;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -37,7 +35,7 @@ namespace Kaiju
         public GraphicsDeviceManager _graphics;
         public GraphicsDeviceManager Graphics { get { return _graphics; } }
         private SpriteBatch _spriteBatch;
-        
+
         private List<GameObject> gameObjects = new List<GameObject>();
         private List<GameObject> newGameObjects = new List<GameObject>();
         private List<GameObject> destroyedGameObjects = new List<GameObject>();
@@ -53,7 +51,7 @@ namespace Kaiju
         private Texture2D background;
 
         private IGameState currentState;
-       
+
         private InputHandler inputHandler = InputHandler.Instance;
         public Camera camera;
 
@@ -71,9 +69,9 @@ namespace Kaiju
 
         protected override void Initialize()
         {
-           
+
             currentState = new BattleState(this); // starter scenen
-            
+
             base.Initialize();
         }
 
@@ -113,7 +111,7 @@ namespace Kaiju
             CheckCollision();
             Cleanup();
 
-            if(currentState != null)
+            if (currentState != null)
             {
                 currentState.Update(gameTime);
             }
@@ -131,12 +129,12 @@ namespace Kaiju
             _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, transform);
 
             //draw background
-            _spriteBatch.Draw(background, 
+            _spriteBatch.Draw(background,
                 new Rectangle(
-                    (int)Math.Round(camera.Center.X) - GraphicsDevice.Viewport.Width / 2, 
-                    (int)Math.Round(camera.Center.Y) - GraphicsDevice.Viewport.Height / 2, 
-                    GraphicsDevice.Viewport.Width, 
-                    GraphicsDevice.Viewport.Height), 
+                    (int)Math.Round(camera.Center.X) - GraphicsDevice.Viewport.Width / 2,
+                    (int)Math.Round(camera.Center.Y) - GraphicsDevice.Viewport.Height / 2,
+                    GraphicsDevice.Viewport.Width,
+                    GraphicsDevice.Viewport.Height),
                 Color.White);
 
 
@@ -150,7 +148,7 @@ namespace Kaiju
 
 
             _spriteBatch.Begin();
-                        
+
 
             foreach (var ui in UIObjects)
             {
@@ -216,7 +214,7 @@ namespace Kaiju
         }
         public bool CheckCollision(Collider col)
         {
-            
+
             foreach (GameObject go2 in gameObjects)
             {
                 if (go2.GetComponent<Stage>() as Stage == null)
@@ -293,13 +291,13 @@ namespace Kaiju
             return animation;
         }
 
-       /// <summary>
-       /// changes the current state to the new state
-       /// </summary>
-       /// <param name="newState"> the new state the current state will change into</param>
+        /// <summary>
+        /// changes the current state to the new state
+        /// </summary>
+        /// <param name="newState"> the new state the current state will change into</param>
         public void ChangeGameState(IGameState newState)
         {
-            if(currentState != null)
+            if (currentState != null)
             {
                 currentState.Exit();
             }
@@ -314,7 +312,7 @@ namespace Kaiju
 
             Debug.WriteLine($"UIObject added: {uiObject}");
         }
-        
+
         public void DestroyUIObject(GameObject uiObjectToDestroy)
         {
             if (UIObjects.Contains(uiObjectToDestroy))

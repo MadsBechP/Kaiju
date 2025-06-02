@@ -1,15 +1,9 @@
-﻿using Kaiju.Command;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kaiju.State
-{   
+{
     /// <summary>
     /// VictoryState is the ending scene where
     /// you can see who won and start a new fight.
@@ -24,7 +18,7 @@ namespace Kaiju.State
         private string nameText;
         private string promptText;
         private bool isDraw;
-        
+
         public Color BackgoundColor => Color.DarkSlateGray;
 
         public VictoryState(GameWorld game, string winnerName, bool isDraw)
@@ -32,10 +26,10 @@ namespace Kaiju.State
             this.game = game;
 
             winFont = game.Content.Load<SpriteFont>("VictoryFont");
-            promptFont = game.Content.Load<SpriteFont>("promptFont"); 
+            promptFont = game.Content.Load<SpriteFont>("promptFont");
             promptText = "press ENTER to start new battle";
-            
-            
+
+
             if (isDraw)
             {
                 winText = "You Are Too Weak\n           To Be King";
@@ -46,9 +40,9 @@ namespace Kaiju.State
             }
 
         }
-        
+
         public void Update(GameTime gameTime)
-        {            
+        {
             if (Keyboard.GetState().IsKeyDown(Keys.Enter))
             {
                 game.ChangeGameState(new BattleState(game));
@@ -65,7 +59,7 @@ namespace Kaiju.State
         }
 
         public void Exit()
-        {            
+        {
         }
     }
 }

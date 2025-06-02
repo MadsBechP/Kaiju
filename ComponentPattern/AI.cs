@@ -2,7 +2,6 @@
 using Kaiju.State;
 using Kaiju.State.AIStates;
 using Microsoft.Xna.Framework;
-using System.Windows.Forms;
 
 namespace Kaiju.ComponentPattern
 {
