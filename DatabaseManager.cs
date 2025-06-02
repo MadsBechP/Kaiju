@@ -5,6 +5,10 @@ using System.IO;
 
 namespace Kaiju
 {
+    /// <summary>
+    /// A singleton class that controls and manages the database
+    /// Handles initialization, Match results and player stats retrieval
+    /// </summary>
     public class DatabaseManager
     {
         private static DatabaseManager instance;
@@ -23,6 +27,10 @@ namespace Kaiju
 
         private readonly string dbPath;
 
+        /// <summary>
+        /// Contructor
+        /// Sets the database path and ensures the database directory exists
+        /// </summary>
         private DatabaseManager()
         {
             string dataFolderPath = Path.Combine(AppContext.BaseDirectory, "Data");
@@ -33,6 +41,9 @@ namespace Kaiju
             dbPath = Path.Combine(dataFolderPath, "KaijuPlayerData.db");
         }
 
+        /// <summary>
+        /// Initializes the database and creates the Player table if it does not exist
+        /// </summary>
         public void Initialize()
         {
             using var connection = new SqliteConnection($"Data Source={dbPath}");
@@ -70,6 +81,10 @@ namespace Kaiju
             command.ExecuteNonQuery();
         }
 
+        /// <summary>
+        /// Writes the player stats to the debug (Needs update to write to screen
+        /// </summary>
+        /// <param name="playerName">The name of the player in the database</param>
         public void PrintPlayerStats(string playerName)
         {
             using var connection = new SqliteConnection($"Data Source={dbPath}");
@@ -104,6 +119,14 @@ namespace Kaiju
             }
         }
 
+        /// <summary>
+        /// Records the results of the match in the database
+        /// </summary>
+        /// <param name="playerName">The player that played the match</param>
+        /// <param name="won">If they won</param>
+        /// <param name="drew">if they lost</param>
+        /// <param name="characterPlayed">The character the player played</param>
+        /// <exception cref="ArgumentException"></exception>
         public void RecordMatchResult(string playerName, bool won, bool drew, string characterPlayed)
         {
             using var connection = new SqliteConnection($"Data Source={dbPath}");
