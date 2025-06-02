@@ -5,8 +5,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -26,15 +26,15 @@ namespace Kaiju.State
         string name2 = "null";
         private Timer timer;
 
-
         private List<GameObject> stateObjects = new List<GameObject>();
         private List<GameObject> UIObjects = new List<GameObject>();
 
-        public Microsoft.Xna.Framework.Color BackgoundColor => Microsoft.Xna.Framework.Color.LightSlateGray;
+        public Color DefaultBackgroundColor => Color.LightSlateGray;
 
         public BattleState(GameWorld game)
         {
             this.game = game;
+            
             InputHandler.Instance.ClearBindings(); // so that it won't try and create binding that are already there
 
             CreateStage();
@@ -120,9 +120,6 @@ namespace Kaiju.State
             var width = game.GraphicsDevice.Viewport.Width;
             var height = game.GraphicsDevice.Viewport.Height;
 
-            //var width = game.Graphics.PreferredBackBufferWidth;
-            //var height = game.Graphics.PreferredBackBufferHeight;
-
             GameObject player1DamageMeterGo = new GameObject();
             var playerDamageMeter = player1DamageMeterGo.AddComponent<DamageMeter>();
             
@@ -169,7 +166,9 @@ namespace Kaiju.State
             game.player1.collider = game.player1Go.AddComponent<Collider>();
             game.player1.stageCollider = game.player1Go.AddComponent<Collider>(game.player1);
             game.player1Go.AddComponent<Animator>();
-            game.player1.chr = game.player1Go.AddComponent<Godzilla>();
+            //game.player1.chr = game.player1Go.AddComponent<Godzilla>();
+            game.player1.chr = CreateCharacter(game.player1Go, game.SelectedCharacterNameP1, out name1, true);
+            
 
             stateObjects.Add(game.player1Go);
             
@@ -181,7 +180,8 @@ namespace Kaiju.State
             game.player2.collider = game.player2Go.AddComponent<Collider>();
             game.player2.stageCollider = game.player2Go.AddComponent<Collider>(game.player2);
             game.player2Go.AddComponent<Animator>();
-            game.player2.chr = game.player2Go.AddComponent<Gigan>();
+            //game.player2.chr = game.player2Go.AddComponent<Gigan>();
+            game.player2.chr = CreateCharacter(game.player2Go, game.SelectedCharacterNameP2, out name2, false);
 
             stateObjects.Add(game.player2Go);            
         }
@@ -201,9 +201,51 @@ namespace Kaiju.State
             game.stageGo.AddComponent<Stage>();
             stateObjects.Add(game.stageGo);            
         }
+        /// <summary>
+        /// Creates the character the player(s) chose in Menu
+        /// </summary>
+        /// <param name="go"> the players gameobject </param>
+        /// <param name="name"> the name of the wanted character </param>
+        /// <param name="characterName"> used to return the actual name of the chosen character</param>
+        /// <returns></returns>
+        private Character CreateCharacter(GameObject go, string name, out string characterName, bool isPlayer1)
+        {
+            if (string.IsNullOrEmpty(name))
+            {                
+                name = isPlayer1 ? "Godzilla" : "Gigan";
+            }
 
+            switch (name)
+            {
+                case "Godzilla":
+                    characterName = "Godzilla";
+                    return go.AddComponent<Godzilla>();
+                case "Gigan":
+                    characterName = "Gigan";
+                    return go.AddComponent<Gigan>();
+                case "Random":
+                    return GetRandomCharacter(go, out characterName);
+                default:
+                    characterName = "Unknown";
+                    return go.AddComponent<Godzilla>();
+            }
+        }
+        private static Random rnd = new Random();
+        private Character GetRandomCharacter(GameObject go, out string name)
+        {
+            if (rnd.Next(2) == 0)
+            {
+                name = "Godzilla";
+                return go.AddComponent<Godzilla>();
+            }
+            else
+            {
+                name = "Gigan";
+                return go.AddComponent<Gigan>();
+            }
+        }
         public void Draw(SpriteBatch spriteBatch)
-        {              
+        {
         }
 
         public void Exit()
