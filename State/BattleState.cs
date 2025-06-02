@@ -36,6 +36,7 @@ namespace Kaiju.State
             CreateTimer();
             LoadContent();
             HUDSetup();
+            DatabaseManager.Instance.Initialize();
 
             foreach (var obj in stateObjects)
             {
@@ -56,21 +57,32 @@ namespace Kaiju.State
                 float player1Lives = game.player1.Lives;
                 float player2Lives = game.player2.Lives;
 
+                string char1 = name1;
+                string char2 = name2;
+
+                //Update at somepoint for the "player1" and 2 to be the actual playerprofiles
                 if (player1Lives == player2Lives)
                 {
+                    DatabaseManager.Instance.RecordMatchResult("Player1", false, true, char1);
+                    DatabaseManager.Instance.RecordMatchResult("Player2", false, true, char2);
+
                     game.ChangeGameState(new VictoryState(game, "", true));
                 }
                 else if (player1Lives > player2Lives)
                 {
+                    DatabaseManager.Instance.RecordMatchResult("Player1", true, false, char1);
+                    DatabaseManager.Instance.RecordMatchResult("Player2", false, false, char2);
+
                     game.ChangeGameState(new VictoryState(game, $"{name1}", false));
                 }
                 else
                 {
+                    DatabaseManager.Instance.RecordMatchResult("Player1", false, false, char1);
+                    DatabaseManager.Instance.RecordMatchResult("Player2", true, false, char2);
+
                     game.ChangeGameState(new VictoryState(game, $"{name2}", false));
                 }
-
             }
-
         }
 
         private void LoadContent()
