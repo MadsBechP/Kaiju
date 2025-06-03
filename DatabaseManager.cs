@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
@@ -85,7 +86,7 @@ namespace Kaiju
         /// Writes the player stats to the debug (Needs update to write to screen
         /// </summary>
         /// <param name="playerName">The name of the player in the database</param>
-        public void PrintPlayerStats(string playerName)
+        public PlayerStats PrintPlayerStats(string playerName)
         {
             using var connection = new SqliteConnection($"Data Source={dbPath}");
             connection.Open();
@@ -107,16 +108,19 @@ namespace Kaiju
             using var reader = command.ExecuteReader();
             if (reader.Read())
             {
-                Debug.WriteLine($"Player: {reader["PlayerName"]}");
-                Debug.WriteLine($"Wins: {reader["Wins"]}, Losses: {reader["Losses"]}, Draws: {reader["Draws"]}");
-                Debug.WriteLine($"Games Played: {reader["GamesPlayed"]}");
-                Debug.WriteLine($"Win/Loss Ratio: {reader["WinLossRatio"]}");
-                Debug.WriteLine($"Favorite Character: {reader["FavoriteCharacter"]}");
+                return new PlayerStats
+                {
+                    PlayerName = reader.GetString(0),
+                    Wins = reader.GetInt32(1),
+                    Losses = reader.GetInt32(2),
+                    Draws = reader.GetInt32(3),
+                    GamesPlayed = reader.GetInt32(4),
+                    WinLossRatio = reader.IsDBNull(5) ? 0.0 : reader.GetDouble(5),
+                    FavoriteCharacter = reader.IsDBNull(6) ? "None" : reader.GetString(6)
+                };
             }
-            else
-            {
-                Debug.WriteLine("Player not found.");
-            }
+
+            return null;
         }
 
         /// <summary>
@@ -172,5 +176,63 @@ namespace Kaiju
             command.Parameters.AddWithValue("$draw", drew ? 1 : 0);
             command.ExecuteNonQuery();
         }
+
+        /// <summary>
+        /// Adds a new player to the database if it does not exist
+        /// </summary>
+        /// <param name="playerName">The name of the new database</param>
+        public void AddNewProfile(string playerName)
+        {
+            using var connection = new SqliteConnection($"Data Source={dbPath}");
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                INSERT INTO Player (PlayerName, Wins, Losses, Draws, [KO's], [KO'd], [TimesPicked Godzilla], [TimesPicked Gigan])
+                VALUES ($name, 0, 0, 0, 0, 0, 0, 0)
+                ON CONFLICT(PlayerName) DO NOTHING;";
+            command.Parameters.AddWithValue("$name", playerName);
+
+            int rowsAffected = command.ExecuteNonQuery();
+
+            if (rowsAffected == 0)
+            {
+                Debug.WriteLine($"Profile {playerName} already exists");
+            }
+            else
+            {
+                Debug.WriteLine($"New profile {playerName} added successfully");
+            }
+        }
+
+        public List<string> ListAllPlayerNames()
+        {
+            var playerNames = new List<string>();
+
+            using var connection = new SqliteConnection($"Data Source={dbPath}");
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"SELECT PlayerName FROM Player ORDER BY PlayerName ASC;";
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                playerNames.Add(reader.GetString(0));
+            }
+
+            return playerNames;
+        }
+    }
+
+    public class PlayerStats
+    {
+        public string PlayerName;
+        public int Wins;
+        public int Losses;
+        public int Draws;
+        public int GamesPlayed;
+        public double WinLossRatio;
+        public string FavoriteCharacter;
     }
 }
