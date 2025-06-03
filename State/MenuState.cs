@@ -38,16 +38,35 @@ namespace Kaiju.State
 
         private Texture2D highlightTexture;
 
+        private Texture2D playerProfileTexture;
+        private Vector2 ppOrigin;
+        private Vector2 p1ProfilePos;
+        private Vector2 p2ProfilePos;
+        
+        private SpriteFont playerProfileFont;
+        private string p1Name;
+        private string p2Name;
+        private Vector2 p1NamePos;
+        private Vector2 p2NamePos;
+
+
+
 
         public MenuState (GameWorld game)
         {
             this.game = game;
-            
+            var w = game.GraphicsDevice.Viewport.Width;
+            var h = game.GraphicsDevice.Viewport.Height;
+
             // The text
             promptFont = game.Content.Load<SpriteFont>("promptFont");
             promptText = "Choose Your Kaiju";
             promptPosition = new Vector2(game.GraphicsDevice.Viewport.Width * 0.50f, game.GraphicsDevice.Viewport.Height * 0.10f);
-            
+
+            playerProfileFont = game.Content.Load<SpriteFont>("Menu\\PlayerProfileFont");
+            p1Name = "Test";
+            p2Name = "Test";
+
             // Load texture
             gzTexture = game.Content.Load<Texture2D>("Menu\\GZMenuProfile");
             ggTexture = game.Content.Load<Texture2D>("Menu\\GGMenuProfile");
@@ -55,13 +74,19 @@ namespace Kaiju.State
 
             highlightTexture = game.Content.Load<Texture2D>("Pixel");
 
-            // Placements
-            var w = game.GraphicsDevice.Viewport.Width;
-            var h = game.GraphicsDevice.Viewport.Height * 0.5f;
+            playerProfileTexture = game.Content.Load<Texture2D>("playerHUD");
 
-            profiles.Add(new CharacterProfile("Godzilla", gzTexture, new Vector2(w * 0.28f, h), false));
-            profiles.Add(new CharacterProfile("Random", rndTexture, new Vector2(w * 0.50f, h), false));
-            profiles.Add(new CharacterProfile("Gigan", ggTexture, new Vector2(w * 0.73f, h), true));
+            // Placements            
+            profiles.Add(new CharacterProfile("Godzilla", gzTexture, new Vector2(w * 0.28f, h * 0.5f), false));
+            profiles.Add(new CharacterProfile("Random", rndTexture, new Vector2(w * 0.50f, h * 0.5f), false));
+            profiles.Add(new CharacterProfile("Gigan", ggTexture, new Vector2(w * 0.73f, h * 0.5f), true));
+
+            ppOrigin = new Vector2(playerProfileTexture.Width / 2, playerProfileTexture.Height / 2);
+            p1ProfilePos = new Vector2(w * 0.30f, h * 0.80f);
+            p2ProfilePos = new Vector2(w * 0.75f, h * 0.80f);
+
+            p1NamePos = new Vector2(w * 0.315f, h * 0.825f);
+            p2NamePos = new Vector2(w * 0.765f, h * 0.825f);
 
             // Input commands for player 1
             InputHandler.Instance.ClearBindings();
@@ -76,11 +101,21 @@ namespace Kaiju.State
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            // Draw text
+            // Draw title text
             Vector2 promOrigin = promptFont.MeasureString(promptText) / 2;
             spriteBatch.DrawString(promptFont, promptText, promptPosition, Color.OrangeRed, 0, promOrigin, 1, SpriteEffects.None, 1);
 
-            
+            //player profile
+            spriteBatch.Draw(playerProfileTexture, p1ProfilePos, null, Color.White, 0, ppOrigin, 1.4f, SpriteEffects.None, 1);
+            spriteBatch.Draw(playerProfileTexture, p2ProfilePos, null, Color.White, 0, ppOrigin, 1.4f, SpriteEffects.None, 1);
+
+            Vector2 p1NameOrigin = playerProfileFont.MeasureString(p1Name) / 2;
+            Vector2 p2NameOrigin = playerProfileFont.MeasureString(p2Name) / 2;
+            spriteBatch.DrawString(playerProfileFont, p1Name, p1NamePos, Color.White, 0, p1NameOrigin, 1, SpriteEffects.None, 1);
+            spriteBatch.DrawString(playerProfileFont, p2Name, p2NamePos, Color.White, 0, p1NameOrigin, 1, SpriteEffects.None, 1);
+
+
+            //character profiles + highlights
             for (int i = 0; i < profiles.Count; i++)
             {
                 CharacterProfile profile = profiles[i];
@@ -97,7 +132,7 @@ namespace Kaiju.State
                         profile.Texture.Width + thickness * 2,
                         profile.Texture.Height + thickness * 2
                         );
-                    spriteBatch.Draw(highlightTexture, higlightRec1, Color.Blue);
+                    spriteBatch.Draw(highlightTexture, higlightRec1, Color.Red);
                 }
                 // The highlight for P2
                 if (i == selectedIndexP2 && !player2Confirmed)
@@ -108,10 +143,9 @@ namespace Kaiju.State
                         profile.Texture.Width + thickness * 2,
                         profile.Texture.Height + thickness * 2
                         );
-                    spriteBatch.Draw(highlightTexture, higlightRec2, Color.Red);
+                    spriteBatch.Draw(highlightTexture, higlightRec2, Color.Blue);
                 }
                 
-
                 // Draw the profile pictures
                 spriteBatch.Draw(profile.Texture, profile.Position, null, Color.White, 0, profile.Origin, 1, effect, 1);
             }
@@ -169,5 +203,6 @@ namespace Kaiju.State
                 player2Confirmed = true;
             }
         }
+        
     }
 }

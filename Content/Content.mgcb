@@ -843,6 +843,13 @@
 /processorParam:TextureFormat=Color
 /build:Menu/GZMenuProfile.png
 
+#begin Menu/PlayerProfileFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Menu/PlayerProfileFont.spritefont
+
 #begin Menu/RandomMenuProfile.png
 /importer:TextureImporter
 /processor:TextureProcessor
