@@ -69,8 +69,8 @@ namespace Kaiju.State
             promptPosition = new Vector2(game.GraphicsDevice.Viewport.Width * 0.50f, game.GraphicsDevice.Viewport.Height * 0.10f);
 
             playerProfileFont = game.Content.Load<SpriteFont>("Menu\\PlayerProfileFont");
-            p1Name = "Test_1";
-            p2Name = "Test_2";
+            p1Name = "DefaultName";
+            p2Name = "DefaultName";
 
             // Load texture
             gzTexture = game.Content.Load<Texture2D>("Menu\\GZMenuProfile");
@@ -163,7 +163,10 @@ namespace Kaiju.State
         {
             InputHandler.Instance.Execute();
 
-            if(player1Confirmed && player2Confirmed)
+            p1Name = game.SelectedPlayerProfileP1 ?? "DefaultName";
+            p2Name = game.SelectedPlayerProfileP2 ?? "DefaultName";
+
+            if (player1Confirmed && player2Confirmed)
             {
                 game.SelectedCharacterNameP1 = profiles[selectedIndexP1].Name;
                 game.SelectedCharacterNameP2 = profiles[selectedIndexP2].Name;
