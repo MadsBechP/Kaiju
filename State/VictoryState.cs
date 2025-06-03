@@ -1,17 +1,9 @@
-﻿using Kaiju.Command;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace Kaiju.State
-{   
+{
     /// <summary>
     /// VictoryState is the ending scene where
     /// you can see who won and start a new fight.
@@ -24,7 +16,9 @@ namespace Kaiju.State
         private SpriteFont promptFont;
         private string winText;
         private string promptText;
+        private bool isDraw;
 
+        public Color BackgoundColor => Color.DarkSlateGray;
 
         public Color DefaultBackgroundColor => Color.DarkSlateGray;
 
@@ -47,9 +41,9 @@ namespace Kaiju.State
             }
 
         }
-        
+
         public void Update(GameTime gameTime)
-        {            
+        {
             if (Keyboard.GetState().IsKeyDown(Keys.Enter))
             {
                 game.ChangeGameState(new BattleState(game));
@@ -73,7 +67,7 @@ namespace Kaiju.State
         }
 
         public void Exit()
-        {            
+        {
         }
     }
 }

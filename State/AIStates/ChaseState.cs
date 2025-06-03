@@ -1,7 +1,5 @@
 ﻿using Kaiju.ComponentPattern;
 using Microsoft.Xna.Framework;
-using SharpDX.Direct3D9;
-using System;
 
 namespace Kaiju.State.AIStates
 {

@@ -3,16 +3,10 @@ using Kaiju.ComponentPattern;
 using Kaiju.ComponentPattern.Characters;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Kaiju.State
-{    
+{
     /// <summary>
     /// BattleState keeps track of the creation of the battle scene. 
     /// This include the player, timer and HUD 
@@ -42,6 +36,7 @@ namespace Kaiju.State
             CreateTimer();
             LoadContent();
             HUDSetup();
+            DatabaseManager.Instance.Initialize();
 
             foreach (var obj in stateObjects)
             {
@@ -50,38 +45,49 @@ namespace Kaiju.State
             game.Cleanup();
         }
         public void Update(GameTime gameTime)
-        {            
+        {
 
             // If a timer has been found and the timer has run out, change to VictoryState
 
             bool player1Dead = game.player1.Lives <= 0;
             bool player2Dead = game.player2.Lives <= 0;
 
-            if (timer != null && timer.TimeRanOut || player1Dead || player2Dead )
-            {                
+            if (timer != null && timer.TimeRanOut || player1Dead || player2Dead)
+            {
                 float player1Lives = game.player1.Lives;
                 float player2Lives = game.player2.Lives;
 
-                if(player1Lives == player2Lives)
+                string char1 = name1;
+                string char2 = name2;
+
+                //Update at somepoint for the "player1" and 2 to be the actual playerprofiles
+                if (player1Lives == player2Lives)
                 {
+                    DatabaseManager.Instance.RecordMatchResult("Player1", false, true, char1);
+                    DatabaseManager.Instance.RecordMatchResult("Player2", false, true, char2);
+
                     game.ChangeGameState(new VictoryState(game, "", true));
                 }
-                else if(player1Lives > player2Lives)
+                else if (player1Lives > player2Lives)
                 {
+                    DatabaseManager.Instance.RecordMatchResult("Player1", true, false, char1);
+                    DatabaseManager.Instance.RecordMatchResult("Player2", false, false, char2);
+
                     game.ChangeGameState(new VictoryState(game, $"{name1}", false));
                 }
                 else
                 {
+                    DatabaseManager.Instance.RecordMatchResult("Player1", false, false, char1);
+                    DatabaseManager.Instance.RecordMatchResult("Player2", true, false, char2);
+
                     game.ChangeGameState(new VictoryState(game, $"{name2}", false));
                 }
-                
             }
-
         }
 
         private void LoadContent()
         {
-            
+
             switch (game.player1.chr)
             {
                 case Godzilla:
@@ -113,8 +119,8 @@ namespace Kaiju.State
                     }
             }
         }
-        
-        
+
+
         private void HUDSetup()
         {
             var width = game.GraphicsDevice.Viewport.Width;
@@ -122,7 +128,7 @@ namespace Kaiju.State
 
             GameObject player1DamageMeterGo = new GameObject();
             var playerDamageMeter = player1DamageMeterGo.AddComponent<DamageMeter>();
-            
+
             //Note: HUD bliver placeres som en procentdel af skærmens bredde og højde
 
             playerDamageMeter.Setup(
@@ -145,7 +151,7 @@ namespace Kaiju.State
                 new Vector2(width * 0.775f, height * 0.883f) // profilePos: 77.5% fra venstre, 88.3% ned
                );
 
-            
+
             game.AddUIObject(player1DamageMeterGo);
             game.AddUIObject(player2DamageMeterGo);
 
@@ -171,7 +177,7 @@ namespace Kaiju.State
             
 
             stateObjects.Add(game.player1Go);
-            
+
             game.player2Go = new GameObject();
             game.player2 = game.player2Go.AddComponent<Player>();
             game.player2.InputType = InputType.Keyboard;
@@ -183,7 +189,7 @@ namespace Kaiju.State
             //game.player2.chr = game.player2Go.AddComponent<Gigan>();
             game.player2.chr = CreateCharacter(game.player2Go, game.SelectedCharacterNameP2, out name2, false);
 
-            stateObjects.Add(game.player2Go);            
+            stateObjects.Add(game.player2Go);
         }
         public void CreateTimer()
         {
@@ -199,7 +205,7 @@ namespace Kaiju.State
             game.stageGo.AddComponent<SpriteRenderer>();
             game.stageGo.AddComponent<Collider>();
             game.stageGo.AddComponent<Stage>();
-            stateObjects.Add(game.stageGo);            
+            stateObjects.Add(game.stageGo);
         }
         /// <summary>
         /// Creates the character the player(s) chose in Menu
