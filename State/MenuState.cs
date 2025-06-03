@@ -49,12 +49,16 @@ namespace Kaiju.State
         private Vector2 p1NamePos;
         private Vector2 p2NamePos;
 
-
+        private bool selectingProfileP1 = false;
+        private bool selectingProfileP2 = false;
+        
 
 
         public MenuState (GameWorld game)
         {
             this.game = game;
+            DatabaseManager.Instance.Initialize();
+
             var w = game.GraphicsDevice.Viewport.Width;
             var h = game.GraphicsDevice.Viewport.Height;
 

@@ -3,6 +3,7 @@ using Kaiju.ComponentPattern;
 using Kaiju.ComponentPattern.Characters;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace Kaiju.State
@@ -28,7 +29,7 @@ namespace Kaiju.State
         public BattleState(GameWorld game)
         {
             this.game = game;
-            
+
             InputHandler.Instance.ClearBindings(); // so that it won't try and create binding that are already there
 
             CreateStage();
@@ -36,8 +37,7 @@ namespace Kaiju.State
             CreateTimer();
             LoadContent();
             HUDSetup();
-            DatabaseManager.Instance.Initialize();
-
+            
             foreach (var obj in stateObjects)
             {
                 game.Instantiate(obj);
