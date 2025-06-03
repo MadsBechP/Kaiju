@@ -49,6 +49,9 @@ namespace Kaiju
         public string SelectedCharacterNameP1 { get; set; }
         public string SelectedCharacterNameP2 { get; set; }
 
+        public string SelectedPlayerProfileP1 { get; set; }
+        public string SelectedPlayerProfileP2 { get; set; }
+
         public GameObject stageGo;
         public Stage stage;
         private Texture2D background;

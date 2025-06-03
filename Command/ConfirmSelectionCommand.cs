@@ -9,17 +9,17 @@ namespace Kaiju.Command
 {
     public class ConfirmSelectionCommand : ICommand
     {
-        private MenuState menu;
+        private ISelectable state;
         private bool isPlayer1;
 
-        public ConfirmSelectionCommand(MenuState menu, bool isPlayer1)
+        public ConfirmSelectionCommand(ISelectable state, bool isPlayer1)
         {
-            this.menu = menu;
+            this.state = state;
             this.isPlayer1 = isPlayer1;
         }
         public void Execute()
         {
-            menu.ConfirmSelection(isPlayer1);
+            state.ConfirmSelection(isPlayer1);
         }
     }
 }

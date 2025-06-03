@@ -63,22 +63,22 @@ namespace Kaiju.State
                 //Update at somepoint for the "player1" and 2 to be the actual playerprofiles
                 if (player1Lives == player2Lives)
                 {
-                    DatabaseManager.Instance.RecordMatchResult("Player1", false, true, char1);
-                    DatabaseManager.Instance.RecordMatchResult("Player2", false, true, char2);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", false, true, char1);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP2}", false, true, char2);
 
                     game.ChangeGameState(new VictoryState(game, "", true));
                 }
                 else if (player1Lives > player2Lives)
                 {
-                    DatabaseManager.Instance.RecordMatchResult("Player1", true, false, char1);
-                    DatabaseManager.Instance.RecordMatchResult("Player2", false, false, char2);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", true, false, char1);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP2}", false, false, char2);
 
                     game.ChangeGameState(new VictoryState(game, $"{name1}", false));
                 }
                 else
                 {
-                    DatabaseManager.Instance.RecordMatchResult("Player1", false, false, char1);
-                    DatabaseManager.Instance.RecordMatchResult("Player2", true, false, char2);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", false, false, char1);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP2}", true, false, char2);
 
                     game.ChangeGameState(new VictoryState(game, $"{name2}", false));
                 }

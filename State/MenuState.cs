@@ -16,7 +16,7 @@ namespace Kaiju.State
     /// and is able to create a player profile that saves the count of the players
     /// win and loses.
     /// </summary>
-    public class MenuState : IGameState
+    public class MenuState : IGameState, ISelectable
     {
         public Color DefaultBackgroundColor => Color.DarkBlue;
 
@@ -51,7 +51,8 @@ namespace Kaiju.State
 
         private bool selectingProfileP1 = false;
         private bool selectingProfileP2 = false;
-        
+        private string selectedProfileP1;
+        private string selectedProfileP2;
 
 
         public MenuState (GameWorld game)
@@ -68,8 +69,8 @@ namespace Kaiju.State
             promptPosition = new Vector2(game.GraphicsDevice.Viewport.Width * 0.50f, game.GraphicsDevice.Viewport.Height * 0.10f);
 
             playerProfileFont = game.Content.Load<SpriteFont>("Menu\\PlayerProfileFont");
-            p1Name = "Test";
-            p2Name = "Test";
+            p1Name = "Test_1";
+            p2Name = "Test_2";
 
             // Load texture
             gzTexture = game.Content.Load<Texture2D>("Menu\\GZMenuProfile");
@@ -92,8 +93,9 @@ namespace Kaiju.State
             p1NamePos = new Vector2(w * 0.315f, h * 0.825f);
             p2NamePos = new Vector2(w * 0.765f, h * 0.825f);
 
-            // Input commands for player 1
+            
             InputHandler.Instance.ClearBindings();
+            // Input commands for player 1
             InputHandler.Instance.AddButtonDownCommand(Keys.A, new ChangeSelectionCommand(-1, this, true));
             InputHandler.Instance.AddButtonDownCommand(Keys.D, new ChangeSelectionCommand(1, this, true));
             InputHandler.Instance.AddButtonDownCommand(Keys.LeftControl, new ConfirmSelectionCommand(this, true));
@@ -168,9 +170,13 @@ namespace Kaiju.State
                 game.ChangeGameState(new BattleState(game));
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Q))
+            if (Keyboard.GetState().IsKeyDown(Keys.X))
             {
-                game.ChangeGameState(new BattleState(game));
+                game.ChangeGameState(new ProfileState(game, true));
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.M))
+            {
+                game.ChangeGameState(new ProfileState(game, false));
             }
         }
 
@@ -207,6 +213,6 @@ namespace Kaiju.State
                 player2Confirmed = true;
             }
         }
-        
+
     }
 }
