@@ -1,22 +1,28 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kaiju.ComponentPattern
 {
+    /// <summary>
+    /// Class used to create Godzillas "Atomic Breath"
+    /// Is part of Component Design Pattern
+    /// Made by: Julius
+    /// </summary>
     internal class Beam : Component
     {
         public Player owner;
         public SpriteRenderer spriteRenderer;
 
+        /// <summary>
+        /// Constuctor 
+        /// </summary>
+        /// <param name="gameObject">specifies which gameobject it is tied to</param>
         public Beam(GameObject gameObject) : base(gameObject)
         {
         }
 
+        /// <summary>
+        /// Updates the beams positions and direction every frame based on owners position
+        /// </summary>
         public override void Update()
         {
             gameObject.Transform.Position = owner.gameObject.Transform.Position + new Vector2(owner.facingRight ? 300 : -300, -25);

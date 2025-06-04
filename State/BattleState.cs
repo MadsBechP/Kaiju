@@ -5,14 +5,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Kaiju.State
-{    
+{
     /// <summary>
     /// BattleState keeps track of the creation of the battle scene. 
     /// This include the player, timer and HUD 
@@ -20,21 +15,22 @@ namespace Kaiju.State
     public class BattleState : IGameState
     {
         private GameWorld game;
+        private Texture2D background;
         private Texture2D player1Profile;
         private Texture2D player2Profile;
         string name1 = "null";
         string name2 = "null";
         private Timer timer;
 
-
         private List<GameObject> stateObjects = new List<GameObject>();
         private List<GameObject> UIObjects = new List<GameObject>();
 
-        public Microsoft.Xna.Framework.Color BackgoundColor => Microsoft.Xna.Framework.Color.LightSlateGray;
+        public Color DefaultBackgroundColor => Color.LightSlateGray;
 
         public BattleState(GameWorld game)
         {
             this.game = game;
+
             InputHandler.Instance.ClearBindings(); // so that it won't try and create binding that are already there
 
             CreateStage();
@@ -43,6 +39,8 @@ namespace Kaiju.State
             LoadContent();
             HUDSetup();
 
+            GameWorld.Instance.camera = new Camera();
+
             foreach (var obj in stateObjects)
             {
                 game.Instantiate(obj);
@@ -50,38 +48,50 @@ namespace Kaiju.State
             game.Cleanup();
         }
         public void Update(GameTime gameTime)
-        {            
+        {
 
             // If a timer has been found and the timer has run out, change to VictoryState
 
             bool player1Dead = game.player1.Lives <= 0;
             bool player2Dead = game.player2.Lives <= 0;
 
-            if (timer != null && timer.TimeRanOut || player1Dead || player2Dead )
-            {                
+            if (timer != null && timer.TimeRanOut || player1Dead || player2Dead)
+            {
                 float player1Lives = game.player1.Lives;
                 float player2Lives = game.player2.Lives;
 
-                if(player1Lives == player2Lives)
+                string char1 = name1;
+                string char2 = name2;
+
+                //Update at somepoint for the "player1" and 2 to be the actual playerprofiles
+                if (player1Lives == player2Lives)
                 {
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", false, true, char1);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP2}", false, true, char2);
+
                     game.ChangeGameState(new VictoryState(game, "", true));
                 }
-                else if(player1Lives > player2Lives)
+                else if (player1Lives > player2Lives)
                 {
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", true, false, char1);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP2}", false, false, char2);
+
                     game.ChangeGameState(new VictoryState(game, $"{name1}", false));
                 }
                 else
                 {
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", false, false, char1);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP2}", true, false, char2);
+
                     game.ChangeGameState(new VictoryState(game, $"{name2}", false));
                 }
-                
             }
-
+            GameWorld.Instance.camera.MoveToward((float)gameTime.ElapsedGameTime.TotalMilliseconds);
         }
 
         private void LoadContent()
         {
-            
+            background = game.Content.Load<Texture2D>("City");
             switch (game.player1.chr)
             {
                 case Godzilla:
@@ -113,19 +123,16 @@ namespace Kaiju.State
                     }
             }
         }
-        
-        
+
+
         private void HUDSetup()
         {
             var width = game.GraphicsDevice.Viewport.Width;
             var height = game.GraphicsDevice.Viewport.Height;
 
-            //var width = game.Graphics.PreferredBackBufferWidth;
-            //var height = game.Graphics.PreferredBackBufferHeight;
-
             GameObject player1DamageMeterGo = new GameObject();
             var playerDamageMeter = player1DamageMeterGo.AddComponent<DamageMeter>();
-            
+
             //Note: HUD bliver placeres som en procentdel af skærmens bredde og højde
 
             playerDamageMeter.Setup(
@@ -148,7 +155,7 @@ namespace Kaiju.State
                 new Vector2(width * 0.775f, height * 0.883f) // profilePos: 77.5% fra venstre, 88.3% ned
                );
 
-            
+
             game.AddUIObject(player1DamageMeterGo);
             game.AddUIObject(player2DamageMeterGo);
 
@@ -169,10 +176,12 @@ namespace Kaiju.State
             game.player1.collider = game.player1Go.AddComponent<Collider>();
             game.player1.stageCollider = game.player1Go.AddComponent<Collider>(game.player1);
             game.player1Go.AddComponent<Animator>();
-            game.player1.chr = game.player1Go.AddComponent<Godzilla>();
+            //game.player1.chr = game.player1Go.AddComponent<Godzilla>();
+            game.player1.chr = CreateCharacter(game.player1Go, game.SelectedCharacterNameP1, out name1, true);
+            
 
             stateObjects.Add(game.player1Go);
-            
+
             game.player2Go = new GameObject();
             game.player2 = game.player2Go.AddComponent<AI>();
             game.player2.InputType = InputType.Keyboard;
@@ -181,9 +190,10 @@ namespace Kaiju.State
             game.player2.collider = game.player2Go.AddComponent<Collider>();
             game.player2.stageCollider = game.player2Go.AddComponent<Collider>(game.player2);
             game.player2Go.AddComponent<Animator>();
-            game.player2.chr = game.player2Go.AddComponent<Gigan>();
+            //game.player2.chr = game.player2Go.AddComponent<Gigan>();
+            game.player2.chr = CreateCharacter(game.player2Go, game.SelectedCharacterNameP2, out name2, false);
 
-            stateObjects.Add(game.player2Go);            
+            stateObjects.Add(game.player2Go);
         }
         public void CreateTimer()
         {
@@ -199,11 +209,63 @@ namespace Kaiju.State
             game.stageGo.AddComponent<SpriteRenderer>();
             game.stageGo.AddComponent<Collider>();
             game.stageGo.AddComponent<Stage>();
-            stateObjects.Add(game.stageGo);            
+            stateObjects.Add(game.stageGo);
         }
+        /// <summary>
+        /// Creates the character the player(s) chose in Menu
+        /// </summary>
+        /// <param name="go"> the players gameobject </param>
+        /// <param name="name"> the name of the wanted character </param>
+        /// <param name="characterName"> used to return the actual name of the chosen character</param>
+        /// <returns></returns>
+        private Character CreateCharacter(GameObject go, string name, out string characterName, bool isPlayer1)
+        {
+            if (string.IsNullOrEmpty(name))
+            {                
+                name = isPlayer1 ? "Godzilla" : "Gigan";
+            }
 
+            switch (name)
+            {
+                case "Godzilla":
+                    characterName = "Godzilla";
+                    return go.AddComponent<Godzilla>();
+                case "Gigan":
+                    characterName = "Gigan";
+                    return go.AddComponent<Gigan>();
+                case "Random":
+                    return GetRandomCharacter(go, out characterName);
+                default:
+                    characterName = "Unknown";
+                    return go.AddComponent<Godzilla>();
+            }
+        }
+        private static Random rnd = new Random();
+        private Character GetRandomCharacter(GameObject go, out string name)
+        {
+            if (rnd.Next(2) == 0)
+            {
+                name = "Godzilla";
+                return go.AddComponent<Godzilla>();
+            }
+            else
+            {
+                name = "Gigan";
+                return go.AddComponent<Gigan>();
+            }
+        }
         public void Draw(SpriteBatch spriteBatch)
-        {              
+        {
+            spriteBatch.Draw(background,
+                new Rectangle(
+                    (int)Math.Round(GameWorld.Instance.camera.Center.X) - GameWorld.Instance.GraphicsDevice.Viewport.Width / 2,
+                    (int)Math.Round(GameWorld.Instance.camera.Center.Y) - GameWorld.Instance.GraphicsDevice.Viewport.Height / 2,
+                    GameWorld.Instance.GraphicsDevice.Viewport.Width,
+                    GameWorld.Instance.GraphicsDevice.Viewport.Height),
+                Color.White);
+
+            GameWorld.Instance.player1.DrawShield(spriteBatch);
+            GameWorld.Instance.player2.DrawShield(spriteBatch);
         }
 
         public void Exit()
@@ -219,6 +281,8 @@ namespace Kaiju.State
                 game.DestroyUIObject(ui);
             }
             UIObjects.Clear();
+
+            GameWorld.Instance.camera = null;
         }
     }
 }

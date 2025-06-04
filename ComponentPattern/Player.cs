@@ -6,8 +6,6 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Kaiju.State;
-using System.IO.Pipes;
 
 namespace Kaiju.ComponentPattern
 {
@@ -150,12 +148,12 @@ namespace Kaiju.ComponentPattern
             gameObject.Transform.Translate(stageCollider);
 
             // respawns player when below the stage
-            if (gameObject.Transform.Position.Y > GameWorld.Instance.GraphicsDevice.Viewport.Height*1.5f)
+            if (gameObject.Transform.Position.Y > GameWorld.Instance.GraphicsDevice.Viewport.Height * 1.5f)
             {
                 gameObject.Transform.Position = startPos;
                 hitTimer = 2f;
                 gameObject.Transform.CurrentVelocity = Vector2.Zero;
-                                
+
                 Lives--;
                 Damage = 0;
                 Notify();
