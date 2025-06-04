@@ -54,7 +54,7 @@ namespace Kaiju
 
         public GameObject stageGo;
         public Stage stage;
-        private Texture2D background;
+        
 
         private IGameState currentState;
 
@@ -76,18 +76,18 @@ namespace Kaiju
         protected override void Initialize()
         {
 
-            currentState = new BattleState(this); // starter scenen
+            currentState = new MenuState(this); // starter scenen
 
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            background = Content.Load<Texture2D>("City");
+            
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            camera = new Camera();
+            
 
         }
 
@@ -112,7 +112,7 @@ namespace Kaiju
                 ui.Update();
             }
 
-            camera.MoveToward((float)gameTime.ElapsedGameTime.TotalMilliseconds);
+            
             InputHandler.Instance.Execute();
             CheckCollision();
             Cleanup();
@@ -131,25 +131,23 @@ namespace Kaiju
             // If the currentState is null it will default to CornflowerBlue (it is like an if-else statement)
             GraphicsDevice.Clear(currentState?.DefaultBackgroundColor ?? Color.CornflowerBlue);
 
-            Matrix transform = Matrix.CreateTranslation(-camera.GetTopLeft().X, -camera.GetTopLeft().Y, 0);
-            _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, transform);
+            if (currentState is BattleState)
+            {
+                Matrix transform = Matrix.CreateTranslation(-camera.GetTopLeft().X, -camera.GetTopLeft().Y, 0);
+                _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, transform);
+            }
+            else
+            {
+                _spriteBatch.Begin();
+            }
 
-            //draw background
-            _spriteBatch.Draw(background,
-                new Rectangle(
-                    (int)Math.Round(camera.Center.X) - GraphicsDevice.Viewport.Width / 2,
-                    (int)Math.Round(camera.Center.Y) - GraphicsDevice.Viewport.Height / 2,
-                    GraphicsDevice.Viewport.Width,
-                    GraphicsDevice.Viewport.Height),
-                Color.White);
-
-
+            currentState.Draw(_spriteBatch);
+            
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Draw(_spriteBatch);
             }
-            player1.DrawShield(_spriteBatch);
-            player2.DrawShield(_spriteBatch);
+            
             _spriteBatch.End();
 
 

@@ -15,6 +15,7 @@ namespace Kaiju.State
     public class BattleState : IGameState
     {
         private GameWorld game;
+        private Texture2D background;
         private Texture2D player1Profile;
         private Texture2D player2Profile;
         string name1 = "null";
@@ -37,7 +38,9 @@ namespace Kaiju.State
             CreateTimer();
             LoadContent();
             HUDSetup();
-            
+
+            GameWorld.Instance.camera = new Camera();
+
             foreach (var obj in stateObjects)
             {
                 game.Instantiate(obj);
@@ -83,11 +86,12 @@ namespace Kaiju.State
                     game.ChangeGameState(new VictoryState(game, $"{name2}", false));
                 }
             }
+            GameWorld.Instance.camera.MoveToward((float)gameTime.ElapsedGameTime.TotalMilliseconds);
         }
 
         private void LoadContent()
         {
-
+            background = game.Content.Load<Texture2D>("City");
             switch (game.player1.chr)
             {
                 case Godzilla:
@@ -252,6 +256,16 @@ namespace Kaiju.State
         }
         public void Draw(SpriteBatch spriteBatch)
         {
+            spriteBatch.Draw(background,
+                new Rectangle(
+                    (int)Math.Round(GameWorld.Instance.camera.Center.X) - GameWorld.Instance.GraphicsDevice.Viewport.Width / 2,
+                    (int)Math.Round(GameWorld.Instance.camera.Center.Y) - GameWorld.Instance.GraphicsDevice.Viewport.Height / 2,
+                    GameWorld.Instance.GraphicsDevice.Viewport.Width,
+                    GameWorld.Instance.GraphicsDevice.Viewport.Height),
+                Color.White);
+
+            GameWorld.Instance.player1.DrawShield(spriteBatch);
+            GameWorld.Instance.player2.DrawShield(spriteBatch);
         }
 
         public void Exit()
@@ -267,6 +281,8 @@ namespace Kaiju.State
                 game.DestroyUIObject(ui);
             }
             UIObjects.Clear();
+
+            GameWorld.Instance.camera = null;
         }
     }
 }
