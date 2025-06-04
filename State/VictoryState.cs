@@ -69,5 +69,15 @@ namespace Kaiju.State
         public void Exit()
         {
         }
+
+        /// <summary>
+        /// Changes the controls of the players depeding on if a controller is connected or not
+        /// </summary>
+        /// <param name="p1Connected">Bool if player one has a controller connected</param>
+        /// <param name="p2Connected">Bool if player two has a controller connected</param>
+        public void OnControllerConnectionChanged(bool p1Connected, bool p2Connected)
+        {
+            
+        }
     }
 }

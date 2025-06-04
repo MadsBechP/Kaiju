@@ -93,16 +93,6 @@ namespace Kaiju.State
             p1NamePos = new Vector2(w * 0.315f, h * 0.825f);
             p2NamePos = new Vector2(w * 0.765f, h * 0.825f);
 
-            
-            InputHandler.Instance.ClearBindings();
-            // Input commands for player 1
-            InputHandler.Instance.AddButtonDownCommand(Keys.A, new ChangeSelectionCommand(-1, this, true));
-            InputHandler.Instance.AddButtonDownCommand(Keys.D, new ChangeSelectionCommand(1, this, true));
-            InputHandler.Instance.AddButtonDownCommand(Keys.LeftControl, new ConfirmSelectionCommand(this, true));
-            // Input commands for player 2
-            InputHandler.Instance.AddButtonDownCommand(Keys.Left, new ChangeSelectionCommand(-1, this, false));
-            InputHandler.Instance.AddButtonDownCommand(Keys.Right, new ChangeSelectionCommand(1, this, false));
-            InputHandler.Instance.AddButtonDownCommand(Keys.RightShift, new ConfirmSelectionCommand(this, false));
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -172,15 +162,6 @@ namespace Kaiju.State
                 game.SelectedCharacterNameP2 = profiles[selectedIndexP2].Name;
                 game.ChangeGameState(new BattleState(game));
             }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.X))
-            {
-                game.ChangeGameState(new ProfileState(game, true));
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.M))
-            {
-                game.ChangeGameState(new ProfileState(game, false));
-            }
         }
 
         public void Exit()
@@ -217,5 +198,52 @@ namespace Kaiju.State
             }
         }
 
+        public void ChangeToProfileState(bool isPlayer1)
+        {
+            if (isPlayer1)
+            {
+                game.ChangeGameState(new ProfileState(game, true));
+            }
+            else
+            {
+                game.ChangeGameState(new ProfileState(game, false));
+            }
+        }
+
+        public void OnControllerConnectionChanged(bool p1Connected, bool p2Connected)
+        {
+            InputHandler.Instance.ClearBindings();
+
+            if (p1Connected)
+            {
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.One, Buttons.LeftThumbstickLeft, new ChangeSelectionCommand(-1, this, true));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.One, Buttons.LeftThumbstickRight, new ChangeSelectionCommand(1, this, true));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.One, Buttons.A, new ConfirmSelectionCommand(this, true));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.One, Buttons.Y, new ChangeToProfileStateCommand(this, true));
+            }
+            else
+            {
+                InputHandler.Instance.AddButtonDownCommand(Keys.A, new ChangeSelectionCommand(-1, this, true));
+                InputHandler.Instance.AddButtonDownCommand(Keys.D, new ChangeSelectionCommand(1, this, true));
+                InputHandler.Instance.AddButtonDownCommand(Keys.LeftControl, new ConfirmSelectionCommand(this, true));
+                InputHandler.Instance.AddButtonDownCommand(Keys.X, new ChangeToProfileStateCommand(this, true));
+            }
+
+            if (p2Connected)
+            {
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.Two, Buttons.LeftThumbstickLeft, new ChangeSelectionCommand(-1, this, false));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.Two, Buttons.LeftThumbstickRight, new ChangeSelectionCommand(1, this, false));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.Two, Buttons.A, new ConfirmSelectionCommand(this, false));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.Two, Buttons.Y, new ChangeToProfileStateCommand(this, false));
+
+            }
+            else
+            {
+                InputHandler.Instance.AddButtonDownCommand(Keys.Left, new ChangeSelectionCommand(-1, this, false));
+                InputHandler.Instance.AddButtonDownCommand(Keys.Right, new ChangeSelectionCommand(1, this, false));
+                InputHandler.Instance.AddButtonDownCommand(Keys.RightShift, new ConfirmSelectionCommand(this, false));
+                InputHandler.Instance.AddButtonDownCommand(Keys.M, new ChangeToProfileStateCommand(this, false));
+            }
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace Kaiju
         private readonly string dbPath;
 
         /// <summary>
-        /// Contructor
+        /// Constructor
         /// Sets the database path and ensures the database directory exists
         /// </summary>
         private DatabaseManager()
@@ -52,38 +52,38 @@ namespace Kaiju
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-            CREATE TABLE IF NOT EXISTS Player (
-                PlayerID               INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                PlayerName             TEXT    NOT NULL UNIQUE,
-                Wins                   INTEGER DEFAULT 0,
-                Losses                 INTEGER DEFAULT 0,
-                Draws                  INTEGER DEFAULT 0,
-                [KO's]                 INTEGER DEFAULT 0,
-                [KO'd]                 INTEGER DEFAULT 0,
-                [TimesPicked Godzilla] INTEGER DEFAULT 0,
-                [TimesPicked Gigan]    INTEGER DEFAULT 0,
+                CREATE TABLE IF NOT EXISTS Player (
+                    PlayerID               INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    PlayerName             TEXT    NOT NULL UNIQUE,
+                    Wins                   INTEGER DEFAULT 0,
+                    Losses                 INTEGER DEFAULT 0,
+                    Draws                  INTEGER DEFAULT 0,
+                    KOs                    INTEGER DEFAULT 0,
+                    KOd                    INTEGER DEFAULT 0,
+                    [TimesPicked Godzilla] INTEGER DEFAULT 0,
+                    [TimesPicked Gigan]    INTEGER DEFAULT 0,
 
-                GamesPlayed            INTEGER GENERATED ALWAYS AS (Wins + Losses + Draws) VIRTUAL,
-                WinLossRatio           REAL GENERATED ALWAYS AS (
-                                          CASE 
-                                            WHEN Losses = 0 THEN Wins 
-                                            ELSE CAST(Wins AS REAL) / Losses 
-                                          END
-                                        ) VIRTUAL,
-                FavoriteCharacter      TEXT GENERATED ALWAYS AS (
-                                          CASE 
-                                            WHEN [TimesPicked Godzilla] > [TimesPicked Gigan] THEN 'Godzilla'
-                                            WHEN [TimesPicked Gigan] > [TimesPicked Godzilla] THEN 'Gigan'
-                                            WHEN [TimesPicked Godzilla] = [TimesPicked Gigan] AND [TimesPicked Godzilla] > 0 THEN 'Tie'
-                                            ELSE NULL
-                                          END
-                                        ) VIRTUAL
-            );";
+                    GamesPlayed            INTEGER GENERATED ALWAYS AS (Wins + Losses + Draws) VIRTUAL,
+                    WinLossRatio           REAL GENERATED ALWAYS AS (
+                                              CASE 
+                                                WHEN Losses = 0 THEN Wins 
+                                                ELSE CAST(Wins AS REAL) / Losses 
+                                              END
+                                            ) VIRTUAL,
+                    FavoriteCharacter      TEXT GENERATED ALWAYS AS (
+                                              CASE 
+                                                WHEN [TimesPicked Godzilla] > [TimesPicked Gigan] THEN 'Godzilla'
+                                                WHEN [TimesPicked Gigan] > [TimesPicked Godzilla] THEN 'Gigan'
+                                                WHEN [TimesPicked Godzilla] = [TimesPicked Gigan] AND [TimesPicked Godzilla] > 0 THEN 'Tie'
+                                                ELSE NULL
+                                              END
+                                            ) VIRTUAL
+                );";
             command.ExecuteNonQuery();
         }
 
         /// <summary>
-        /// Writes the player stats to the debug (Needs update to write to screen
+        /// Retrieves and returns the player stats from the database
         /// </summary>
         /// <param name="playerName">The name of the player in the database</param>
         public PlayerStats PrintPlayerStats(string playerName)
@@ -93,16 +93,18 @@ namespace Kaiju
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-            SELECT 
-                PlayerName, 
-                Wins, 
-                Losses, 
-                Draws, 
-                GamesPlayed, 
-                WinLossRatio, 
-                FavoriteCharacter 
-            FROM Player 
-            WHERE PlayerName = $name;";
+                SELECT 
+                    PlayerName, 
+                    Wins, 
+                    Losses, 
+                    Draws, 
+                    GamesPlayed, 
+                    WinLossRatio, 
+                    KOs,
+                    KOd,
+                    FavoriteCharacter 
+                FROM Player 
+                WHERE PlayerName = $name;";
             command.Parameters.AddWithValue("$name", playerName);
 
             using var reader = command.ExecuteReader();
@@ -116,7 +118,9 @@ namespace Kaiju
                     Draws = reader.GetInt32(3),
                     GamesPlayed = reader.GetInt32(4),
                     WinLossRatio = reader.IsDBNull(5) ? 0.0 : reader.GetDouble(5),
-                    FavoriteCharacter = reader.IsDBNull(6) ? "None" : reader.GetString(6)
+                    KOs = reader.GetInt32(6),
+                    KOd = reader.GetInt32(7),
+                    FavoriteCharacter = reader.IsDBNull(8) ? "None" : reader.GetString(8)
                 };
             }
 
@@ -128,41 +132,45 @@ namespace Kaiju
         /// </summary>
         /// <param name="playerName">The player that played the match</param>
         /// <param name="won">If they won</param>
-        /// <param name="drew">if they lost</param>
+        /// <param name="drew">If the match was a draw</param>
         /// <param name="characterPlayed">The character the player played</param>
         /// <exception cref="ArgumentException"></exception>
-        public void RecordMatchResult(string playerName, bool won, bool drew, string characterPlayed)
+        public void RecordMatchResult(string playerName, bool won, bool drew, string characterPlayed, int kosGiven, int kosTaken)
         {
             using var connection = new SqliteConnection($"Data Source={dbPath}");
             connection.Open();
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-            INSERT INTO Player (PlayerName, Wins, Losses, Draws, [TimesPicked Godzilla], [TimesPicked Gigan])
-            VALUES ($name, 0, 0, 0, 0, 0)
-            ON CONFLICT(PlayerName) DO NOTHING;";
+                INSERT INTO Player (PlayerName, Wins, Losses, Draws, [TimesPicked Godzilla], [TimesPicked Gigan])
+                VALUES ($name, 0, 0, 0, 0, 0)
+                ON CONFLICT(PlayerName) DO NOTHING;";
             command.Parameters.AddWithValue("$name", playerName);
             command.ExecuteNonQuery();
 
             if (characterPlayed == "Godzilla")
             {
                 command.CommandText = @"
-            UPDATE Player
-            SET Wins = Wins + $win,
-                Losses = Losses + $loss,
-                Draws = Draws + $draw,
-                [TimesPicked Godzilla] = [TimesPicked Godzilla] + 1
-            WHERE PlayerName = $name;";
+                    UPDATE Player
+                    SET Wins = Wins + $win,
+                        Losses = Losses + $loss,
+                        Draws = Draws + $draw,
+                        KOs = KOs + $kosGiven,
+                        KOd = KOd + $kosTaken,
+                        [TimesPicked Godzilla] = [TimesPicked Godzilla] + 1
+                    WHERE PlayerName = $name;";
             }
             else if (characterPlayed == "Gigan")
             {
                 command.CommandText = @"
-            UPDATE Player
-            SET Wins = Wins + $win,
-                Losses = Losses + $loss,
-                Draws = Draws + $draw,
-                [TimesPicked Gigan] = [TimesPicked Gigan] + 1
-            WHERE PlayerName = $name;";
+                    UPDATE Player
+                    SET Wins = Wins + $win,
+                        Losses = Losses + $loss,
+                        Draws = Draws + $draw,
+                        KOs = KOs + $kosGiven,
+                        KOd = KOd + $kosTaken,
+                        [TimesPicked Gigan] = [TimesPicked Gigan] + 1
+                    WHERE PlayerName = $name;";
             }
             else
             {
@@ -174,6 +182,8 @@ namespace Kaiju
             command.Parameters.AddWithValue("$win", won ? 1 : 0);
             command.Parameters.AddWithValue("$loss", (!won && !drew) ? 1 : 0);
             command.Parameters.AddWithValue("$draw", drew ? 1 : 0);
+            command.Parameters.AddWithValue("$kosGiven", kosGiven);
+            command.Parameters.AddWithValue("$kosTaken", kosTaken);
             command.ExecuteNonQuery();
         }
 
@@ -188,7 +198,7 @@ namespace Kaiju
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-                INSERT INTO Player (PlayerName, Wins, Losses, Draws, [KO's], [KO'd], [TimesPicked Godzilla], [TimesPicked Gigan])
+                INSERT INTO Player (PlayerName, Wins, Losses, Draws, KOs, KOd, [TimesPicked Godzilla], [TimesPicked Gigan])
                 VALUES ($name, 0, 0, 0, 0, 0, 0, 0)
                 ON CONFLICT(PlayerName) DO NOTHING;";
             command.Parameters.AddWithValue("$name", playerName);
@@ -205,6 +215,10 @@ namespace Kaiju
             }
         }
 
+        /// <summary>
+        /// Returns a list of all playernames in the database
+        /// </summary>
+        /// <returns></returns>
         public List<string> ListAllPlayerNames()
         {
             var playerNames = new List<string>();
@@ -225,6 +239,9 @@ namespace Kaiju
         }
     }
 
+    /// <summary>
+    /// Public class to help write out stats from the database
+    /// </summary>
     public class PlayerStats
     {
         public string PlayerName;
@@ -233,6 +250,8 @@ namespace Kaiju
         public int Draws;
         public int GamesPlayed;
         public double WinLossRatio;
+        public int KOs;
+        public int KOd;
         public string FavoriteCharacter;
     }
 }

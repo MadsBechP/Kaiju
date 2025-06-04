@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Kaiju.ComponentPattern;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
@@ -163,7 +164,8 @@ namespace Kaiju.Command
         {
             keybindsUpdate.Clear();
             keybindsButtonDown.Clear();
-
+            buttonbindsUpdate.Clear();
+            buttonbindsButtonDown.Clear();
         }
     }
 }

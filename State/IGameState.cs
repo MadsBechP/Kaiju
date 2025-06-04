@@ -9,5 +9,6 @@ namespace Kaiju.State
         void Update(GameTime gameTime);
         void Draw(SpriteBatch spriteBatch);
         void Exit();
+        void OnControllerConnectionChanged(bool p1Connected, bool p2Connected);
     }
 }

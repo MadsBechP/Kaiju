@@ -80,6 +80,14 @@ namespace Kaiju.ComponentPattern.Characters
                 "GZ_Sprites\\GZ_Breath\\GZ_Breath_06",}, 5, false));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("Block", new string[] {
                 "GZ_Sprites\\GZ_Crouch\\GZ_Crouch_02"}, 5, true));
+        }
+
+        /// <summary>
+        /// Sets the controls for the character based on player and inputtype
+        /// </summary>
+        public override void SetControls()
+        {
+            Player player = (Player)gameObject.GetComponent<Player>();
 
             if (player != null)
             {

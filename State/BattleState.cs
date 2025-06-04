@@ -60,28 +60,34 @@ namespace Kaiju.State
                 float player1Lives = game.player1.Lives;
                 float player2Lives = game.player2.Lives;
 
+                int p1KosGiven = 3 - game.player2.Lives;
+                int p1KosTaken = 3 - game.player1.Lives;
+
+                int p2KosGiven = 3 - game.player1.Lives;
+                int p2KosTaken = 3 - game.player2.Lives;
+
                 string char1 = name1;
                 string char2 = name2;
 
                 //Update at somepoint for the "player1" and 2 to be the actual playerprofiles
                 if (player1Lives == player2Lives)
                 {
-                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", false, true, char1);
-                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP2}", false, true, char2);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", false, true, char1, p1KosGiven, p1KosTaken);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP2}", false, true, char2, p2KosGiven, p2KosTaken);
 
                     game.ChangeGameState(new VictoryState(game, "", true));
                 }
                 else if (player1Lives > player2Lives)
                 {
-                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", true, false, char1);
-                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP2}", false, false, char2);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", true, false, char1, p1KosGiven, p1KosTaken);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP2}", false, false, char2, p2KosGiven, p2KosTaken);
 
                     game.ChangeGameState(new VictoryState(game, $"{name1}", false));
                 }
                 else
                 {
-                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", false, false, char1);
-                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP2}", true, false, char2);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", false, false, char1, p1KosGiven, p1KosTaken);
+                    DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP2}", true, false, char2, p2KosGiven, p2KosTaken);
 
                     game.ChangeGameState(new VictoryState(game, $"{name2}", false));
                 }
@@ -183,7 +189,7 @@ namespace Kaiju.State
             stateObjects.Add(game.player1Go);
 
             game.player2Go = new GameObject();
-            game.player2 = game.player2Go.AddComponent<AI>();
+            game.player2 = game.player2Go.AddComponent<Player>();
             game.player2.InputType = InputType.Keyboard;
             game.player2.GamePadIndex = PlayerIndex.Two;
             game.player2Go.AddComponent<SpriteRenderer>();
@@ -281,6 +287,36 @@ namespace Kaiju.State
                 game.DestroyUIObject(ui);
             }
             UIObjects.Clear();
+        }
+
+        /// <summary>
+        /// Changes the controls of the players depeding on if a controller is connected or not
+        /// </summary>
+        /// <param name="p1Connected">Bool if player one has a controller connected</param>
+        /// <param name="p2Connected">Bool if player two has a controller connected</param>
+        public void OnControllerConnectionChanged(bool p1Connected, bool p2Connected)
+        {
+            if (p1Connected)
+            {
+                game.player1.InputType = InputType.GamePad;
+            }
+            else
+            {
+                game.player1.InputType = InputType.Keyboard;
+            }
+            if (p2Connected)
+            {
+                game.player2.InputType = InputType.GamePad;
+            }
+            else
+            {
+                game.player2.InputType = InputType.Keyboard;
+            }
+
+            InputHandler.Instance.ClearBindings();
+
+            game.player1.chr.SetControls();
+            game.player2.chr.SetControls();
         }
     }
 }
