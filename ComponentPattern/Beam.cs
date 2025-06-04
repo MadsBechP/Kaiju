@@ -10,7 +10,6 @@ namespace Kaiju.ComponentPattern
     internal class Beam : Component
     {
         public Player owner;
-        public Vector2 direction;
         public SpriteRenderer spriteRenderer;
 
         /// <summary>
@@ -26,7 +25,7 @@ namespace Kaiju.ComponentPattern
         /// </summary>
         public override void Update()
         {
-            gameObject.Transform.Position = direction + owner.gameObject.Transform.Position + new Vector2(owner.facingRight ? 300 : -300, -25);
+            gameObject.Transform.Position = owner.gameObject.Transform.Position + new Vector2(owner.facingRight ? 300 : -300, -25);
             spriteRenderer.SetFlipHorizontal(!owner.facingRight);
         }
     }

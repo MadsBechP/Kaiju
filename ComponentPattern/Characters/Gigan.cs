@@ -77,11 +77,11 @@ namespace Kaiju.ComponentPattern.Characters
         {
             Player player = (Player)gameObject.GetComponent<Player>();
 
-            if (gameObject.GetComponent<Player>() as Player != null)
+            if (player != null)
             {
                 if (player.InputType == InputType.Keyboard)
                 {
-                    if (this.gameObject == GameWorld.Instance.player1Go)
+                    if (gameObject == GameWorld.Instance.player1Go)
                     {
                         InputHandler.Instance.AddUpdateCommand(Keys.A, new MoveCommand(GameWorld.Instance.player1, new Vector2(-1, 0)));
                         InputHandler.Instance.AddUpdateCommand(Keys.D, new MoveCommand(GameWorld.Instance.player1, new Vector2(1, 0)));
@@ -92,7 +92,7 @@ namespace Kaiju.ComponentPattern.Characters
                         InputHandler.Instance.AddUpdateCommand(Keys.Q, new SpecialCommand(GameWorld.Instance.player1, 2));
                         InputHandler.Instance.AddUpdateCommand(Keys.LeftShift, new BlockCommand(GameWorld.Instance.player1));
                     }
-                    else if (this.gameObject == GameWorld.Instance.player2Go)
+                    else if (gameObject == GameWorld.Instance.player2Go)
                     {
                         InputHandler.Instance.AddUpdateCommand(Keys.Left, new MoveCommand(GameWorld.Instance.player2, new Vector2(-1, 0)));
                         InputHandler.Instance.AddUpdateCommand(Keys.Right, new MoveCommand(GameWorld.Instance.player2, new Vector2(1, 0)));

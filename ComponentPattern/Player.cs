@@ -27,23 +27,25 @@ namespace Kaiju.ComponentPattern
         public bool facingRight;
         private bool lastPunchRight;
         private float atkCooldown;
+        private Vector2 startPos;
 
+        // Special attack logic
         private bool specialActive;
         private float SpecialDuration = 3;
         private float specialTime;
         private float specialCooldown;
         private GameObject sawHitBox;
 
-        private bool hit = false;
-        private float hitTimer;
+        private bool hit = false; // is player in hitstun
+        private float hitTimer; // timer for hitstun
 
-        private bool blocking;
+        // blocking logic
+        private bool blocking; 
         private float maxblockhp = 30;
         private float blockhp = 30;
         private Texture2D shieldTexture;
         private float shieldMaxRadius = 100;
-
-        private float secondTimer = 1;
+        private float secondTimer = 1; // timer for shield regen
 
         private List<IObserver> observers = new List<IObserver>();
 
@@ -67,22 +69,25 @@ namespace Kaiju.ComponentPattern
         /// </summary>
         public override void Start()
         {
+            // gets reference to relevant components
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
             animator = gameObject.GetComponent<Animator>() as Animator;
             collider = gameObject.GetComponent<Collider>() as Collider;
 
+            // sets spawnpoint based on player number
             if (gameObject == GameWorld.Instance.player1Go)
             {
-                gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+                startPos = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
                 facingRight = true;
                 shieldTexture = CreateCircleTexture(GameWorld.Instance.GraphicsDevice, (int)shieldMaxRadius, Color.Red);
             }
             else if (gameObject == GameWorld.Instance.player2Go)
             {
-                gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+                startPos = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
                 facingRight = false;
                 shieldTexture = CreateCircleTexture(GameWorld.Instance.GraphicsDevice, (int)shieldMaxRadius, Color.Blue);
             }
+            gameObject.Transform.Position = startPos;
             speed = 600;
         }
 
@@ -91,6 +96,7 @@ namespace Kaiju.ComponentPattern
         /// </summary>
         public override void Update()
         {
+            // heals shield hp every second
             if (!blocking)
             {
                 if (secondTimer > 0)
@@ -135,7 +141,7 @@ namespace Kaiju.ComponentPattern
                     }
                 }
             }
-
+            // ticks down specialcooldown timer
             if (specialCooldown > 0)
             {
                 specialCooldown -= GameWorld.Instance.DeltaTime;
@@ -147,17 +153,19 @@ namespace Kaiju.ComponentPattern
                 blocking = false;
             }
 
-
-
-
+            // adds downward velocity, aka gravity
             if (gameObject.Transform.CurrentVelocity.Y < 50)
             {
                 gameObject.Transform.AddVelocity(new Vector2(0, 2f));
             }
+            // moves player based on current velocity and checks for collision with stage
             gameObject.Transform.Translate(stageCollider);
+
+            // respawns player when below the stage
             if (gameObject.Transform.Position.Y > GameWorld.Instance.GraphicsDevice.Viewport.Height * 1.5f)
             {
-                gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+                gameObject.Transform.Position = startPos;
+                hitTimer = 2f;
                 gameObject.Transform.CurrentVelocity = Vector2.Zero;
 
                 Lives--;
@@ -269,7 +277,14 @@ namespace Kaiju.ComponentPattern
                 return;
             }
             atkCooldown = 0.5f;
+            hitTimer = 0f;
 
+            // 1 - godzilla punch
+            // 2 - godzilla kick
+            // 3 - godzilla tailswipe
+            // 4 - gigan punch
+            // 5 - gigan kick
+            // 6 - gigan beam
             switch (atkNumber)
             {
                 case 1:
@@ -350,7 +365,8 @@ namespace Kaiju.ComponentPattern
                 return;
             }
             specialCooldown = 5f;
-
+            // 1 - godzilla
+            // 2 - gigan
             switch (specialNumber)
             {
                 case 1:
@@ -415,7 +431,6 @@ namespace Kaiju.ComponentPattern
                     else
                     {
                         TakeDamage(collider.Damage);
-                        hit = true;
                         hitTimer = 0.5f;
                         if (!collider.isProjectile && collider.maxTime < 2)
                         {
