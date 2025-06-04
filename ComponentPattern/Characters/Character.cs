@@ -28,6 +28,11 @@
             ani = gameObject.GetComponent<Animator>() as Animator;
         }
 
+        public virtual void SetControls()
+        {
+
+        }
+
         /// <summary>
         /// Used to define the direction the character faces
         /// Implemented because Gigan and Godzillas sprites faces different directions

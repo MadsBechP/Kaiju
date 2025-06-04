@@ -68,7 +68,11 @@ namespace Kaiju.ComponentPattern.Characters
                 "GG_Sprites\\GG_Saw_Move\\GG_Saw_Move_04",}, 5, true));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("Block", new string[] {
                 "GG_Sprites\\GG_Saw_Still\\GG_Saw_Still_03" }, 5, true));
+        }
 
+        public override void SetControls()
+        {
+            Player player = (Player)gameObject.GetComponent<Player>();
 
             if (gameObject.GetComponent<Player>() as Player != null)
             {

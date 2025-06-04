@@ -61,5 +61,10 @@ namespace Kaiju.State
         public void Exit()
         {
         }
+
+        public void OnControllerConnectionChanged(bool p1Connected, bool p2Connected)
+        {
+            
+        }
     }
 }

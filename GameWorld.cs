@@ -52,8 +52,10 @@ namespace Kaiju
 
         private IGameState currentState;
 
-        private InputHandler inputHandler = InputHandler.Instance;
         public Camera camera;
+
+        private bool p1GamepadConnected;
+        private bool p2GamepadConnected;
 
         public float DeltaTime { get; private set; }
         private GameWorld()
@@ -65,6 +67,8 @@ namespace Kaiju
             _graphics.ToggleFullScreen();
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            p1GamepadConnected = GamePad.GetState(PlayerIndex.One).IsConnected;
+            p2GamepadConnected = GamePad.GetState(PlayerIndex.Two).IsConnected;
         }
 
         protected override void Initialize()
@@ -93,6 +97,20 @@ namespace Kaiju
             {
                 Graphics.PreferredBackBufferWidth++;
                 Graphics.PreferredBackBufferHeight++;
+            }
+
+            bool currentP1Connected = GamePad.GetState(PlayerIndex.One).IsConnected;
+            bool currentP2Connected = GamePad.GetState(PlayerIndex.Two).IsConnected;
+
+            if (currentP1Connected != p1GamepadConnected || currentP2Connected != p2GamepadConnected)
+            {
+                p1GamepadConnected = currentP1Connected;
+                p2GamepadConnected = currentP2Connected;
+
+                if (currentState is IGameState gameState)
+                {
+                    gameState.OnControllerConnectionChanged(p1GamepadConnected, p2GamepadConnected);
+                }
             }
 
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -302,6 +320,11 @@ namespace Kaiju
                 currentState.Exit();
             }
             currentState = newState;
+
+            if (currentState is IGameState gameState)
+            {
+                gameState.OnControllerConnectionChanged(p1GamepadConnected, p2GamepadConnected);
+            }
         }
 
         public void AddUIObject(GameObject uiObject)

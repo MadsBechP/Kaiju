@@ -232,5 +232,30 @@ namespace Kaiju.State
             }
             UIObjects.Clear();
         }
+
+        public void OnControllerConnectionChanged(bool p1Connected, bool p2Connected)
+        {
+            if (p1Connected)
+            {
+                game.player1.InputType = InputType.GamePad;
+            }
+            else
+            {
+                game.player1.InputType = InputType.Keyboard;
+            }
+            if (p2Connected)
+            {
+                game.player2.InputType = InputType.GamePad;
+            }
+            else
+            {
+                game.player2.InputType = InputType.Keyboard;
+            }
+
+            InputHandler.Instance.ClearBindings();
+
+            game.player1.chr.SetControls();
+            game.player2.chr.SetControls();
+        }
     }
 }
