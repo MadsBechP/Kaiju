@@ -9,6 +9,7 @@ namespace Kaiju.State
     public interface ISelectable
     {
         void ChangeSelection(int direction, bool isPlayer1);
+        void ChangeToProfileState(bool isPlayer1);
         void ConfirmSelection(bool isPlayer1);
     }
 }

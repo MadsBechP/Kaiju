@@ -12,7 +12,7 @@ namespace Kaiju.State
 {
     public class ProfileState : IGameState, ISelectable
     {
-        public Color DefaultBackgroundColor => Color.Beige;
+        public Color DefaultBackgroundColor => Color.Black;
 
         private GameWorld game;
         private bool isPlayer1;
@@ -36,21 +36,6 @@ namespace Kaiju.State
             textFont = game.Content.Load<SpriteFont>("promptFont");
 
             profiles = DatabaseManager.Instance.ListAllPlayerNames();
-
-            InputHandler.Instance.ClearBindings();
-            if (isPlayer1)
-            {
-                InputHandler.Instance.AddButtonDownCommand(Keys.W, new ChangeSelectionCommand(-1, this, true));
-                InputHandler.Instance.AddButtonDownCommand(Keys.S, new ChangeSelectionCommand(1, this, true));
-                InputHandler.Instance.AddButtonDownCommand(Keys.LeftControl, new ConfirmSelectionCommand(this, true));
-
-            }
-            else
-            {
-                InputHandler.Instance.AddButtonDownCommand(Keys.Up, new ChangeSelectionCommand(-1, this, false));
-                InputHandler.Instance.AddButtonDownCommand(Keys.Down, new ChangeSelectionCommand(1, this, false));
-                InputHandler.Instance.AddButtonDownCommand(Keys.RightShift, new ConfirmSelectionCommand(this, false));
-            }
 
             selectedStats = DatabaseManager.Instance.PrintPlayerStats(profiles[selectedIndex]);
             profiles.Add("Create new profile");
@@ -261,6 +246,42 @@ namespace Kaiju.State
                 return ' ';
             }
             return '\0'; // returns a null character, or an empty charater
+        }
+
+        public void OnControllerConnectionChanged(bool p1Connected, bool p2Connected)
+        {
+            InputHandler.Instance.ClearBindings();
+
+            if (p1Connected)
+            {
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.One, Buttons.LeftThumbstickUp, new ChangeSelectionCommand(-1, this, true));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.One, Buttons.LeftThumbstickDown, new ChangeSelectionCommand(1, this, true));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.One, Buttons.A, new ConfirmSelectionCommand(this, true));
+            }
+            else
+            {
+                InputHandler.Instance.AddButtonDownCommand(Keys.W, new ChangeSelectionCommand(-1, this, true));
+                InputHandler.Instance.AddButtonDownCommand(Keys.S, new ChangeSelectionCommand(1, this, true));
+                InputHandler.Instance.AddButtonDownCommand(Keys.LeftControl, new ConfirmSelectionCommand(this, true));
+            }
+
+            if (p2Connected)
+            {
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.Two, Buttons.LeftThumbstickUp, new ChangeSelectionCommand(-1, this, false));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.Two, Buttons.LeftThumbstickDown, new ChangeSelectionCommand(1, this, false));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.Two, Buttons.A, new ConfirmSelectionCommand(this, false));
+            }
+            else
+            {
+                InputHandler.Instance.AddButtonDownCommand(Keys.Up, new ChangeSelectionCommand(-1, this, false));
+                InputHandler.Instance.AddButtonDownCommand(Keys.Down, new ChangeSelectionCommand(1, this, false));
+                InputHandler.Instance.AddButtonDownCommand(Keys.RightShift, new ConfirmSelectionCommand(this, false));
+            }
+        }
+
+        public void ChangeToProfileState(bool isPlayer1)
+        {
+            
         }
     }
 }

@@ -97,6 +97,7 @@ namespace Kaiju
         {
 
             currentState = new MenuState(this); // starter scenen
+            currentState.OnControllerConnectionChanged(p1GamepadConnected, p2GamepadConnected);
 
             base.Initialize();
         }
