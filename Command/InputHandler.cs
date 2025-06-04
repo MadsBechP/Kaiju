@@ -163,7 +163,8 @@ namespace Kaiju.Command
         {
             keybindsUpdate.Clear();
             keybindsButtonDown.Clear();
-
+            buttonbindsUpdate.Clear();
+            buttonbindsButtonDown.Clear();
         }
     }
 }
