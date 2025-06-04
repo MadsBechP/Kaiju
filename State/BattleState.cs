@@ -281,8 +281,6 @@ namespace Kaiju.State
                 game.DestroyUIObject(ui);
             }
             UIObjects.Clear();
-
-            GameWorld.Instance.camera = null;
         }
     }
 }
