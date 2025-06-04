@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 namespace Kaiju
 {
     /// <summary>
-    /// Data holder for creating character profiles in MenuState 
+    /// Data holder for creating character profiles in MenuState (the characters name, visual appearance, and positioning).
+    /// Made by Emilie
     /// </summary>
     public class CharacterProfile
     {
@@ -19,6 +20,13 @@ namespace Kaiju
         public bool FlipTexture { get; set; } = false;
         public Vector2 Origin => new Vector2(Texture.Width / 2, Texture.Height / 2);
 
+        /// <summary>
+        /// Initialize a new instance of the CharacterProfile with specified settings.
+        /// </summary>
+        /// <param name="name">The name of the character</param>
+        /// <param name="texture">The texture displaying the character</param>
+        /// <param name="position">The characters profile position</param>
+        /// <param name="flip">Whether the texture needs to be flipped horizontally (default is false)</param>
         public CharacterProfile(string name, Texture2D texture, Vector2 position, bool flip = false)
         {
             this.Name = name;

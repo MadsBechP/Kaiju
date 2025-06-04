@@ -76,7 +76,7 @@ namespace Kaiju
         protected override void Initialize()
         {
 
-            currentState = new MenuState(this); // starter scenen
+            currentState = new MenuState(this); // starter scene
 
             base.Initialize();
         }
@@ -308,6 +308,10 @@ namespace Kaiju
             currentState = newState;
         }
 
+        /// <summary>
+        /// Adds GameObjects to a UI-list
+        /// </summary>
+        /// <param name="uiObject">A UI object</param>
         public void AddUIObject(GameObject uiObject)
         {
             UIObjects.Add(uiObject);
@@ -317,6 +321,10 @@ namespace Kaiju
             Debug.WriteLine($"UIObject added: {uiObject}");
         }
 
+        /// <summary>
+        /// Adds a UI GameObject to a list to be destroyed/removed
+        /// </summary>
+        /// <param name="uiObjectToDestroy"></param>
         public void DestroyUIObject(GameObject uiObjectToDestroy)
         {
             if (UIObjects.Contains(uiObjectToDestroy))
