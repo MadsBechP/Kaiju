@@ -25,6 +25,12 @@ namespace Kaiju.State
         private string promptText;
         private Vector2 promptPosition;
 
+        private SpriteFont keyMapFont;
+        private string textKeyMapP1;
+        private string textKeyMapP2;
+        private Vector2 textKMP1Pos;
+        private Vector2 textKMP2Pos;
+
         private List<CharacterProfile> profiles = new List<CharacterProfile>();
         
         private int selectedIndexP1;
@@ -54,7 +60,10 @@ namespace Kaiju.State
         private string selectedProfileP1;
         private string selectedProfileP2;
 
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="game"></param>
         public MenuState (GameWorld game)
         {
             this.game = game;
@@ -71,6 +80,19 @@ namespace Kaiju.State
             playerProfileFont = game.Content.Load<SpriteFont>("Menu\\PlayerProfileFont");
             p1Name = "DefaultName";
             p2Name = "DefaultName";
+
+            keyMapFont = game.Content.Load<SpriteFont>("Menu\\keyMapFont");
+            textKeyMapP1 = "P1 Controls (Red)\n\n" +
+                "Switching between kaiju:\n A/D\n\n" +
+                "Confirm choice:\n Left Control\n\n" +
+                "Chose profile:\n X\n\n\n" +
+                "P2 Controls (Blue)\n\n" +
+                "Switching between kaiju:\n Arrow Keys\n\n" +
+                "Confirm choice:\n Rigth Shift\n\n" +
+                "Chose profile:\n M";
+            //textKeyMapP2 = "Switching between kaiju: Arrow keys\nConfirm choice: Right Shift\nChose profile: M";
+            textKMP1Pos = new Vector2(w * 0.03f, h * 0.25f);
+                        
 
             // Load texture
             gzTexture = game.Content.Load<Texture2D>("Menu\\GZMenuProfile");
@@ -110,6 +132,10 @@ namespace Kaiju.State
             // Draw title text
             Vector2 promOrigin = promptFont.MeasureString(promptText) / 2;
             spriteBatch.DrawString(promptFont, promptText, promptPosition, Color.OrangeRed, 0, promOrigin, 1, SpriteEffects.None, 1);
+
+            //Draw text that show how to navigate
+            spriteBatch.DrawString(keyMapFont, textKeyMapP1, textKMP1Pos, Color.White);
+            //spriteBatch.DrawString(keyMapFont, textKeyMapP2, textKMP2Pos, Color.White);
 
             //player profile
             spriteBatch.Draw(playerProfileTexture, p1ProfilePos, null, Color.White, 0, ppOrigin, 1.4f, SpriteEffects.None, 1);

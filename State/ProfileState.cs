@@ -12,7 +12,7 @@ namespace Kaiju.State
 {
     public class ProfileState : IGameState, ISelectable
     {
-        public Color DefaultBackgroundColor => Color.Beige;
+        public Color DefaultBackgroundColor => Color.Gray;
 
         private GameWorld game;
         private bool isPlayer1;

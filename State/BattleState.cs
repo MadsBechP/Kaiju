@@ -10,7 +10,7 @@ namespace Kaiju.State
 {
     /// <summary>
     /// BattleState keeps track of the creation of the battle scene. 
-    /// This include the player, timer and HUD 
+    /// This include the player, timer, HUD and stage 
     /// </summary>
     public class BattleState : IGameState
     {
@@ -25,7 +25,7 @@ namespace Kaiju.State
         private List<GameObject> stateObjects = new List<GameObject>();
         private List<GameObject> UIObjects = new List<GameObject>();
 
-        public Color DefaultBackgroundColor => Color.LightSlateGray;
+        public Color DefaultBackgroundColor => Color.Gray;
 
         public BattleState(GameWorld game)
         {
