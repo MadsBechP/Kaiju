@@ -189,7 +189,7 @@ namespace Kaiju.State
             stateObjects.Add(game.player1Go);
 
             game.player2Go = new GameObject();
-            game.player2 = game.player2Go.AddComponent<AI>();
+            game.player2 = game.player2Go.AddComponent<Player>();
             game.player2.InputType = InputType.Keyboard;
             game.player2.GamePadIndex = PlayerIndex.Two;
             game.player2Go.AddComponent<SpriteRenderer>();

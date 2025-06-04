@@ -115,7 +115,9 @@ namespace Kaiju.State
                 spriteBatch.DrawString(textFont, $"Losses: {selectedStats.Losses}", new Vector2(w * 0.50f, h * 0.45f), Color.White);
                 spriteBatch.DrawString(textFont, $"Draws: {selectedStats.Draws}", new Vector2(w * 0.50f, h * 0.50f), Color.White);
                 spriteBatch.DrawString(textFont, $"Win/Loss Ratio: {selectedStats.WinLossRatio}", new Vector2(w * 0.50f, h * 0.55f), Color.White);
-                spriteBatch.DrawString(textFont, $"Favorite Kaiju: {selectedStats.FavoriteCharacter}", new Vector2(w * 0.50f, h * 0.60f), Color.White);
+                spriteBatch.DrawString(textFont, $"KOs: {selectedStats.KOs}", new Vector2(w * 0.50f, h * 0.60f), Color.White);
+                spriteBatch.DrawString(textFont, $"KOd: {selectedStats.KOd}", new Vector2(w * 0.50f, h * 0.65f), Color.White);
+                spriteBatch.DrawString(textFont, $"Favorite Kaiju: {selectedStats.FavoriteCharacter}", new Vector2(w * 0.50f, h * 0.70f), Color.White);
             }
             else
             {

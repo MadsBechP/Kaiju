@@ -83,7 +83,7 @@ namespace Kaiju
             _graphics.PreferredBackBufferHeight = 1440;
             _graphics.PreferredBackBufferWidth = 2560;
             _graphics.ApplyChanges();
-            //_graphics.ToggleFullScreen();
+            _graphics.ToggleFullScreen();
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             p1GamepadConnected = GamePad.GetState(PlayerIndex.One).IsConnected;
