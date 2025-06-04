@@ -1,5 +1,6 @@
 ﻿using Kaiju.ComponentPattern;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace Kaiju.State.AIStates
 {
@@ -7,6 +8,7 @@ namespace Kaiju.State.AIStates
     {
         public AI parrent;
         public Player opponent;
+        private Random rnd = new();
 
         Vector2 Pos { get { return parrent.gameObject.Transform.Position; } }
         Vector2 OPos { get { return opponent.gameObject.Transform.Position; } }
@@ -22,6 +24,28 @@ namespace Kaiju.State.AIStates
             if (Vector2.Distance(Pos, OPos) > 200)
             {
                 parrent.ChangeGameState(new ChaseState());
+            }
+            else
+            {
+                if (parrent.atkCooldown <= 0)
+                {
+                    switch (rnd.Next(3))
+                    {
+                        case (0):
+                            parrent.punch.Execute();
+                            parrent.atkCooldown = 1;
+                            break;
+                        case (1):
+                            parrent.kick.Execute();
+                            parrent.atkCooldown = 1;
+                            break;
+                        case (2):
+                            parrent.special.Execute();
+                            parrent.atkCooldown = 4;
+                            break;
+                    }
+                }
+                
             }
         }
 

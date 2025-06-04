@@ -26,6 +26,10 @@ namespace Kaiju
             TranslateX(col);
             TranslateY(col);
         }
+
+        /// <summary>
+        /// moves x position in 1 pixel increments and checks for collision, cancels if it collides
+        /// </summary>
         public void TranslateX(Collider col)
         {
             int xRemainder = (int)Math.Round(CurrentVelocity.X);
@@ -47,6 +51,10 @@ namespace Kaiju
                 }
             }
         }
+
+        /// <summary>
+        /// moves y position in 1 pixel increments and checks for collision, cancels if it collides
+        /// </summary>
         public void TranslateY(Collider col)
         {
             if (col.Owner != null)
