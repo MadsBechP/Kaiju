@@ -102,7 +102,7 @@ namespace Kaiju.State
             // Input commands for player 2
             InputHandler.Instance.AddButtonDownCommand(Keys.Left, new ChangeSelectionCommand(-1, this, false));
             InputHandler.Instance.AddButtonDownCommand(Keys.Right, new ChangeSelectionCommand(1, this, false));
-            InputHandler.Instance.AddButtonDownCommand(Keys.Enter, new ConfirmSelectionCommand(this, false));
+            InputHandler.Instance.AddButtonDownCommand(Keys.RightShift, new ConfirmSelectionCommand(this, false));
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -206,7 +206,7 @@ namespace Kaiju.State
             
         } 
         public void ConfirmSelection(bool isPlayer1)
-        {
+        {            
             if (isPlayer1)
             {
                 player1Confirmed = true;

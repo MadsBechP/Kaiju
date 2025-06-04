@@ -24,6 +24,11 @@ namespace Kaiju.State
         private bool player1Confirmed = false;
         private bool player2Confirmed = false;
 
+        private bool isCreatingProfile = false;
+        private string newProfileName;
+        private string errorMessage;
+        private KeyboardState previousKeyState;
+
         public ProfileState(GameWorld game, bool isPlayer1)
         {
             this.game = game;
@@ -44,10 +49,11 @@ namespace Kaiju.State
             {
                 InputHandler.Instance.AddButtonDownCommand(Keys.Up, new ChangeSelectionCommand(-1, this, false));
                 InputHandler.Instance.AddButtonDownCommand(Keys.Down, new ChangeSelectionCommand(1, this, false));
-                InputHandler.Instance.AddButtonDownCommand(Keys.Enter, new ConfirmSelectionCommand(this, false));
+                InputHandler.Instance.AddButtonDownCommand(Keys.RightShift, new ConfirmSelectionCommand(this, false));
             }
 
             selectedStats = DatabaseManager.Instance.PrintPlayerStats(profiles[selectedIndex]);
+            profiles.Add("Create new profile");
         }
 
         /// <summary>
@@ -58,6 +64,13 @@ namespace Kaiju.State
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+            if (isCreatingProfile)
+            {
+                CreatingProfile();
+                previousKeyState = Keyboard.GetState();
+                return;
+            }
+
             if (player1Confirmed && isPlayer1)
             {
                 game.SelectedPlayerProfileP1 = profiles[selectedIndex];
@@ -79,6 +92,20 @@ namespace Kaiju.State
             string title = isPlayer1 ? "Player 1 : Selecting Profile" : "Player 2 : Selecting Profile";
             spriteBatch.DrawString(textFont, title, new Vector2((w * 0.5f) - textFont.MeasureString(title).X / 2, h * 0.10f), Color.White);
 
+            //Draw creating profile
+            if (isCreatingProfile)
+            {
+                spriteBatch.DrawString(textFont, "Enter new profile name", new Vector2(w * 0.30f, h * 0.25f), Color.White);
+                spriteBatch.DrawString(textFont, newProfileName + "|", new Vector2(w * 0.32f, h * 0.35f), Color.Yellow);
+
+                if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    spriteBatch.DrawString(textFont, errorMessage, new Vector2(w * 0.35f, h * 0.45f), Color.Red);
+                }
+
+                return;
+            }
+
             //Profile name            
             for (int i = 0; i < profiles.Count; i++)
             {
@@ -88,6 +115,11 @@ namespace Kaiju.State
                 Color color = (i == selectedIndex) ? Color.Yellow : Color.White;
 
                 spriteBatch.DrawString(textFont, profileName, position, color);
+            }
+
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                spriteBatch.DrawString(textFont, errorMessage, new Vector2(w * 0.40f, h * 0.20f), Color.Red);
             }
 
             //Profile stats
@@ -133,14 +165,102 @@ namespace Kaiju.State
         /// <param name="isPlayer1">A bool that tells which player is confirming</param>
         public void ConfirmSelection(bool isPlayer1)
         {
+            string selectedProfile = profiles[selectedIndex];
+
+            if (selectedProfile == "Create new profile")
+            {
+                isCreatingProfile = true;
+                newProfileName = "";
+                errorMessage = "";
+                selectedIndex = profiles.Count - 1; // makes sure that it is looking at "Creating new profile", not previous chosen name
+
+                return;
+            }
+
             if (isPlayer1)
             {
+                if(game.SelectedPlayerProfileP2 == selectedProfile)
+                {
+                    errorMessage = "Player 2 is using this profile";
+                    return;
+                }
                 player1Confirmed = true;
             }
             else
             {
+                if (game.SelectedPlayerProfileP1 == selectedProfile)
+                {
+                    errorMessage = "Player 1 is using this profile";
+                    return;
+                }
                 player2Confirmed = true;
             }
+        }
+
+        /// <summary>
+        /// Creates a new profile.
+        /// Uses the keyboard to type a profile name
+        /// </summary>
+        public void CreatingProfile()
+        {
+            KeyboardState keyboardState = Keyboard.GetState();
+
+            foreach (Keys key in keyboardState.GetPressedKeys())
+            {
+                if(key == Keys.Enter)
+                {
+                    //error management
+                    if (string.IsNullOrWhiteSpace(newProfileName)) { errorMessage = "Profile name cannot be empty"; return; }
+                    if (DatabaseManager.Instance.ListAllPlayerNames().Contains(newProfileName)) { errorMessage = "This profile name already exist"; return; }
+
+                    // Create profile
+                    DatabaseManager.Instance.AddNewProfile(newProfileName);
+
+                    // reload and reset 
+                    profiles = DatabaseManager.Instance.ListAllPlayerNames();
+                    profiles.Add("Create new profile");
+                    selectedIndex = profiles.IndexOf(newProfileName);
+                    selectedStats = DatabaseManager.Instance.PrintPlayerStats(newProfileName);
+
+                    isCreatingProfile = false;
+                    newProfileName = "";
+                    errorMessage = "";
+                    return;
+                }
+
+                char c = KeyToChar(key, keyboardState);
+                if (c != '\0' && !previousKeyState.IsKeyDown(key))
+                {
+                    newProfileName += c;
+                }
+
+                if (key == Keys.Back && !previousKeyState.IsKeyDown(key))
+                {
+                    if(newProfileName.Length > 0)
+                    {
+                        newProfileName = newProfileName.Substring(0, newProfileName.Length - 1);
+                    }
+                }
+            }
+        }
+
+        private char KeyToChar(Keys key, KeyboardState keyboardState)
+        {
+            bool shift = keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift);
+
+            if(key >= Keys.A && key <= Keys.Z)
+            {
+                return (char)(shift ? key : key + 32); // A-Z -> a-z
+            }
+            if(key >= Keys.D0 && key <= Keys.D9)
+            {
+                return (char)(key - Keys.D0 + '0');
+            }
+            if(key == Keys.Space)
+            {
+                return ' ';
+            }
+            return '\0'; // returns a null character, or an empty charater
         }
     }
 }
