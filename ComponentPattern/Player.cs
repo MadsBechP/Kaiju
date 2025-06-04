@@ -9,6 +9,11 @@ using System.Diagnostics;
 
 namespace Kaiju.ComponentPattern
 {
+    /// <summary>
+    /// The main playerclass in charge of all player behavior
+    /// Part of the Component Pattern
+    /// Made by: All
+    /// </summary>
     public class Player : Component, ISubject
     {
         protected float speed;
@@ -48,12 +53,18 @@ namespace Kaiju.ComponentPattern
         public int Damage { get; private set; }
         public int Lives { get; private set; } = 3;
 
-
+        /// <summary>
+        /// Constuctor 
+        /// </summary>
+        /// <param name="gameObject">specifies which gameobject it is tied to</param>
         public Player(GameObject gameObject) : base(gameObject)
         {
 
         }
 
+        /// <summary>
+        /// Initializes the player component
+        /// </summary>
         public override void Start()
         {
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
@@ -75,6 +86,9 @@ namespace Kaiju.ComponentPattern
             speed = 600;
         }
 
+        /// <summary>
+        /// The main update loop of the player
+        /// </summary>
         public override void Update()
         {
             if (!blocking)
@@ -193,6 +207,10 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// The movement logic of the player consisting of velocity, direction and animations
+        /// </summary>
+        /// <param name="velocity">the direction of movement</param>
         public void Move(Vector2 velocity)
         {
             if (velocity == Vector2.Zero)
@@ -229,6 +247,9 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// Jump logic making the player jump if on the ground
+        /// </summary>
         public void Jump()
         {
             if (grounded)
@@ -237,6 +258,10 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// The attack logic of the player, Uses different attack based on what attacknumber is assigned
+        /// </summary>
+        /// <param name="atkNumber">number that specifies which attack should be made</param>
         public void Attack(int atkNumber)
         {
             if (atkCooldown > 0 || hit)
@@ -314,6 +339,10 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// The special attack logic of the player, Uses different specials based on what specialnumber is assigned
+        /// </summary>
+        /// <param name="specialNumber">number that specifies which special should be made</param>
         public void Special(int specialNumber)
         {
             if (specialCooldown > 0 || hit)
@@ -340,6 +369,9 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// Allows the player to block if the shield has enough HP
+        /// </summary>
         public void Block()
         {
             if (blockhp >= 1)
@@ -354,6 +386,10 @@ namespace Kaiju.ComponentPattern
             animator.PlayAnimation("Block");
         }
 
+        /// <summary>
+        /// Handles collision events when the player collides with other colliders
+        /// </summary>
+        /// <param name="collider">The collider the player collided with</param>
         public override void OnCollisionEnter(Collider collider)
         {
             if (collider.Owner != this)
@@ -390,6 +426,10 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// Applies damage and knockback to the player depending on block and attacks
+        /// </summary>
+        /// <param name="amount">amount of damage to apply</param>
         public void TakeDamage(int amount)
         {
             if (!blocking || blockhp < amount)
@@ -408,16 +448,27 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// Attaches an observer to the player for recieving updates
+        /// </summary>
+        /// <param name="observer">The observer to attach</param>
         public void Attach(IObserver observer)
         {
             observers.Add(observer);
         }
 
+        /// <summary>
+        /// Detaches an observer from the player.
+        /// </summary>
+        /// <param name="observer">The observer to detach</param>
         public void Detach(IObserver observer)
         {
             observers.Remove(observer);
         }
 
+        /// <summary>
+        /// Notifies all attached observers that the player state has changed
+        /// </summary>
         public void Notify()
         {
             Debug.WriteLine($"{this} Notifying {observers.Count} observers."); //tjek om Notify bliver kaldt og sender vider til observer
@@ -427,6 +478,10 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// Spawns a hitbox game object for the specified attack number, setting its position, damage, and duration
+        /// </summary>
+        /// <param name="atkNumber">The attack identifier determining hitbox size and position</param>
         public void SpawnHitbox(int atkNumber)
         {
             GameObject attackGo = new();
@@ -510,6 +565,11 @@ namespace Kaiju.ComponentPattern
             GameWorld.Instance.Instantiate(attackGo);
         }
 
+        /// <summary>
+        /// Spawns a projectile game object fired in the given direction, based on the attack type
+        /// </summary>
+        /// <param name="direction">The direction the projectile will travel</param>
+        /// <param name="atkNumber">The attack identifier for the projectile type</param>
         public void SpawnProjectile(Vector2 direction, int atkNumber)
         {
             int damage;
@@ -569,6 +629,13 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// Creates a circular texture of a given radius and color, used for drawing the shield
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device used to create the texture</param>
+        /// <param name="radius">The radius of the circle</param>
+        /// <param name="color">The fill color of the circle</param>
+        /// <returns>A Texture2D object representing a filled circle</returns>
         public Texture2D CreateCircleTexture(GraphicsDevice graphicsDevice, int radius, Color color)
         {
             int diameter = radius * 2;
@@ -599,6 +666,10 @@ namespace Kaiju.ComponentPattern
             return texture;
         }
 
+        /// <summary>
+        /// Draws the player's shield with transparency and scaling based on current block HP
+        /// </summary>
+        /// <param name="spriteBatch">The SpriteBatch used for drawing</param>
         public void DrawShield(SpriteBatch spriteBatch)
         {
             if (!blocking || shieldTexture == null)

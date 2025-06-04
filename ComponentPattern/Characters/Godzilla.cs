@@ -82,6 +82,9 @@ namespace Kaiju.ComponentPattern.Characters
                 "GZ_Sprites\\GZ_Crouch\\GZ_Crouch_02"}, 5, true));
         }
 
+        /// <summary>
+        /// Sets the controls for the character based on player and inputtype
+        /// </summary>
         public override void SetControls()
         {
             Player player = (Player)gameObject.GetComponent<Player>();
