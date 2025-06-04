@@ -21,9 +21,7 @@ namespace Kaiju.State
         private SpriteFont winFont;
         private SpriteFont promptFont;
         private string winText;
-        private string nameText;
         private string promptText;
-        private bool isDraw;
         
         public Color BackgoundColor => Color.DarkSlateGray;
 

@@ -24,6 +24,7 @@ namespace Kaiju.ComponentPattern
         public bool facingRight;
         private bool lastPunchRight;
         private float atkCooldown;
+        private Vector2 startPos;
 
         // Special attack logic
         private bool specialActive;
@@ -59,27 +60,31 @@ namespace Kaiju.ComponentPattern
 
         public override void Start()
         {
+            // gets reference to relevant components
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;
             animator = gameObject.GetComponent<Animator>() as Animator;
             collider = gameObject.GetComponent<Collider>() as Collider;
 
+            // sets spawnpoint based on player number
             if (gameObject == GameWorld.Instance.player1Go)
             {
-                gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+                startPos = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
                 facingRight = true;
                 shieldTexture = CreateCircleTexture(GameWorld.Instance.GraphicsDevice, (int)shieldMaxRadius, Color.Red);
             }
             else if (gameObject == GameWorld.Instance.player2Go)
             {
-                gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+                startPos = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 2, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
                 facingRight = false;
                 shieldTexture = CreateCircleTexture(GameWorld.Instance.GraphicsDevice, (int)shieldMaxRadius, Color.Blue);
             }
+            gameObject.Transform.Position = startPos;
             speed = 600;
         }
 
         public override void Update()
         {
+            // heals shield hp every second
             if (!blocking)
             {
                 if (secondTimer > 0)
@@ -124,7 +129,7 @@ namespace Kaiju.ComponentPattern
                     }
                 }
             }
-
+            // ticks down specialcooldown timer
             if (specialCooldown > 0)
             {
                 specialCooldown -= GameWorld.Instance.DeltaTime;
@@ -136,17 +141,18 @@ namespace Kaiju.ComponentPattern
                 blocking = false;
             }
 
-            
-
-
+            // adds downward velocity, aka gravity
             if (gameObject.Transform.CurrentVelocity.Y < 50)
             {
                 gameObject.Transform.AddVelocity(new Vector2(0, 2f));
             }
+            // moves player based on current velocity and checks for collision with stage
             gameObject.Transform.Translate(stageCollider);
+
+            // respawns player when below the stage
             if (gameObject.Transform.Position.Y > GameWorld.Instance.GraphicsDevice.Viewport.Height*1.5f)
             {
-                gameObject.Transform.Position = new Vector2((GameWorld.Instance.Graphics.PreferredBackBufferWidth / 3) * 1, GameWorld.Instance.Graphics.PreferredBackBufferHeight / 2);
+                gameObject.Transform.Position = startPos;
                 hitTimer = 2f;
                 gameObject.Transform.CurrentVelocity = Vector2.Zero;
                                 
@@ -197,6 +203,10 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        /// <summary>
+        /// adds given velocity to player
+        /// </summary>
+        /// <param name="velocity"></param>
         public void Move(Vector2 velocity)
         {
             if (velocity == Vector2.Zero)
@@ -366,6 +376,10 @@ namespace Kaiju.ComponentPattern
             animator.PlayAnimation("Block");
         }
 
+        /// <summary>
+        /// checks if other collider is an attack/projectile, and takes damage
+        /// </summary>
+        /// <param name="collider"></param>
         public override void OnCollisionEnter(Collider collider)
         {
             if (collider.Owner != this)
@@ -419,6 +433,8 @@ namespace Kaiju.ComponentPattern
             }
         }
 
+        // observer
+
         public void Attach(IObserver observer)
         {
             observers.Add(observer);
@@ -437,7 +453,9 @@ namespace Kaiju.ComponentPattern
                 observer.Updated();
             }
         }
-
+        /// <summary>
+        /// spawns a hitbox for given attack
+        /// </summary>
         public void SpawnHitbox(int atkNumber)
         {
             GameObject attackGo = new();
@@ -579,6 +597,8 @@ namespace Kaiju.ComponentPattern
                     break;
             }
         }
+
+        // shield
 
         public Texture2D CreateCircleTexture(GraphicsDevice graphicsDevice, int radius, Color color)
         {

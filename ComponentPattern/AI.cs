@@ -36,6 +36,8 @@ namespace Kaiju.ComponentPattern
         public override void Awake()
         {
             base.Awake();
+
+            // adds commands based on character
             left = new MoveCommand(this, new Vector2(-1, 0));
             right = new MoveCommand(this, new Vector2(1, 0));
             jump = new JumpCommand(this);
@@ -58,7 +60,7 @@ namespace Kaiju.ComponentPattern
 
             gameObject.Transform.Scale = new Vector2(2f, 2f);
 
-
+            // gets reference to self and opponent
             if (gameObject == GameWorld.Instance.player1Go)
             {
                 opponent = GameWorld.Instance.player2;
@@ -78,6 +80,8 @@ namespace Kaiju.ComponentPattern
         public override void Start()
         {
             base.Start();
+
+            // starts ai recovery check thread
             Thread aiLogic = new(AILoop);
             aiLogic.IsBackground = true;
             aiLogic.Start();
@@ -86,32 +90,31 @@ namespace Kaiju.ComponentPattern
         public override void Update()
         {
             base.Update();
+
             currentState.Execute();
 
+            // ticks down cooldown on attacks, ai does not attack if cooldown > 0
             if (atkCooldown > 0)
             {
                 atkCooldown -= GameWorld.Instance.DeltaTime;
             }
         }
-
+        /// <summary>
+        /// checks if the ai is at the edge 5 times every second. if it is, goes to recoverystate 
+        /// </summary>
         private void AILoop()
         {
-            // checks if the ai is at the edge 5 times every second. if it is, goes to recoverystate 
             while (true)
             {
                 Thread.Sleep(200);
-
+                
                 Rectangle overVoidCheckLeft = new Rectangle(stageCollider.CollisionBox.X - 100, stageCollider.CollisionBox.Y, 1, stageCollider.CollisionBox.Height + 1000);
                 Rectangle overVoidCheckRight = new Rectangle(stageCollider.CollisionBox.X + 100, stageCollider.CollisionBox.Y, 1, stageCollider.CollisionBox.Height + 1000);
                 if (!GameWorld.Instance.CheckCollision(overVoidCheckLeft) || !GameWorld.Instance.CheckCollision(overVoidCheckRight))
                 {
                     ChangeGameState(new RecoveryState());
                 }
-
-
-
             }
-
         }
         public void ChangeGameState(IState<AI> newState)
         {
