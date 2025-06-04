@@ -80,6 +80,8 @@ namespace Kaiju
                                             ) VIRTUAL
                 );";
             command.ExecuteNonQuery();
+
+            AddNewProfile("AI");
         }
 
         /// <summary>

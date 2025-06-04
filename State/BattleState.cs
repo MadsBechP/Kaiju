@@ -175,7 +175,14 @@ namespace Kaiju.State
         public void CreatePlayers()
         {
             game.player1Go = new GameObject();
-            game.player1 = game.player1Go.AddComponent<Player>();
+            if (game.SelectedPlayerProfileP1 == "AI")
+            {
+                game.player1 = game.player1Go.AddComponent<AI>();
+            }
+            else
+            {
+                game.player1 = game.player1Go.AddComponent<Player>();
+            }
             game.player1.InputType = InputType.Keyboard;
             game.player1.GamePadIndex = PlayerIndex.One;
             game.player1Go.AddComponent<SpriteRenderer>();
@@ -184,12 +191,19 @@ namespace Kaiju.State
             game.player1Go.AddComponent<Animator>();
             //game.player1.chr = game.player1Go.AddComponent<Godzilla>();
             game.player1.chr = CreateCharacter(game.player1Go, game.SelectedCharacterNameP1, out name1, true);
-            
+
 
             stateObjects.Add(game.player1Go);
 
             game.player2Go = new GameObject();
-            game.player2 = game.player2Go.AddComponent<Player>();
+            if (game.SelectedPlayerProfileP2 == "AI")
+            {
+                game.player2 = game.player2Go.AddComponent<AI>();
+            }
+            else
+            {
+                game.player2 = game.player2Go.AddComponent<Player>();
+            }
             game.player2.InputType = InputType.Keyboard;
             game.player2.GamePadIndex = PlayerIndex.Two;
             game.player2Go.AddComponent<SpriteRenderer>();
@@ -227,7 +241,7 @@ namespace Kaiju.State
         private Character CreateCharacter(GameObject go, string name, out string characterName, bool isPlayer1)
         {
             if (string.IsNullOrEmpty(name))
-            {                
+            {
                 name = isPlayer1 ? "Godzilla" : "Gigan";
             }
 
