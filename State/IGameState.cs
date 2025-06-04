@@ -5,7 +5,7 @@ namespace Kaiju.State
 {
     public interface IGameState
     {
-        Color BackgoundColor { get; }
+        Color DefaultBackgroundColor { get; }
         void Update(GameTime gameTime);
         void Draw(SpriteBatch spriteBatch);
         void Exit();

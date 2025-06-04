@@ -87,7 +87,7 @@ namespace Kaiju.ComponentPattern
         }
 
         /// <summary>
-        /// Updated the observer
+        /// Updates the observer
         /// </summary>
         public void Updated()
         {
