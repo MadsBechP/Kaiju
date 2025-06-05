@@ -29,6 +29,14 @@
         }
 
         /// <summary>
+        /// Sets the controls for the character based on player and inputtype
+        /// </summary>
+        public virtual void SetControls()
+        {
+
+        }
+
+        /// <summary>
         /// Used to define the direction the character faces
         /// Implemented because Gigan and Godzillas sprites faces different directions
         /// </summary>

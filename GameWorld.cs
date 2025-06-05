@@ -10,12 +10,20 @@ using System.Diagnostics;
 
 namespace Kaiju
 {
+    /// <summary>
+    /// Enum for whether the players are using a controller or keyboard as input
+    /// </summary>
     public enum InputType
     {
         Keyboard,
         GamePad
     }
 
+    /// <summary>
+    /// GameWorld is the main game world class and the core loop logic of the game
+    /// Handles initialization, content loading, updates, drawing and so on
+    /// Made by: All
+    /// </summary>
     public class GameWorld : Game
     {
         private static GameWorld instance;
@@ -58,10 +66,17 @@ namespace Kaiju
 
         private IGameState currentState;
 
-        private InputHandler inputHandler = InputHandler.Instance;
         public Camera camera;
 
+        private bool p1GamepadConnected;
+        private bool p2GamepadConnected;
+
         public float DeltaTime { get; private set; }
+
+        /// <summary>
+        /// Contructor used to set specific variables on launch
+        /// such as window size and fullscreen
+        /// </summary>
         private GameWorld()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -71,16 +86,25 @@ namespace Kaiju
             _graphics.ToggleFullScreen();
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            p1GamepadConnected = GamePad.GetState(PlayerIndex.One).IsConnected;
+            p2GamepadConnected = GamePad.GetState(PlayerIndex.Two).IsConnected;
         }
 
+        /// <summary>
+        /// Initializes the game world and sets the initial game state
+        /// </summary>
         protected override void Initialize()
         {
 
-            currentState = new MenuState(this); // starter scene
+            currentState = new MenuState(this); // starter scenen
+            currentState.OnControllerConnectionChanged(p1GamepadConnected, p2GamepadConnected);
 
             base.Initialize();
         }
 
+        /// <summary>
+        /// Loads all required game content
+        /// </summary>
         protected override void LoadContent()
         {
             
@@ -91,6 +115,10 @@ namespace Kaiju
 
         }
 
+        /// <summary>
+        /// Main update loop of the game
+        /// </summary>
+        /// <param name="gameTime">Makes the game frameindependent</param>
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -99,6 +127,20 @@ namespace Kaiju
             {
                 Graphics.PreferredBackBufferWidth++;
                 Graphics.PreferredBackBufferHeight++;
+            }
+
+            bool currentP1Connected = GamePad.GetState(PlayerIndex.One).IsConnected;
+            bool currentP2Connected = GamePad.GetState(PlayerIndex.Two).IsConnected;
+
+            if (currentP1Connected != p1GamepadConnected || currentP2Connected != p2GamepadConnected)
+            {
+                p1GamepadConnected = currentP1Connected;
+                p2GamepadConnected = currentP2Connected;
+
+                if (currentState is IGameState gameState)
+                {
+                    gameState.OnControllerConnectionChanged(p1GamepadConnected, p2GamepadConnected);
+                }
             }
 
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -125,6 +167,10 @@ namespace Kaiju
             base.Update(gameTime);
         }
 
+        /// <summary>
+        /// Draws and renders all gameobjects, UI
+        /// </summary>
+        /// <param name="gameTime">Makes the game frameindependent</param>
         protected override void Draw(GameTime gameTime)
         {
             // if currentState is not null it will use the states BackgoundColor.
@@ -161,7 +207,7 @@ namespace Kaiju
 
             if (currentState != null)
             {
-                currentState.Draw(_spriteBatch);
+                //currentState.Draw(_spriteBatch);
             }
 
             _spriteBatch.End();
@@ -169,6 +215,9 @@ namespace Kaiju
             base.Draw(gameTime);
         }
 
+        /// <summary>
+        /// Detects and handles collision between all active gameobjects
+        /// </summary>
         public void CheckCollision()
         {
             HashSet<(GameObject, GameObject)> handledCollisions = new();
@@ -252,16 +301,28 @@ namespace Kaiju
             return false;
         }
 
+        /// <summary>
+        /// Instantiates new gameobjects
+        /// </summary>
+        /// <param name="gameObjectToInstantiate">Gameobject to instantiate</param>
         public void Instantiate(GameObject gameObjectToInstantiate)
         {
             newGameObjects.Add(gameObjectToInstantiate);
         }
 
+        /// <summary>
+        /// Destroys gameobjects
+        /// </summary>
+        /// <param name="gameObjectToDestroy">Gameobject to destroy</param>
         public void Destroy(GameObject gameObjectToDestroy)
         {
             destroyedGameObjects.Add(gameObjectToDestroy);
         }
 
+        /// <summary>
+        /// Adds pending gameobjects to the gameobjec list
+        /// and deletes gameobjects to be destroyed
+        /// </summary>
         public void Cleanup()
         {
             for (int i = 0; i < newGameObjects.Count; i++)
@@ -281,6 +342,14 @@ namespace Kaiju
             newGameObjects.Clear();
         }
 
+        /// <summary>
+        /// Loads and contructs an animation from a set of sprites
+        /// </summary>
+        /// <param name="animationName">The name of the animation</param>
+        /// <param name="spriteNames">Array of the sprite names</param>
+        /// <param name="fps">The frames per second of the animation</param>
+        /// <param name="heldAnimation">Whether the animation should be held</param>
+        /// <returns></returns>
         public Animation BuildAnimation(string animationName, string[] spriteNames, int fps, bool heldAnimation)
         {
             Texture2D[] sprites = new Texture2D[spriteNames.Length];
@@ -306,12 +375,17 @@ namespace Kaiju
                 currentState.Exit();
             }
             currentState = newState;
+
+            if (currentState is IGameState gameState)
+            {
+                gameState.OnControllerConnectionChanged(p1GamepadConnected, p2GamepadConnected);
+            }
         }
 
         /// <summary>
-        /// Adds GameObjects to a UI-list
+        /// Adds a UI object to the world and initializes it
         /// </summary>
-        /// <param name="uiObject">A UI object</param>
+        /// <param name="uiObject">The UI Gameobject to add</param>
         public void AddUIObject(GameObject uiObject)
         {
             UIObjects.Add(uiObject);
@@ -322,9 +396,9 @@ namespace Kaiju
         }
 
         /// <summary>
-        /// Adds a UI GameObject to a list to be destroyed/removed
+        /// Removes a UI object from the world and marks it for destruction
         /// </summary>
-        /// <param name="uiObjectToDestroy"></param>
+        /// <param name="uiObjectToDestroy">The UI Gameobject to remove</param>
         public void DestroyUIObject(GameObject uiObjectToDestroy)
         {
             if (UIObjects.Contains(uiObjectToDestroy))

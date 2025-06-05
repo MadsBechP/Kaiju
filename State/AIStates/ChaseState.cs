@@ -19,6 +19,7 @@ namespace Kaiju.State.AIStates
 
         public void Execute()
         {
+            // chases opponent if they are more than 200 away
             if (Pos.X < OPos.X - 200)
             {
                 parrent.right.Execute();
@@ -27,6 +28,7 @@ namespace Kaiju.State.AIStates
             {
                 parrent.left.Execute();
             }
+            
             else
             {
                 parrent.ChangeGameState(new IdleState());

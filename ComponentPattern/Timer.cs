@@ -15,6 +15,7 @@ namespace Kaiju.ComponentPattern
         private string text;
         private Vector2 position = new Vector2(GameWorld.Instance.GraphicsDevice.Viewport.Width * 0.5f, GameWorld.Instance.GraphicsDevice.Viewport.Height * 0.05f);
         private float timeLeft = 120f;
+
         public bool TimeRanOut { get; private set; } = false;
 
         /// <summary>

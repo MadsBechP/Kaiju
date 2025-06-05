@@ -80,44 +80,55 @@ namespace Kaiju.ComponentPattern.Characters
                 "GZ_Sprites\\GZ_Breath\\GZ_Breath_06",}, 5, false));
             ani.AddAnimation(GameWorld.Instance.BuildAnimation("Block", new string[] {
                 "GZ_Sprites\\GZ_Crouch\\GZ_Crouch_02"}, 5, true));
+        }
 
-            if (player.InputType == InputType.Keyboard)
-            {
-                if (this.gameObject == GameWorld.Instance.player1Go)
-                {
-                    InputHandler.Instance.AddUpdateCommand(Keys.A, new MoveCommand(GameWorld.Instance.player1, new Vector2(-1, 0)));
-                    InputHandler.Instance.AddUpdateCommand(Keys.D, new MoveCommand(GameWorld.Instance.player1, new Vector2(1, 0)));
-                    InputHandler.Instance.AddButtonDownCommand(Keys.W, new JumpCommand(GameWorld.Instance.player1));
-                    InputHandler.Instance.AddButtonDownCommand(Keys.F, new AttackCommand(GameWorld.Instance.player1, 1));
-                    InputHandler.Instance.AddButtonDownCommand(Keys.G, new AttackCommand(GameWorld.Instance.player1, 2));
-                    InputHandler.Instance.AddButtonDownCommand(Keys.H, new AttackCommand(GameWorld.Instance.player1, 3));
-                    InputHandler.Instance.AddUpdateCommand(Keys.Q, new SpecialCommand(GameWorld.Instance.player1, 1));
-                    InputHandler.Instance.AddUpdateCommand(Keys.LeftShift, new BlockCommand(GameWorld.Instance.player1));
+        /// <summary>
+        /// Sets the controls for the character based on player and inputtype
+        /// </summary>
+        public override void SetControls()
+        {
+            Player player = (Player)gameObject.GetComponent<Player>();
 
-                }
-                else if (this.gameObject == GameWorld.Instance.player2Go)
-                {
-                    InputHandler.Instance.AddUpdateCommand(Keys.Left, new MoveCommand(GameWorld.Instance.player2, new Vector2(-1, 0)));
-                    InputHandler.Instance.AddUpdateCommand(Keys.Right, new MoveCommand(GameWorld.Instance.player2, new Vector2(1, 0)));
-                    InputHandler.Instance.AddButtonDownCommand(Keys.Up, new JumpCommand(GameWorld.Instance.player2));
-                    InputHandler.Instance.AddButtonDownCommand(Keys.OemComma, new AttackCommand(GameWorld.Instance.player2, 1));
-                    InputHandler.Instance.AddButtonDownCommand(Keys.OemPeriod, new AttackCommand(GameWorld.Instance.player2, 2));
-                    InputHandler.Instance.AddButtonDownCommand(Keys.OemMinus, new AttackCommand(GameWorld.Instance.player2, 3));
-                    InputHandler.Instance.AddUpdateCommand(Keys.RightShift, new SpecialCommand(GameWorld.Instance.player2, 1));
-                    InputHandler.Instance.AddUpdateCommand(Keys.RightControl, new BlockCommand(GameWorld.Instance.player2));
-                }
-            }
-            else if (player.InputType == InputType.GamePad)
+            if (player != null)
             {
-                var index = player.GamePadIndex;
-                InputHandler.Instance.AddUpdateCommand(index, Buttons.LeftThumbstickLeft, new MoveCommand(player, new Vector2(-1, 0)));
-                InputHandler.Instance.AddUpdateCommand(index, Buttons.LeftThumbstickRight, new MoveCommand(player, new Vector2(1, 0)));
-                InputHandler.Instance.AddButtonDownCommand(index, Buttons.A, new JumpCommand(player));
-                InputHandler.Instance.AddButtonDownCommand(index, Buttons.X, new AttackCommand(player, 1));
-                InputHandler.Instance.AddButtonDownCommand(index, Buttons.B, new AttackCommand(player, 2));
-                InputHandler.Instance.AddButtonDownCommand(index, Buttons.Y, new AttackCommand(player, 3));
-                InputHandler.Instance.AddUpdateCommand(index, Buttons.LeftTrigger, new SpecialCommand(player, 1));
-                InputHandler.Instance.AddUpdateCommand(index, Buttons.RightTrigger, new BlockCommand(player));
+                if (player.InputType == InputType.Keyboard)
+                {
+                    if (this.gameObject == GameWorld.Instance.player1Go)
+                    {
+                        InputHandler.Instance.AddUpdateCommand(Keys.A, new MoveCommand(GameWorld.Instance.player1, new Vector2(-1, 0)));
+                        InputHandler.Instance.AddUpdateCommand(Keys.D, new MoveCommand(GameWorld.Instance.player1, new Vector2(1, 0)));
+                        InputHandler.Instance.AddButtonDownCommand(Keys.W, new JumpCommand(GameWorld.Instance.player1));
+                        InputHandler.Instance.AddButtonDownCommand(Keys.F, new AttackCommand(GameWorld.Instance.player1, 1));
+                        InputHandler.Instance.AddButtonDownCommand(Keys.G, new AttackCommand(GameWorld.Instance.player1, 2));
+                        InputHandler.Instance.AddButtonDownCommand(Keys.H, new AttackCommand(GameWorld.Instance.player1, 3));
+                        InputHandler.Instance.AddUpdateCommand(Keys.Q, new SpecialCommand(GameWorld.Instance.player1, 1));
+                        InputHandler.Instance.AddUpdateCommand(Keys.LeftShift, new BlockCommand(GameWorld.Instance.player1));
+
+                    }
+                    else if (this.gameObject == GameWorld.Instance.player2Go)
+                    {
+                        InputHandler.Instance.AddUpdateCommand(Keys.Left, new MoveCommand(GameWorld.Instance.player2, new Vector2(-1, 0)));
+                        InputHandler.Instance.AddUpdateCommand(Keys.Right, new MoveCommand(GameWorld.Instance.player2, new Vector2(1, 0)));
+                        InputHandler.Instance.AddButtonDownCommand(Keys.Up, new JumpCommand(GameWorld.Instance.player2));
+                        InputHandler.Instance.AddButtonDownCommand(Keys.OemComma, new AttackCommand(GameWorld.Instance.player2, 1));
+                        InputHandler.Instance.AddButtonDownCommand(Keys.OemPeriod, new AttackCommand(GameWorld.Instance.player2, 2));
+                        InputHandler.Instance.AddButtonDownCommand(Keys.OemMinus, new AttackCommand(GameWorld.Instance.player2, 3));
+                        InputHandler.Instance.AddUpdateCommand(Keys.RightShift, new SpecialCommand(GameWorld.Instance.player2, 1));
+                        InputHandler.Instance.AddUpdateCommand(Keys.RightControl, new BlockCommand(GameWorld.Instance.player2));
+                    }
+                }
+                else if (player.InputType == InputType.GamePad)
+                {
+                    var index = player.GamePadIndex;
+                    InputHandler.Instance.AddUpdateCommand(index, Buttons.LeftThumbstickLeft, new MoveCommand(player, new Vector2(-1, 0)));
+                    InputHandler.Instance.AddUpdateCommand(index, Buttons.LeftThumbstickRight, new MoveCommand(player, new Vector2(1, 0)));
+                    InputHandler.Instance.AddButtonDownCommand(index, Buttons.A, new JumpCommand(player));
+                    InputHandler.Instance.AddButtonDownCommand(index, Buttons.X, new AttackCommand(player, 1));
+                    InputHandler.Instance.AddButtonDownCommand(index, Buttons.B, new AttackCommand(player, 2));
+                    InputHandler.Instance.AddButtonDownCommand(index, Buttons.Y, new AttackCommand(player, 3));
+                    InputHandler.Instance.AddUpdateCommand(index, Buttons.LeftTrigger, new SpecialCommand(player, 1));
+                    InputHandler.Instance.AddUpdateCommand(index, Buttons.RightTrigger, new BlockCommand(player));
+                } 
             }
         }
 

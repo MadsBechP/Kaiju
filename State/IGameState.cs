@@ -29,5 +29,6 @@ namespace Kaiju.State
         /// Cleans up the state before transitioning to another game state.
         /// </summary>
         void Exit();
+        void OnControllerConnectionChanged(bool p1Connected, bool p2Connected);
     }
 }

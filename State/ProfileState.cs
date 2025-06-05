@@ -48,21 +48,6 @@ namespace Kaiju.State
 
             profiles = DatabaseManager.Instance.ListAllPlayerNames();
 
-            InputHandler.Instance.ClearBindings();
-            if (isPlayer1)
-            {
-                InputHandler.Instance.AddButtonDownCommand(Keys.W, new ChangeSelectionCommand(-1, this, true));
-                InputHandler.Instance.AddButtonDownCommand(Keys.S, new ChangeSelectionCommand(1, this, true));
-                InputHandler.Instance.AddButtonDownCommand(Keys.LeftControl, new ConfirmSelectionCommand(this, true));
-
-            }
-            else
-            {
-                InputHandler.Instance.AddButtonDownCommand(Keys.Up, new ChangeSelectionCommand(-1, this, false));
-                InputHandler.Instance.AddButtonDownCommand(Keys.Down, new ChangeSelectionCommand(1, this, false));
-                InputHandler.Instance.AddButtonDownCommand(Keys.RightShift, new ConfirmSelectionCommand(this, false));
-            }
-
             selectedStats = DatabaseManager.Instance.PrintPlayerStats(profiles[selectedIndex]);
             profiles.Add("Create new profile");
         }
@@ -145,7 +130,9 @@ namespace Kaiju.State
                 spriteBatch.DrawString(textFont, $"Losses: {selectedStats.Losses}", new Vector2(w * 0.50f, h * 0.45f), Color.White);
                 spriteBatch.DrawString(textFont, $"Draws: {selectedStats.Draws}", new Vector2(w * 0.50f, h * 0.50f), Color.White);
                 spriteBatch.DrawString(textFont, $"Win/Loss Ratio: {selectedStats.WinLossRatio}", new Vector2(w * 0.50f, h * 0.55f), Color.White);
-                spriteBatch.DrawString(textFont, $"Favorite Kaiju: {selectedStats.FavoriteCharacter}", new Vector2(w * 0.50f, h * 0.60f), Color.White);
+                spriteBatch.DrawString(textFont, $"KOs: {selectedStats.KOs}", new Vector2(w * 0.50f, h * 0.60f), Color.White);
+                spriteBatch.DrawString(textFont, $"KOd: {selectedStats.KOd}", new Vector2(w * 0.50f, h * 0.65f), Color.White);
+                spriteBatch.DrawString(textFont, $"Favorite Kaiju: {selectedStats.FavoriteCharacter}", new Vector2(w * 0.50f, h * 0.70f), Color.White);
             }
             else
             {
@@ -294,6 +281,42 @@ namespace Kaiju.State
                 return ' ';
             }
             return '\0';
+        }
+
+        public void OnControllerConnectionChanged(bool p1Connected, bool p2Connected)
+        {
+            InputHandler.Instance.ClearBindings();
+
+            if (p1Connected)
+            {
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.One, Buttons.LeftThumbstickUp, new ChangeSelectionCommand(-1, this, true));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.One, Buttons.LeftThumbstickDown, new ChangeSelectionCommand(1, this, true));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.One, Buttons.A, new ConfirmSelectionCommand(this, true));
+            }
+            else
+            {
+                InputHandler.Instance.AddButtonDownCommand(Keys.W, new ChangeSelectionCommand(-1, this, true));
+                InputHandler.Instance.AddButtonDownCommand(Keys.S, new ChangeSelectionCommand(1, this, true));
+                InputHandler.Instance.AddButtonDownCommand(Keys.LeftControl, new ConfirmSelectionCommand(this, true));
+            }
+
+            if (p2Connected)
+            {
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.Two, Buttons.LeftThumbstickUp, new ChangeSelectionCommand(-1, this, false));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.Two, Buttons.LeftThumbstickDown, new ChangeSelectionCommand(1, this, false));
+                InputHandler.Instance.AddButtonDownCommand(PlayerIndex.Two, Buttons.A, new ConfirmSelectionCommand(this, false));
+            }
+            else
+            {
+                InputHandler.Instance.AddButtonDownCommand(Keys.Up, new ChangeSelectionCommand(-1, this, false));
+                InputHandler.Instance.AddButtonDownCommand(Keys.Down, new ChangeSelectionCommand(1, this, false));
+                InputHandler.Instance.AddButtonDownCommand(Keys.RightShift, new ConfirmSelectionCommand(this, false));
+            }
+        }
+
+        public void ChangeToProfileState(bool isPlayer1)
+        {
+            
         }
     }
 }
