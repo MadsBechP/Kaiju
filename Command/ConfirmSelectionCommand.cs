@@ -10,7 +10,7 @@ namespace Kaiju.Command
     /// <summary>
     /// A command that confirms a player's current selection in a selectable state.
     /// Implements the ICommand interface.
-    /// Made by Emilie and Julius
+    /// Made by Emilie
     /// </summary>
     public class ConfirmSelectionCommand : ICommand
     {

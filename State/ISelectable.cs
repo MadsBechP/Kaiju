@@ -26,6 +26,10 @@ namespace Kaiju.State
         /// <param name="isPlayer1">Checks whether the selection is for player 1 (true) or player 2 (false)</param>
         void ConfirmSelection(bool isPlayer1);
 
+        /// <summary>
+        /// Changes the state of the game(Name is a bit misleading)
+        /// </summary>
+        /// <param name="isPlayer1">Checks whether the selection is for player 1 (true) or player 2 (false)</param>
         void ChangeToProfileState(bool isPlayer1);
     }
 }

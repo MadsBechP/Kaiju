@@ -10,7 +10,7 @@ namespace Kaiju.Command
     /// <summary>
     /// A command uses to change the current selection in a selectable game state.
     /// Implements the ICommand interface.
-    /// Made by Emilie and Julius
+    /// Made by Emilie
     /// </summary>
     public class ChangeSelectionCommand : ICommand
     {

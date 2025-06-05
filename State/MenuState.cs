@@ -249,7 +249,10 @@ namespace Kaiju.State
             }
         }
 
-        
+        /// <summary>
+        /// Changes to profile state when called
+        /// </summary>
+        /// <param name="isPlayer1">Checks whether the selection is for player 1 (true) or player 2 (false)</param>
         public void ChangeToProfileState(bool isPlayer1)
         {
             if (isPlayer1)
@@ -262,6 +265,11 @@ namespace Kaiju.State
             }
         }
 
+        /// <summary>
+        /// Changes between controller and keyboard controls when called
+        /// </summary>
+        /// <param name="p1Connected">If player 1 has a controller connected</param>
+        /// <param name="p2Connected">If player 2 has a controller connected</param>
         public void OnControllerConnectionChanged(bool p1Connected, bool p2Connected)
         {
             InputHandler.Instance.ClearBindings();
