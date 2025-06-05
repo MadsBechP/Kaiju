@@ -249,6 +249,7 @@ namespace Kaiju.State
             }
         }
 
+        
         public void ChangeToProfileState(bool isPlayer1)
         {
             if (isPlayer1)

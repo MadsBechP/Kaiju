@@ -19,12 +19,13 @@ namespace Kaiju.State
         /// <param name="direction">The direction to move the selection</param>
         /// <param name="isPlayer1">Checks whether the selection is for player 1 (true) or player 2 (false)</param>
         void ChangeSelection(int direction, bool isPlayer1);
-        void ChangeToProfileState(bool isPlayer1);
-
+        
         /// <summary>
         /// Confirms the current selection for the player 
         /// </summary>
         /// <param name="isPlayer1">Checks whether the selection is for player 1 (true) or player 2 (false)</param>
         void ConfirmSelection(bool isPlayer1);
+
+        void ChangeToProfileState(bool isPlayer1);
     }
 }
