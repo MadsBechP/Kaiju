@@ -10,9 +10,14 @@ using System.Threading.Tasks;
 
 namespace Kaiju.State
 {
+    /// <summary>
+    /// This is the game state where a player can selects and/or creates a profile before starting a battle.
+    /// The class handles profile creation logic and profile selection for both Player 1 and Player 2.
+    /// Made by Emilie
+    /// </summary>
     public class ProfileState : IGameState, ISelectable
     {
-        public Color DefaultBackgroundColor => Color.Black;
+        public Color DefaultBackgroundColor => Color.Gray;
 
         private GameWorld game;
         private bool isPlayer1;
@@ -29,6 +34,12 @@ namespace Kaiju.State
         private string errorMessage;
         private KeyboardState previousKeyState;
 
+        /// <summary>
+        /// Constructor
+        /// Makes a new instance of the ProfileState class, whit binding input controls and loading profiles.
+        /// </summary>
+        /// <param name="game">The current GameWorld instance</param>
+        /// <param name="isPlayer1">Checks which player it is. True = P1, False = P2</param>
         public ProfileState(GameWorld game, bool isPlayer1)
         {
             this.game = game;
@@ -42,9 +53,8 @@ namespace Kaiju.State
         }
 
         /// <summary>
-        /// Keeps checking if the player currently changing their profile have decided on a profile.
-        /// When P1 or P2 confirms their choice, the choice will be saved in GameWorld and the player
-        /// will go back to MenuState
+        /// Updates the current state.
+        /// keeps checking for if P1 or P2 have confirmed their choice of profile or is creating a new one.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
@@ -68,6 +78,11 @@ namespace Kaiju.State
             }
         }
 
+        /// <summary>
+        /// Draws profile selection and/or profile creation. 
+        /// This include the list of profiles and the current profiles statistics.
+        /// </summary>
+        /// <param name="spriteBatch">Used for drawing</param>
         public void Draw(SpriteBatch spriteBatch)
         {
             var w = game.GraphicsDevice.Viewport.Width;
@@ -125,16 +140,21 @@ namespace Kaiju.State
             }
         }
 
+        /// <summary>
+        /// Called when exiting the ProfileState. 
+        /// Unused.
+        /// </summary>
         public void Exit()
         {
 
         }
 
         /// <summary>
-        /// Scroll between the different profiles.
-        /// the stats will change to fit the selected profile.
+        /// Changes between the different profiles.
+        /// The stats will change to fit the selected profile.
+        /// When reaching past one end of the list, it loop back around to the other end.
         /// </summary>
-        /// <param name="direction"></param>
+        /// <param name="direction"> -1 is for up, 1 is for down </param>
         /// <param name="isPlayer1">A bool that checks if the player is P1. If not then it must be P2</param>
         public void ChangeSelection(int direction, bool isPlayer1)
         {
@@ -146,8 +166,10 @@ namespace Kaiju.State
         }
 
         /// <summary>
-        /// Player confirms their choice of profile.
+        /// Player confirms their currently selected profile.
         /// This method checks which player confirmed, which then activates Update.
+        /// If "Creating new profile" is selected, it will switch to profile creation mode.
+        /// Prevent both player from selecting the same profile.
         /// </summary>
         /// <param name="isPlayer1">A bool that tells which player is confirming</param>
         public void ConfirmSelection(bool isPlayer1)
@@ -186,7 +208,10 @@ namespace Kaiju.State
 
         /// <summary>
         /// Creates a new profile.
-        /// Uses the keyboard to type a profile name
+        /// Uses the keyboard to type a profile name.
+        /// Allows characters (letters, numbers and space), uses backspace to delete a character,
+        /// and confirms the new profile name with Enter.
+        /// Validate profile name. Does not allow use of unique characters or an empty name.
         /// </summary>
         public void CreatingProfile()
         {
@@ -231,13 +256,21 @@ namespace Kaiju.State
             }
         }
 
+        /// <summary>
+        /// Converts a keyboard key to its characters representation.
+        /// Can use uppercasing (A-Z), normal letters (a-z), numbers (0-9) and space.
+        /// Ignores unsupported keys.
+        /// </summary>
+        /// <param name="key">The pressed key</param>
+        /// <param name="keyboardState">Current state of the keyboard. Used to check for Shift</param>
+        /// <returns>The corresponding character, or '\0' if the key is not valid.</returns>
         private char KeyToChar(Keys key, KeyboardState keyboardState)
         {
             bool shift = keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift);
 
             if(key >= Keys.A && key <= Keys.Z)
             {
-                return (char)(shift ? key : key + 32); // A-Z -> a-z
+                return (char)(shift ? key : key + 32);
             }
             if(key >= Keys.D0 && key <= Keys.D9)
             {
@@ -247,9 +280,14 @@ namespace Kaiju.State
             {
                 return ' ';
             }
-            return '\0'; // returns a null character, or an empty charater
+            return '\0';
         }
 
+        /// <summary>
+        /// Changes between controller and keyboard controls when called
+        /// </summary>
+        /// <param name="p1Connected">If player 1 has a controller connected</param>
+        /// <param name="p2Connected">If player 2 has a controller connected</param>
         public void OnControllerConnectionChanged(bool p1Connected, bool p2Connected)
         {
             InputHandler.Instance.ClearBindings();
@@ -281,6 +319,10 @@ namespace Kaiju.State
             }
         }
 
+        /// <summary>
+        /// Changes to a different state when called
+        /// </summary>
+        /// <param name="isPlayer1">Checks whether the selection is for player 1 (true) or player 2 (false)</param>
         public void ChangeToProfileState(bool isPlayer1)
         {
             

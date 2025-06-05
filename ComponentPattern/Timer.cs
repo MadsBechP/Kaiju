@@ -4,6 +4,11 @@ using System;
 
 namespace Kaiju.ComponentPattern
 {
+    /// <summary>
+    /// A countdown timer component.
+    /// Displays remaining time in a MM:SS format and goes to the ending screen (VictoryState) when time runs out.
+    /// Made by Emilie
+    /// </summary>
     public class Timer : Component
     {
         private SpriteFont hudFont;
@@ -13,15 +18,28 @@ namespace Kaiju.ComponentPattern
 
         public bool TimeRanOut { get; private set; } = false;
 
+        /// <summary>
+        /// Constructer
+        /// </summary>
+        /// <param name="gameObject">The GameObject to attach the timer to</param>
         public Timer(GameObject gameObject) : base(gameObject)
         {
         }
 
+        /// <summary>
+        /// Called once when the timer is initialized.
+        /// Loads the font used to draw the timer text.
+        /// </summary>
         public override void Awake()
         {
             base.Awake();
             hudFont = GameWorld.Instance.Content.Load<SpriteFont>("HUDFont");
         }
+
+        /// <summary>
+        /// Updates the timer by reducing the remaining time.
+        /// When time is up, it will set TimeRanOut to true.
+        /// </summary>
         public override void Update()
         {
             base.Update();
@@ -36,6 +54,11 @@ namespace Kaiju.ComponentPattern
                 text = $"{time.Minutes:D2}:{time.Seconds:D2}";
             }
         }
+
+        /// <summary>
+        /// Draws the remaining timer in MM:SS format
+        /// </summary>
+        /// <param name="spriteBatch">Used to draw the timer</param>
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (!string.IsNullOrEmpty(text))

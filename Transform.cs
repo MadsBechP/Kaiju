@@ -4,6 +4,9 @@ using System;
 
 namespace Kaiju
 {
+    /// <summary>
+    /// Transform class that generalises position, scale and rotations for all gameobjects
+    /// </summary>
     public class Transform
     {
         public Vector2 Position { get; set; }
@@ -13,14 +16,28 @@ namespace Kaiju
         public float Rotation { get; set; }
         public Vector2 CurrentVelocity { get; set; }
 
+        /// <summary>
+        /// Adds velocity to a gameobject
+        /// </summary>
+        /// <param name="translation">The direction of the velocity</param>
         public void AddVelocity(Vector2 translation)
         {
             CurrentVelocity += translation;
         }
+
+        /// <summary>
+        /// Changes the position of the gameobject
+        /// </summary>
+        /// <param name="translation">The direction of the movement</param>
         public void Translate(Vector2 translation)
         {
             Position += translation;
         }
+
+        /// <summary>
+        /// calls the two collision translations
+        /// </summary>
+        /// <param name="col">The collider the gameobject collided with</param>
         public void Translate(Collider col)
         {
             TranslateX(col);

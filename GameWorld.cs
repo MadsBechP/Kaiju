@@ -265,6 +265,11 @@ namespace Kaiju
                 }
             }
         }
+        /// <summary>
+        /// Checks for stage collision
+        /// </summary>
+        /// <param name="col">Uses a collider</param>
+        /// <returns></returns>
         public bool CheckCollision(Collider col)
         {
 
@@ -283,6 +288,11 @@ namespace Kaiju
             }
             return false;
         }
+        /// <summary>
+        /// Checks for stage collision
+        /// </summary>
+        /// <param name="rect">Uses a rectangle</param>
+        /// <returns></returns>
         public bool CheckCollision(Rectangle rect)
         {
             foreach (GameObject go2 in gameObjects)

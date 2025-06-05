@@ -9,8 +9,9 @@ using System.Collections.Generic;
 namespace Kaiju.State
 {
     /// <summary>
-    /// BattleState keeps track of the creation of the battle scene. 
-    /// This include the player, timer and HUD 
+    /// BattleState manages the battle scene. 
+    /// This include creating the scene, handling the victory conditions, and setting up players, timer and HUD.
+    /// Made by Emilie
     /// </summary>
     public class BattleState : IGameState
     {
@@ -25,8 +26,14 @@ namespace Kaiju.State
         private List<GameObject> stateObjects = new List<GameObject>();
         private List<GameObject> UIObjects = new List<GameObject>();
 
-        public Color DefaultBackgroundColor => Color.LightSlateGray;
+        public Color DefaultBackgroundColor => Color.Gray;
 
+        /// <summary>
+        /// Constructor
+        /// Initialize a new instance of the BattleState class.
+        /// Sets up the stage, players, timer and HUD.
+        /// </summary>
+        /// <param name="game">The current GameWorld instance</param>
         public BattleState(GameWorld game)
         {
             this.game = game;
@@ -47,11 +54,13 @@ namespace Kaiju.State
             }
             game.Cleanup();
         }
+
+        /// <summary>
+        /// Called every frame to update game logic and check win conditions.
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
-
-            // If a timer has been found and the timer has run out, change to VictoryState
-
             bool player1Dead = game.player1.Lives <= 0;
             bool player2Dead = game.player2.Lives <= 0;
 
@@ -69,7 +78,6 @@ namespace Kaiju.State
                 string char1 = name1;
                 string char2 = name2;
 
-                //Update at somepoint for the "player1" and 2 to be the actual playerprofiles
                 if (player1Lives == player2Lives)
                 {
                     DatabaseManager.Instance.RecordMatchResult($"{game.SelectedPlayerProfileP1}", false, true, char1, p1KosGiven, p1KosTaken);
@@ -95,6 +103,9 @@ namespace Kaiju.State
             GameWorld.Instance.camera.MoveToward((float)gameTime.ElapsedGameTime.TotalMilliseconds);
         }
 
+        /// <summary>
+        /// Loads the content for player HUD based on the selected character.
+        /// </summary>
         private void LoadContent()
         {
             background = game.Content.Load<Texture2D>("City");
@@ -130,7 +141,11 @@ namespace Kaiju.State
             }
         }
 
-
+        /// <summary>
+        /// Sets up the HUD elements for both players.
+        /// Adds them to the UI game object list.
+        /// Sets them to subjects (the observer). 
+        /// </summary>
         private void HUDSetup()
         {
             var width = game.GraphicsDevice.Viewport.Width;
@@ -139,15 +154,13 @@ namespace Kaiju.State
             GameObject player1DamageMeterGo = new GameObject();
             var playerDamageMeter = player1DamageMeterGo.AddComponent<DamageMeter>();
 
-            //Note: HUD bliver placeres som en procentdel af skærmens bredde og højde
-
             playerDamageMeter.Setup(
                 name1,
                 player1Profile,
-                new Vector2(width * 0.145f, height * 0.895f), // damageFontPos: 14.5% fra venster, 89.5% ned
-                new Vector2(width * 0.14f, height * 0.956f), // namePos: 14% fra venstre, 95.6% ned
-                new Vector2(width * 0.05f, height * 0.85f), // hudPos: 5% fra venstre, 85% ned
-                new Vector2(width * 0.067f, height * 0.88f) // profilePos: 6.7% fra venstre, 88% ned
+                new Vector2(width * 0.145f, height * 0.895f), // damageFontPos
+                new Vector2(width * 0.14f, height * 0.956f), // namePos
+                new Vector2(width * 0.05f, height * 0.85f), // hudPos
+                new Vector2(width * 0.067f, height * 0.88f) // profilePos
                );
 
             GameObject player2DamageMeterGo = new GameObject();
@@ -155,10 +168,10 @@ namespace Kaiju.State
             player2DamageMeter.Setup(
                 name2,
                 player2Profile,
-                new Vector2(width * 0.844f, height * 0.895f), // damageFontPos: 89.4% fra venstre, 89.5% ned 
-                new Vector2(width * 0.845f, height * 0.956f), // namePos: 84.4% fra venstre, 95.6% ned
-                new Vector2(width * 0.75f, height * 0.85f), // hudPos: 75% fra venstre, 85% ned
-                new Vector2(width * 0.775f, height * 0.883f) // profilePos: 77.5% fra venstre, 88.3% ned
+                new Vector2(width * 0.844f, height * 0.895f), // damageFontPos 
+                new Vector2(width * 0.845f, height * 0.956f), // namePos
+                new Vector2(width * 0.75f, height * 0.85f), // hudPos
+                new Vector2(width * 0.775f, height * 0.883f) // profilePos
                );
 
 
@@ -172,8 +185,12 @@ namespace Kaiju.State
             player2DamageMeter.SetSubject(game.player2);
         }
 
+        /// <summary>
+        /// Creates both player objects based on character selection.
+        /// </summary>
         public void CreatePlayers()
         {
+            // Player 1
             game.player1Go = new GameObject();
             if (game.SelectedPlayerProfileP1 == "AI")
             {
@@ -189,12 +206,11 @@ namespace Kaiju.State
             game.player1.collider = game.player1Go.AddComponent<Collider>();
             game.player1.stageCollider = game.player1Go.AddComponent<Collider>(game.player1);
             game.player1Go.AddComponent<Animator>();
-            //game.player1.chr = game.player1Go.AddComponent<Godzilla>();
             game.player1.chr = CreateCharacter(game.player1Go, game.SelectedCharacterNameP1, out name1, true);
-
-
+            
             stateObjects.Add(game.player1Go);
 
+            // Player 2
             game.player2Go = new GameObject();
             if (game.SelectedPlayerProfileP2 == "AI")
             {
@@ -210,11 +226,14 @@ namespace Kaiju.State
             game.player2.collider = game.player2Go.AddComponent<Collider>();
             game.player2.stageCollider = game.player2Go.AddComponent<Collider>(game.player2);
             game.player2Go.AddComponent<Animator>();
-            //game.player2.chr = game.player2Go.AddComponent<Gigan>();
             game.player2.chr = CreateCharacter(game.player2Go, game.SelectedCharacterNameP2, out name2, false);
 
             stateObjects.Add(game.player2Go);
         }
+
+        /// <summary>
+        /// Creates the timer object and adds it to the UI.
+        /// </summary>
         public void CreateTimer()
         {
             GameObject timerGo = new GameObject();
@@ -223,6 +242,10 @@ namespace Kaiju.State
             UIObjects.Add(timerGo);
 
         }
+
+        /// <summary>
+        /// Creates the stage with its components
+        /// </summary>
         public void CreateStage()
         {
             game.stageGo = new GameObject();
@@ -231,13 +254,15 @@ namespace Kaiju.State
             game.stageGo.AddComponent<Stage>();
             stateObjects.Add(game.stageGo);
         }
+
         /// <summary>
-        /// Creates the character the player(s) chose in Menu
+        /// Creates the character component for a player, based on the selected name.
+        /// It also returns the characters name.
         /// </summary>
         /// <param name="go"> the players gameobject </param>
-        /// <param name="name"> the name of the wanted character </param>
-        /// <param name="characterName"> used to return the actual name of the chosen character</param>
-        /// <returns></returns>
+        /// <param name="name"> the name of the selected character </param>
+        /// <param name="characterName"> sets to the actual name of the character</param>
+        /// <returns>the created character component</returns>
         private Character CreateCharacter(GameObject go, string name, out string characterName, bool isPlayer1)
         {
             if (string.IsNullOrEmpty(name))
@@ -260,7 +285,14 @@ namespace Kaiju.State
                     return go.AddComponent<Godzilla>();
             }
         }
+        
         private static Random rnd = new Random();
+        /// <summary>
+        /// Randomly chooses between character and return the chosen one.
+        /// </summary>
+        /// <param name="go">the gameobject to attach the character to.</param>
+        /// <param name="name">gives and sets the actual name of the randomly selected character.</param>
+        /// <returns>the created character component.</returns>
         private Character GetRandomCharacter(GameObject go, out string name)
         {
             if (rnd.Next(2) == 0)
@@ -274,6 +306,11 @@ namespace Kaiju.State
                 return go.AddComponent<Gigan>();
             }
         }
+
+        /// <summary>
+        /// Draws the background and any custom effects (like shields).
+        /// </summary>
+        /// <param name="spriteBatch">used to draw</param>
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(background,
@@ -288,6 +325,9 @@ namespace Kaiju.State
             GameWorld.Instance.player2.DrawShield(spriteBatch);
         }
 
+        /// <summary>
+        /// When exiting, cleans up all objects created during the battle.
+        /// </summary>
         public void Exit()
         {
             foreach (var obj in stateObjects)

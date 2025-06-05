@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 namespace Kaiju.State
 {
     /// <summary>
-    /// This class holds the logic of the Menu screen.
-    /// In the Menu, the player choose which character they want to play as,
-    /// and is able to create a player profile that saves the count of the players
-    /// win and loses.
+    /// This class is the menu state of the game.
+    /// Allows the player(s) to choose character and profile.
+    /// Handles navigation controls, character selection, and transition to battle or profile state.
+    /// Made by Emilie
     /// </summary>
     public class MenuState : IGameState, ISelectable
     {
@@ -24,6 +24,12 @@ namespace Kaiju.State
         private SpriteFont promptFont;
         private string promptText;
         private Vector2 promptPosition;
+
+        private SpriteFont keyMapFont;
+        private string textKeyMapP1;
+        private string textKeyMapP2;
+        private Vector2 textKMP1Pos;
+        private Vector2 textKMP2Pos;
 
         private List<CharacterProfile> profiles = new List<CharacterProfile>();
         
@@ -54,7 +60,12 @@ namespace Kaiju.State
         private string selectedProfileP1;
         private string selectedProfileP2;
 
-
+        /// <summary>
+        /// Constructor
+        /// Creates a new MenuState instance.
+        /// Initialize input command bindings, assets, and position for character profile as well as text guide for the keys 
+        /// </summary>
+        /// <param name="game">The main game instance</param>
         public MenuState (GameWorld game)
         {
             this.game = game;
@@ -71,6 +82,17 @@ namespace Kaiju.State
             playerProfileFont = game.Content.Load<SpriteFont>("Menu\\PlayerProfileFont");
             p1Name = "DefaultName";
             p2Name = "DefaultName";
+
+            keyMapFont = game.Content.Load<SpriteFont>("Menu\\keyMapFont");
+            textKeyMapP1 = "P1 Controls (Red)\n\n" +
+                "Switching between kaiju:\n A/D\n\n" +
+                "Confirm choice:\n Left Control\n\n" +
+                "Chose profile:\n X\n\n\n" +
+                "P2 Controls (Blue)\n\n" +
+                "Switching between kaiju:\n Arrow Keys\n\n" +
+                "Confirm choice:\n Right Shift\n\n" +
+                "Chose profile:\n M";            
+            textKMP1Pos = new Vector2(w * 0.03f, h * 0.25f);                        
 
             // Load texture
             gzTexture = game.Content.Load<Texture2D>("Menu\\GZMenuProfile");
@@ -95,11 +117,19 @@ namespace Kaiju.State
 
         }
 
+        /// <summary>
+        /// Draws all menu elements.
+        /// Highlights currently selected character for both players in different colors.
+        /// </summary>
+        /// <param name="spriteBatch">Used to draw</param>
         public void Draw(SpriteBatch spriteBatch)
         {
             // Draw title text
             Vector2 promOrigin = promptFont.MeasureString(promptText) / 2;
             spriteBatch.DrawString(promptFont, promptText, promptPosition, Color.OrangeRed, 0, promOrigin, 1, SpriteEffects.None, 1);
+
+            //Draw text that show how to navigate
+            spriteBatch.DrawString(keyMapFont, textKeyMapP1, textKMP1Pos, Color.White);
 
             //player profile
             spriteBatch.Draw(playerProfileTexture, p1ProfilePos, null, Color.White, 0, ppOrigin, 1.4f, SpriteEffects.None, 1);
@@ -149,6 +179,11 @@ namespace Kaiju.State
            
         }        
         
+        /// <summary>
+        /// Updates on selected player profile for both players, handling input,
+        /// and transition to BattleState or ProfileState.
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
             InputHandler.Instance.Execute();
@@ -164,11 +199,21 @@ namespace Kaiju.State
             }
         }
 
+        /// <summary>
+        /// Called when exiting the ProfileState. 
+        /// Unused.
+        /// </summary>
         public void Exit()
         {
 
         }
 
+        /// <summary>
+        /// Scroll between the different character profiles.
+        /// If it reach one end of the list it will loop over to the other end.
+        /// </summary>
+        /// <param name="direction"> -1 for left, 1 for right </param>
+        /// <param name="isPlayer1">checks if it is player 1 (true) or player 2 (false)</param>
         public void ChangeSelection(int direction, bool isPlayer1)
         {
             if(isPlayer1 && !player1Confirmed)
@@ -185,7 +230,13 @@ namespace Kaiju.State
                 if (selectedIndexP2 >= profiles.Count) { selectedIndexP2 = 0; }
             }
             
-        } 
+        }
+
+        /// <summary>
+        /// Player confirms their selected character.
+        /// When both has confirmed, Update will transition the game to the battle.
+        /// </summary>
+        /// <param name="isPlayer1">checks if it is player 1 (true) or player 2 (false) confirming</param>
         public void ConfirmSelection(bool isPlayer1)
         {            
             if (isPlayer1)
@@ -198,6 +249,10 @@ namespace Kaiju.State
             }
         }
 
+        /// <summary>
+        /// Changes to profile state when called
+        /// </summary>
+        /// <param name="isPlayer1">Checks whether the selection is for player 1 (true) or player 2 (false)</param>
         public void ChangeToProfileState(bool isPlayer1)
         {
             if (isPlayer1)
@@ -210,6 +265,11 @@ namespace Kaiju.State
             }
         }
 
+        /// <summary>
+        /// Changes between controller and keyboard controls when called
+        /// </summary>
+        /// <param name="p1Connected">If player 1 has a controller connected</param>
+        /// <param name="p2Connected">If player 2 has a controller connected</param>
         public void OnControllerConnectionChanged(bool p1Connected, bool p2Connected)
         {
             InputHandler.Instance.ClearBindings();
