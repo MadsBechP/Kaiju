@@ -30,7 +30,7 @@ namespace Kaiju.ComponentPattern
         private ISubject subject;
 
         /// <summary>
-        /// Ininitialize a new instance of the DamageMeter class.
+        /// Constructer
         /// </summary>
         /// <param name="gameObject">The GameObject the component is attached to</param>
         public DamageMeter(GameObject gameObject) : base(gameObject)

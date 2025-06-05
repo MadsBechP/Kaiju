@@ -19,7 +19,7 @@ namespace Kaiju.ComponentPattern
         public bool TimeRanOut { get; private set; } = false;
 
         /// <summary>
-        /// Initialize a new instance of the timer.
+        /// Constructer
         /// </summary>
         /// <param name="gameObject">The GameObject to attach the timer to</param>
         public Timer(GameObject gameObject) : base(gameObject)

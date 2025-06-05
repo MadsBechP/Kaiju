@@ -486,7 +486,7 @@ namespace Kaiju.ComponentPattern
         /// </summary>
         public void Notify()
         {
-            Debug.WriteLine($"{this} Notifying {observers.Count} observers."); //tjek om Notify bliver kaldt og sender vider til observer
+            Debug.WriteLine($"{this} Notifying {observers.Count} observers.");
             foreach (var observer in observers)
             {
                 observer.Updated();
