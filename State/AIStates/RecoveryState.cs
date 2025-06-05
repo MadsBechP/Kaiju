@@ -6,17 +6,20 @@ namespace Kaiju.State.AIStates
     public class RecoveryState : IState<AI>
     {
         public AI parrent;
-        public Player opponent;
 
         Vector2 Pos { get { return parrent.gameObject.Transform.Position; } }
-        Vector2 OPos { get { return opponent.gameObject.Transform.Position; } }
 
+        /// <summary>
+        /// Gets reference to owner
+        /// </summary>
+        /// <param name="parrent"></param>
         public void Enter(AI parrent)
         {
             this.parrent = parrent;
-            opponent = parrent.opponent;
         }
-
+        /// <summary>
+        /// Runs towards the stages center
+        /// </summary>
         public void Execute()
         {
             if (Pos.X > (GameWorld.Instance.Graphics.PreferredBackBufferWidth / 2) + 500)

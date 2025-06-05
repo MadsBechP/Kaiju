@@ -10,6 +10,9 @@ namespace Kaiju.ComponentPattern
         {
         }
 
+        /// <summary>
+        /// Gets stage sprite and sets scale/position
+        /// </summary>
         public override void Start()
         {
             sr = gameObject.GetComponent<SpriteRenderer>() as SpriteRenderer;

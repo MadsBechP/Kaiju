@@ -25,7 +25,7 @@ namespace Kaiju.ComponentPattern
 
 
 
-        public Player opponent { get; private set; }
+        public Player Opponent { get; private set; }
 
 
 
@@ -56,19 +56,18 @@ namespace Kaiju.ComponentPattern
                 swipebeam = new AttackCommand(this, 6);
                 special = new SpecialCommand(this, 2);
             }
-                kick = new AttackCommand(this, 1);
 
             gameObject.Transform.Scale = new Vector2(2f, 2f);
 
             // gets reference to self and opponent
             if (gameObject == GameWorld.Instance.player1Go)
             {
-                opponent = GameWorld.Instance.player2;
+                Opponent = GameWorld.Instance.player2;
 
             }
             if (gameObject == GameWorld.Instance.player2Go)
             {
-                opponent = GameWorld.Instance.player1;
+                Opponent = GameWorld.Instance.player1;
             }
             ChangeGameState(new IdleState());
             speed = 300;
@@ -82,8 +81,10 @@ namespace Kaiju.ComponentPattern
             base.Start();
 
             // starts ai recovery check thread
-            Thread aiLogic = new(AILoop);
-            aiLogic.IsBackground = true;
+            Thread aiLogic = new(AILoop)
+            {
+                IsBackground = true
+            };
             aiLogic.Start();
 
         }
@@ -100,7 +101,7 @@ namespace Kaiju.ComponentPattern
             }
         }
         /// <summary>
-        /// checks if the ai is at the edge 5 times every second. if it is, goes to recoverystate 
+        /// Checks if the ai is at the edge 5 times every second. if it is, goes to recoverystate 
         /// </summary>
         private void AILoop()
         {

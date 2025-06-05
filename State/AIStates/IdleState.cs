@@ -13,12 +13,19 @@ namespace Kaiju.State.AIStates
         Vector2 Pos { get { return parrent.gameObject.Transform.Position; } }
         Vector2 OPos { get { return opponent.gameObject.Transform.Position; } }
 
+        /// <summary>
+        /// Gets refrences to owner and opponent
+        /// </summary>
+        /// <param name="parrent"></param>
         public void Enter(AI parrent)
         {
             this.parrent = parrent;
-            opponent = parrent.opponent;
+            opponent = parrent.Opponent;
         }
 
+        /// <summary>
+        /// Does a random attack if opponent is close enough, otherwise changes to chase
+        /// </summary>
         public void Execute()
         {
             if (Vector2.Distance(Pos, OPos) > 200)
